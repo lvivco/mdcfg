@@ -1,0 +1,34 @@
+engine:
+  type: [electric, gas, diesel]
+  drive: [4WD, 2WD]
+
+available-colors:
+  any@: [white, black]
+  model@bmw: [white, black, blue, metalic]
+  model@ford:
+    any@: [black, metalic]
+    cat@crossover: [white, black, metalic, gray]
+
+horsepower:
+  any@: 400
+  model@bmw:
+    drive@4WD: 500
+  model@[toyota, ford]:
+    drive@4WD: 350
+    drive@2WD: 300
+
+price:
+  model@bmw:
+    any@: 45000
+    addin*@[leather-seats, panoramic-roof]: 55000
+  model@toyota:
+    any@: 30000
+    addin*@leather-seats: 35000
+  model@ford: 28000
+
+offroad:
+  clearance@[..12]: false
+  clearance@[!12..17, 19, 20]: true
+  clearance@[!20..]: true
+
+options: {"parktronic": true, "cruise-control": false, "lights": "led"}

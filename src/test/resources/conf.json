@@ -1,0 +1,11 @@
+{
+  "property": {
+    "any@": false,
+    "ps1@val1": {
+      "ps3@val2": true
+    },
+    "ps2@[..1]": true,
+    "ps2@[1..5]": true,
+    "ps2@[8..10]": true
+  }
+}
