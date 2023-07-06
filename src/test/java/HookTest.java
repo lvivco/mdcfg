@@ -2,12 +2,14 @@ import com.mdcfg.builder.MdcBuilder;
 import com.mdcfg.exceptions.MdcException;
 import com.mdcfg.provider.MdcContext;
 import com.mdcfg.provider.MdcOptional;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HookTest {
 
@@ -24,14 +26,14 @@ public class HookTest {
                 })
                 .build().getOptional();
 
-        Assert.assertEquals(18, count.get());
+        assertEquals(18, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
 
-        Assert.assertTrue(provider.getString(context, "price").orElse("").contains("_all"));
-        Assert.assertTrue(provider.getString(context, "available-colors").orElse("").contains("_all"));
-        Assert.assertTrue(provider.getString(context, "horsepower").orElse("").contains("_all"));
+        assertTrue(provider.getString(context, "price").orElse("").contains("_all"));
+        assertTrue(provider.getString(context, "available-colors").orElse("").contains("_all"));
+        assertTrue(provider.getString(context, "horsepower").orElse("").contains("_all"));
     }
 
     @Test
@@ -45,11 +47,11 @@ public class HookTest {
                 })
                 .build().getOptional();
 
-        Assert.assertEquals(5, count.get());
+        assertEquals(5, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
-        Assert.assertEquals(Integer.valueOf(450000), provider.getInteger(context, "price").orElse(0));
+        assertEquals(Integer.valueOf(450000), provider.getInteger(context, "price").orElse(0));
     }
 
     @Test
@@ -63,12 +65,12 @@ public class HookTest {
                 })
                 .build().getOptional();
 
-        Assert.assertEquals(4, count.get());
+        assertEquals(4, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
         context.put("drive", "4WD");
-        Assert.assertEquals(Integer.valueOf(5000), provider.getInteger(context, "horsepower").orElse(0));
+        assertEquals(Integer.valueOf(5000), provider.getInteger(context, "horsepower").orElse(0));
     }
 
     @Test
@@ -81,6 +83,6 @@ public class HookTest {
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
-        Assert.assertEquals(Integer.valueOf(40000), provider.getInteger(context, "horsepower").orElse(0));
+        assertEquals(Integer.valueOf(40000), provider.getInteger(context, "horsepower").orElse(0));
     }
 }
