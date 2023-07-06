@@ -20,7 +20,7 @@ public class PropertyProcessor {
     private static final String RANGE_SIGN = "..";
     private static final String ANY = "any";
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("\\s|\\[|]");
-    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile(",|\\.\\.");
+    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
 
 
@@ -126,22 +126,23 @@ public class PropertyProcessor {
     }
 
     private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
-        if(selector.contains(RANGE_SIGN)){
+        if (selector.contains(RANGE_SIGN)) {
             // numeric ranges
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             int index = selector.indexOf(RANGE_SIGN);
-            String min = null;
-            String max = null;
-            if(index > 0){
-                min = selector.substring(0, index);
+            if ((selector.length() - 1) / 2 > index) {
+                for (String max : List.of(selector.substring(index + RANGE_SIGN.length()).split(","))) {
+                    ranges.add(new Range(dimension, selector.substring(0, index), max));
+                }
+            } else {
+                for (String min : List.of(selector.substring(0, index).split(","))) {
+                    ranges.add(new Range(dimension, min, selector.substring(index + RANGE_SIGN.length())));
+                }
             }
-            if(index < selector.length() - RANGE_SIGN.length()){
-                max = selector.substring(index + RANGE_SIGN.length());
-            }
-            ranges.add(new Range(dimension, min, max));
+
             selector = "(\\d|\\.)*";
 
-        } else if(selector.contains("[")) {
+        } else if (selector.contains("[")) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             selector = COMMA_PATTERN.matcher(selector).replaceAll("|");

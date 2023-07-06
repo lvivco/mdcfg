@@ -58,4 +58,15 @@ public class Range {
         boolean maxMatch = maxInclusive ? value <= max : value < max;
         return minMatch && maxMatch;
     }
+
+    @Override
+    public String toString() {
+        return "Range{" +
+                "dimension=" + dimension +
+                ", min=" + min +
+                ", minInclusive=" + minInclusive +
+                ", max=" + max +
+                ", maxInclusive=" + maxInclusive +
+                '}';
+    }
 }

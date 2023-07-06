@@ -28,7 +28,10 @@ price:
 
 offroad:
   clearance@[..12]: false
-  clearance@[!12..17, 19, 20]: true
   clearance@[!20..]: true
+  clearance@[!12..17, 19, 20]: true
+  clearance@[..17, 19, 20]: true
+  clearance@[17, 19, 33 ..66]: true
+  clearance@[17, 19, 33..]: true
 
 options: {"parktronic": true, "cruise-control": false, "lights": "led"}
