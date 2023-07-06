@@ -11,6 +11,7 @@ public class Property {
 
     private final String name;
     private final Map<String, Dimension> dimensions;
+
     private final List<Chain> chains;
 
     public Property(String name, Map<String, Dimension> dimensions, List<Chain> chains) {
@@ -21,6 +22,10 @@ public class Property {
 
     public String getName() {
         return name;
+    }
+
+    public List<Chain> getChains() {
+        return chains;
     }
 
     public String getString(MdcContext context) {

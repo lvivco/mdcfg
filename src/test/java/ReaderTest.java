@@ -23,6 +23,5 @@ public class ReaderTest {
         MdcProvider provider = MdcBuilder.withJson(new File(getClass().getResource(JSON_PATH).getPath()).getPath())
                 .autoReload()
                 .build();
-
     }
 }

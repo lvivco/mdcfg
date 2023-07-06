@@ -26,9 +26,4 @@ price:
     addin*@leather-seats: 35000
   model@ford: 28000
 
-#offroad:
-#  clearance@[..12]: false
-#  clearance@[!12..17, 19, 20]: true
-# clearance@[!20..]: true
-
 options: {"parktronic": true, "cruise-control": false, "lights": "led"}

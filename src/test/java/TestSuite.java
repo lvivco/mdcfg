@@ -4,7 +4,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
-        ReaderTest.class
+        ReaderTest.class,
+        HookTest.class
 })
 public class TestSuite {
 }
