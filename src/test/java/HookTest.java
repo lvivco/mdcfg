@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class HookTest {
 
-    private static final String YAML_PATH = Objects.requireNonNull(ReaderTest.class.getResource("/hook/conf.yaml")).getPath();
+    private static final String YAML_PATH = Objects.requireNonNull(ReaderTest.class.getResource("conf.yaml")).getPath();
 
     @Test
     public void testHookToAllProps() throws MdcException {
