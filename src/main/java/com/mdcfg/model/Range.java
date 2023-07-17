@@ -5,6 +5,7 @@ import com.mdcfg.utils.ProviderUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Range {
 
@@ -58,6 +59,21 @@ public class Range {
         boolean maxMatch = maxInclusive ? value <= max : value < max;
         return minMatch && maxMatch;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Range)) return false;
+        Range range = (Range) o;
+        return Double.compare(range.min, min) == 0 && minInclusive == range.minInclusive && Double.compare(range.max, max) == 0 && maxInclusive == range.maxInclusive && dimension.equals(range.dimension);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dimension, min, minInclusive, max, maxInclusive);
+    }
+
+
 
     @Override
     public String toString() {
