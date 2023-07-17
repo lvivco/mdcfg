@@ -12,7 +12,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # 17,5 - scheduled to run at 19:00 and 07:00 on Kyiv timezone.
-    - cron: '*/5 * * * *'
+    - cron: '0 17,5 * * *'
   push:
     branches: [ "master" ]
   pull_request:
