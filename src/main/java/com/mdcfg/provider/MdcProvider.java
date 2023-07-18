@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MdcProvider {
@@ -23,6 +24,7 @@ public class MdcProvider {
     private static final Function<String, Long> TO_LONG = Long::parseLong;
     private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
+    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
 
     private final MdcOptional optional;
     private final Processor processor;
@@ -117,7 +119,9 @@ public class MdcProvider {
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter){
         Property property = properties.get(key);
         if(property != null){
-            return Arrays.stream(property.getString(context).split(","))
+            return Arrays.stream(LIST_SIGN_PATTERN.matcher(property.getString(context))
+                        .replaceAll("")
+                        .split(","))
                     .map(StringUtils::trim)
                     .map(converter)
                     .collect(Collectors.toList());
