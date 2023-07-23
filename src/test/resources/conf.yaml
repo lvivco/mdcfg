@@ -11,7 +11,9 @@ available-colors:
 
 horsepower:
   any@: 400
+  model@fiat: 380
   model@bmw:
+    any@: 480
     drive@4WD: 500
   model@[toyota, ford]:
     drive@4WD: 350
