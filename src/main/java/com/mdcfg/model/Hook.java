@@ -1,24 +1,24 @@
 package com.mdcfg.model;
 
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 public class Hook {
     private final Pattern pattern;
-    private final Consumer<Chain> consumer;
+    private final UnaryOperator<String> func;
 
-    public Hook(Pattern pattern, Consumer<Chain> consumer) {
+    public Hook(Pattern pattern, UnaryOperator<String> func) {
         this.pattern = pattern;
-        this.consumer = consumer;
+        this.func = func;
     }
 
     public Pattern getPattern() {
         return pattern;
     }
 
-    public Consumer<Chain> getConsumer() {
-        return consumer;
+    public UnaryOperator<String> getFunction() {
+        return func;
     }
 
     @Override
@@ -26,11 +26,11 @@ public class Hook {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Hook hook = (Hook) o;
-        return pattern.equals(hook.pattern) && consumer.equals(hook.consumer);
+        return pattern.equals(hook.pattern) && func.equals(hook.func);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pattern, consumer);
+        return Objects.hash(pattern, func);
     }
 }

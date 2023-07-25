@@ -21,9 +21,9 @@ public class HookTest {
         AtomicInteger count = new AtomicInteger();
         MdcOptional provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
-                .loadHook((chain) -> {
+                .loadHook((v) -> {
                     count.getAndIncrement();
-                    chain.setValue(chain.getValue() + "_all");
+                    return v + "_all";
                 })
                 .build().getOptional();
 
@@ -42,9 +42,9 @@ public class HookTest {
         AtomicInteger count = new AtomicInteger();
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
-                .loadHook("price", (chain) -> {
+                .loadHook("price", v -> {
                     count.getAndIncrement();
-                    chain.setValue(chain.getValue() + "0");
+                    return v + "0";
                 })
                 .build();
 
@@ -60,9 +60,9 @@ public class HookTest {
         AtomicInteger count = new AtomicInteger();
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
-                .loadHook(Pattern.compile("^h.+r$"), (chain) -> {
+                .loadHook(Pattern.compile("^h.+r$"), v -> {
                     count.getAndIncrement();
-                    chain.setValue(chain.getValue() + "0");
+                    return v + "0";
                 })
                 .build();
 
@@ -78,8 +78,8 @@ public class HookTest {
     public void testTwoHooks() throws MdcException {
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
-                .loadHook(Pattern.compile("^h.+r$"), (chain) -> chain.setValue(chain.getValue() + "0"))
-                .loadHook("horsepower", (chain) -> chain.setValue(chain.getValue() + "0"))
+                .loadHook(Pattern.compile("^h.+r$"), v -> v + "0")
+                .loadHook("horsepower", v -> v + "0")
                 .build();
 
         MdcContext context = new MdcContext();

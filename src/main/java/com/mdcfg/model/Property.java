@@ -24,10 +24,6 @@ public class Property {
         return name;
     }
 
-    public List<Chain> getChains() {
-        return chains;
-    }
-
     public String getString(MdcContext context) {
         String compare = createCompareString(context);
         for (Chain chain : chains) {
