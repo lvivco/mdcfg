@@ -2,6 +2,7 @@ import com.mdcfg.builder.MdcBuilder;
 import com.mdcfg.exceptions.MdcException;
 import com.mdcfg.provider.MdcContext;
 import com.mdcfg.provider.MdcOptional;
+import com.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import java.util.Objects;
@@ -39,50 +40,50 @@ public class HookTest {
     @Test
     public void testHookExactMatch() throws MdcException {
         AtomicInteger count = new AtomicInteger();
-        MdcOptional provider = MdcBuilder.withYaml(YAML_PATH)
+        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
                 .loadHook("price", (chain) -> {
                     count.getAndIncrement();
                     chain.setValue(chain.getValue() + "0");
                 })
-                .build().getOptional();
+                .build();
 
         assertEquals(5, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
-        assertEquals(Integer.valueOf(450000), provider.getInteger(context, "price").orElse(0));
+        assertEquals(Integer.valueOf(450000), provider.getInteger(context, "price"));
     }
 
     @Test
     public void testHookPattern() throws MdcException {
         AtomicInteger count = new AtomicInteger();
-        MdcOptional provider = MdcBuilder.withYaml(YAML_PATH)
+        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
                 .loadHook(Pattern.compile("^h.+r$"), (chain) -> {
                     count.getAndIncrement();
                     chain.setValue(chain.getValue() + "0");
                 })
-                .build().getOptional();
+                .build();
 
         assertEquals(4, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
         context.put("drive", "4WD");
-        assertEquals(Integer.valueOf(5000), provider.getInteger(context, "horsepower").orElse(0));
+        assertEquals(Integer.valueOf(5000), provider.getInteger(context, "horsepower"));
     }
 
     @Test
     public void testTwoHooks() throws MdcException {
-        MdcOptional provider = MdcBuilder.withYaml(YAML_PATH)
+        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
                 .loadHook(Pattern.compile("^h.+r$"), (chain) -> chain.setValue(chain.getValue() + "0"))
                 .loadHook("horsepower", (chain) -> chain.setValue(chain.getValue() + "0"))
-                .build().getOptional();
+                .build();
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
-        assertEquals(Integer.valueOf(40000), provider.getInteger(context, "horsepower").orElse(0));
+        assertEquals(Integer.valueOf(40000), provider.getInteger(context, "horsepower"));
     }
 }
