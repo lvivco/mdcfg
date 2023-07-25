@@ -31,11 +31,4 @@ public class Processor {
         }
         return properties;
     }
-
-    /*private void applyLoadHooks(Property property) {
-        loadHooks.stream()
-                .filter(hook -> hook.getPattern().matcher(property.getName()).matches())
-                .forEach(hook -> property.getChains()
-                        .forEach(chain -> hook.getConsumer().accept(chain)));
-    }*/
 }
