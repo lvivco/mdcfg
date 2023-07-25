@@ -1,12 +1,17 @@
 package com.mdcfg.builder;
 
 import com.mdcfg.exceptions.MdcException;
+import com.mdcfg.model.Hook;
 import com.mdcfg.provider.MdcProvider;
-import com.mdcfg.source.Source;
 import com.mdcfg.source.JsonSource;
+import com.mdcfg.source.Source;
 import com.mdcfg.source.YamlSource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 public class MdcBuilder {
 
@@ -15,6 +20,7 @@ public class MdcBuilder {
         private boolean autoReload;
         private long reloadInterval = 1000L;
         private Consumer<MdcException> onFail;
+        private final List<Hook> loadHooks = new ArrayList<>();
 
         public MdcConfigBuilder(Source source) {
             this.source = source;
@@ -38,8 +44,26 @@ public class MdcBuilder {
             return this;
         }
 
+        public MdcConfigBuilder loadHook(UnaryOperator<String> loadHook) {
+            Hook hook = new Hook(Pattern.compile(".*"), loadHook);
+            loadHooks.add(hook);
+            return this;
+        }
+
+        public MdcConfigBuilder loadHook(String property, UnaryOperator<String> loadHook) {
+            Hook hook = new Hook(Pattern.compile(property), loadHook);
+            loadHooks.add(hook);
+            return this;
+        }
+
+        public MdcConfigBuilder loadHook(Pattern pattern, UnaryOperator<String> loadHook) {
+            Hook hook = new Hook(pattern, loadHook);
+            loadHooks.add(hook);
+            return this;
+        }
+
         public MdcProvider build() throws MdcException {
-            return new MdcProvider(source, autoReload, reloadInterval, onFail);
+            return new MdcProvider(source, autoReload, reloadInterval, onFail, loadHooks);
         }
     }
 
