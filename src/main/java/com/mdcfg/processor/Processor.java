@@ -32,7 +32,7 @@ public class Processor {
                     .collect(Collectors.toList());
             Property property = new PropertyProcessor(propertyName, appropriateHooks)
                     .getProperty(entry.getValue());
-            properties.put(entry.getKey(), property);
+            properties.put(propertyName, property);
         }
         return properties;
     }
