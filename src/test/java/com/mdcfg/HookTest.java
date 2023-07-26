@@ -1,3 +1,5 @@
+package com.mdcfg;
+
 import com.mdcfg.builder.MdcBuilder;
 import com.mdcfg.exceptions.MdcException;
 import com.mdcfg.provider.MdcContext;
@@ -5,16 +7,15 @@ import com.mdcfg.provider.MdcOptional;
 import com.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+
+import static com.mdcfg.Resources.YAML_PATH;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HookTest {
-
-    private static final String YAML_PATH = Objects.requireNonNull(ReaderTest.class.getResource("conf.yaml")).getPath();
 
     @Test
     public void testHookToAllProps() throws MdcException {
@@ -27,7 +28,7 @@ public class HookTest {
                 })
                 .build().getOptional();
 
-        assertEquals(18, count.get());
+        assertEquals(20, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
@@ -66,7 +67,7 @@ public class HookTest {
                 })
                 .build();
 
-        assertEquals(4, count.get());
+        assertEquals(6, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
@@ -84,6 +85,6 @@ public class HookTest {
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
-        assertEquals(Integer.valueOf(40000), provider.getInteger(context, "horsepower"));
+        assertEquals(Integer.valueOf(48000), provider.getInteger(context, "horsepower"));
     }
 }

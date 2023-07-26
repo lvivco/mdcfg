@@ -50,6 +50,10 @@ public class MdcProvider {
         }
     }
 
+    public int getSize() {
+        return properties.size();
+    }
+
     public MdcOptional getOptional() {
         return optional;
     }

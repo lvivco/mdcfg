@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PropertyProcessor {
 
@@ -150,8 +151,9 @@ public class PropertyProcessor {
         } else if(selector.contains("[")) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
-            selector = COMMA_PATTERN.matcher(selector).replaceAll("|");
-            selector = "(" + Pattern.quote(selector) + ")";
+            selector = Arrays.stream(COMMA_PATTERN.split(selector))
+                    .map(Pattern::quote)
+                    .collect(Collectors.joining("|", "(", ")"));
         } else {
             selector = Pattern.quote(selector);
         }

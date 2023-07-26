@@ -1,10 +1,14 @@
+package com.mdcfg;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
-        ReaderTest.class,
+        BuilderTest.class,
+        ProviderTest.class,
+        ConversionTest.class,
         HookTest.class
 })
 public class TestSuite {
