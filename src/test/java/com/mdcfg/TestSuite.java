@@ -1,3 +1,5 @@
+package com.mdcfg;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -6,7 +8,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         BuilderTest.class,
         ProviderTest.class,
-        ConversionTest.class
+        ConversionTest.class,
         HookTest.class
 })
 public class TestSuite {
