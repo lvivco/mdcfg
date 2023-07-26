@@ -21,6 +21,10 @@ public class Chain {
         return value;
     }
 
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     public boolean match(MdcContext context, String compare) {
         boolean match = pattern.matcher(compare).matches();
         if(match && !ranges.isEmpty()){

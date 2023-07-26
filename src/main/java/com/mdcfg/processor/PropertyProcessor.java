@@ -1,11 +1,8 @@
 package com.mdcfg.processor;
 
 import com.mdcfg.exceptions.MdcException;
+import com.mdcfg.model.*;
 import com.mdcfg.utils.SourceUtils;
-import com.mdcfg.model.Chain;
-import com.mdcfg.model.Dimension;
-import com.mdcfg.model.Property;
-import com.mdcfg.model.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,9 +25,11 @@ public class PropertyProcessor {
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
     private final List<Chain> chains = new ArrayList<>();
+    private final List<Hook> loadHooks;
 
-    public PropertyProcessor(String name) {
+    public PropertyProcessor(String name, List<Hook> loadHooks) {
         this.name = name;
+        this.loadHooks = loadHooks;
     }
 
     public Property getProperty(Map<String, String> map) throws MdcException {
@@ -93,7 +92,7 @@ public class PropertyProcessor {
     }
 
     private void createSelectorChains(Map<String, String> map){
-        for(var entry:map.entrySet()) {
+        for(var entry : map.entrySet()) {
             Map<String, String> chain = new HashMap<>();
             for (var item:entry.getKey().split(DIMENSION_SEPARATOR)) {
                 Pair<String, String> pair = SourceUtils.splitSelector(item);
@@ -123,6 +122,13 @@ public class PropertyProcessor {
         }
         // end
         pattern.append("$");
+
+        if (null != loadHooks) {
+            for (var hook : loadHooks) {
+                value = hook.getFunction().apply(value);
+            }
+        }
+
         return new Chain(pattern.toString(), value, ranges);
     }
 
@@ -160,11 +166,8 @@ public class PropertyProcessor {
         pattern.append(dimension.getName()).append("@").append(selector);
     }
 
-
     private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map){
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
 
 }
-
-

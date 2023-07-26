@@ -1,6 +1,7 @@
 package com.mdcfg.provider;
 
 import com.mdcfg.exceptions.MdcException;
+import com.mdcfg.model.Hook;
 import com.mdcfg.model.Property;
 import com.mdcfg.processor.Processor;
 import com.mdcfg.source.Source;
@@ -34,11 +35,12 @@ public class MdcProvider {
 
     private Map<String, Property> properties;
 
-    public MdcProvider(Source source, boolean autoReload, long reloadInterval, Consumer<MdcException> onFail) throws MdcException {
+    public MdcProvider(Source source, boolean autoReload, long reloadInterval, Consumer<MdcException> onFail,
+                       List<Hook> loadHooks) throws MdcException {
         this.source = source;
         this.onFail = onFail;
 
-        this.processor = new Processor();
+        this.processor = new Processor(loadHooks);
         this.optional = new MdcOptional(this);
 
         properties = processor.process(source);
