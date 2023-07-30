@@ -15,7 +15,7 @@ public class BuilderTest {
     public void testYaml() throws MdcException {
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
         assertNotNull(provider);
-        assertEquals(8, provider.getSize());
+        assertEquals(9, provider.getSize());
     }
 
     @Test

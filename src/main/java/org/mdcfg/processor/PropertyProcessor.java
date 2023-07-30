@@ -134,21 +134,11 @@ public class PropertyProcessor {
 
     private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
         if (selector.contains(RANGE_SIGN)) {
-            // numeric ranges
-            selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
-            int index = selector.indexOf(RANGE_SIGN);
-            if ((selector.length() - 1) / 2 > index) {
-                for (String max : List.of(selector.substring(index + RANGE_SIGN.length()).split(","))) {
-                    ranges.add(new Range(dimension, selector.substring(0, index), max));
-                }
-            } else {
-                for (String min : List.of(selector.substring(0, index).split(","))) {
-                    ranges.add(new Range(dimension, min, selector.substring(index + RANGE_SIGN.length())));
-                }
+            selector = selector.replaceAll(String.valueOf(LIST_SIGN_PATTERN), "");
+            for (String selectorPart : COMMA_PATTERN.split(selector)) {
+                ranges.add(getRange(selectorPart, dimension));
             }
-
             selector = "(\\d|\\.)*";
-
         } else if (selector.contains("[")) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
@@ -160,15 +150,31 @@ public class PropertyProcessor {
         }
 
         // dimension list
-        if(dimension.isList()){
+        if (dimension.isList()) {
             selector = "\\[(.*,)*" + selector + "(,.*)*\\]";
         }
 
         pattern.append(dimension.getName()).append("@").append(selector);
     }
 
-    private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map){
+    private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map) {
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
 
+    private Range getRange(String selectorPart, Dimension dimension) {
+        int index = selectorPart.indexOf(RANGE_SIGN);
+        String min = null;
+        String max = null;
+        if (index < 0) {
+            min = max = selectorPart;
+        } else {
+            if (index > 0) {
+                min = selectorPart.substring(0, index);
+            }
+            if (index < selectorPart.length() - RANGE_SIGN.length()) {
+                max = selectorPart.substring(index + RANGE_SIGN.length());
+            }
+        }
+        return new Range(dimension, min, max);
+    }
 }
