@@ -136,10 +136,11 @@ public class PropertyProcessor {
         if (selector.contains(RANGE_SIGN)) {
             selector = selector.replaceAll(String.valueOf(LIST_SIGN_PATTERN), "");
             for (String selectorPart : COMMA_PATTERN.split(selector)) {
-                ranges.add(getRange(selectorPart, dimension));
+                ranges.add(createRange(selectorPart, dimension));
+                System.out.println(createRange(selectorPart, dimension));
             }
             selector = "(\\d|\\.)*";
-        } else if (selector.contains("[")) {
+        } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             selector = Arrays.stream(COMMA_PATTERN.split(selector))
@@ -161,20 +162,31 @@ public class PropertyProcessor {
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
 
-    private Range getRange(String selectorPart, Dimension dimension) {
+    private Range createRange(String selectorPart, Dimension dimension) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;
         String max = null;
+        boolean minInclusive = true;
+        boolean maxInclusive = true;
+
         if (index < 0) {
             min = max = selectorPart;
         } else {
             if (index > 0) {
                 min = selectorPart.substring(0, index);
+                if(min.startsWith("!")){
+                    min = min.substring(1);
+                    minInclusive = false;
+                }
             }
             if (index < selectorPart.length() - RANGE_SIGN.length()) {
                 max = selectorPart.substring(index + RANGE_SIGN.length());
+                if(max.startsWith("!")){
+                    max = max.substring(1);
+                    maxInclusive = false;
+                }
             }
         }
-        return new Range(dimension, min, max);
+        return new Range(dimension, minInclusive, min, maxInclusive, max);
     }
 }
