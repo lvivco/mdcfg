@@ -1,12 +1,15 @@
 package org.mdcfg.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 public class Range {
 
     private final Dimension dimension;
@@ -50,29 +53,5 @@ public class Range {
         boolean minMatch = minInclusive ? value >= min : value > min;
         boolean maxMatch = maxInclusive ? value <= max : value < max;
         return minMatch && maxMatch;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Range)) return false;
-        Range range = (Range) o;
-        return Double.compare(range.min, min) == 0 && minInclusive == range.minInclusive && Double.compare(range.max, max) == 0 && maxInclusive == range.maxInclusive && dimension.equals(range.dimension);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(dimension, min, minInclusive, max, maxInclusive);
-    }
-
-    @Override
-    public String toString() {
-        return "Range{" +
-                "dimension=" + dimension +
-                ", min=" + min +
-                ", minInclusive=" + minInclusive +
-                ", max=" + max +
-                ", maxInclusive=" + maxInclusive +
-                '}';
     }
 }

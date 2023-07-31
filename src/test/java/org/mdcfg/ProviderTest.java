@@ -112,12 +112,14 @@ public class ProviderTest {
     }
 
     @Test
-    public void testBooleanSelectors() throws MdcException {
+    public void testRangesAndNumericDimensions() throws MdcException {
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
-        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "offroad"));
-        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
-        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
+        // check [!12..17, 19, 20] matches below
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "offroad"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
     }
 }

@@ -134,7 +134,7 @@ public class PropertyProcessor {
 
     private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
         if (selector.contains(RANGE_SIGN)) {
-            selector = selector.replaceAll(String.valueOf(LIST_SIGN_PATTERN), "");
+            selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             for (String selectorPart : COMMA_PATTERN.split(selector)) {
                 ranges.add(createRange(selectorPart, dimension));
             }
