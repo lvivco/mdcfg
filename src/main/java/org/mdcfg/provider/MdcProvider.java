@@ -7,10 +7,7 @@ import org.mdcfg.processor.Processor;
 import org.mdcfg.source.Source;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -87,7 +84,7 @@ public class MdcProvider {
     }
 
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter){
-        Property property = properties.get(key);
+        Property property = properties.get(key.toLowerCase(Locale.ROOT));
         if(property != null){
             return converter.apply(property.getString(context));
         }
@@ -123,14 +120,17 @@ public class MdcProvider {
     }
 
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter){
-        Property property = properties.get(key);
+        Property property = properties.get(key.toLowerCase(Locale.ROOT));
         if(property != null){
-            return Arrays.stream(LIST_SIGN_PATTERN.matcher(property.getString(context))
-                        .replaceAll("")
-                        .split(","))
-                    .map(StringUtils::trim)
-                    .map(converter)
-                    .collect(Collectors.toList());
+            String listString = Optional.ofNullable(property.getString(context))
+                    .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                    .orElse(null);
+            if(StringUtils.isNotBlank(listString)) {
+                return Arrays.stream(listString.split(","))
+                        .map(StringUtils::trim)
+                        .map(converter)
+                        .collect(Collectors.toList());
+            }
         }
         return Collections.emptyList();
     }

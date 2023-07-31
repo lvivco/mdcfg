@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,7 +52,7 @@ public final class SourceUtils {
     private static Map<String, Object> flatten(Map<String, Object> map, String prefix) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
+            String key = entry.getKey().toLowerCase(Locale.ROOT);
             Object value = entry.getValue();
             if (value instanceof Map) {
                 result.putAll(flatten((Map<String, Object>) value,prefix + key + DIMENSION_SEPARATOR));

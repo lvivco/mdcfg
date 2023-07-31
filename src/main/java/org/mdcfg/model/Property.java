@@ -7,6 +7,7 @@ import org.mdcfg.utils.ProviderUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -45,6 +46,6 @@ public class Property {
             }
             compare.append(object);
         }
-        return compare.toString();
+        return compare.toString().toLowerCase(Locale.ROOT);
     }
 }

@@ -54,7 +54,7 @@ public class ProviderTest {
         String horsepowerFord2WD = provider.getString(TestContextBuilder.init().model("ford").drive("2WD").build(), "horsepower");
         assertEquals("300", horsepowerToyota2WD);
 
-        String horsepowerFiat2WD = provider.getString(TestContextBuilder.init().model("Fiat").drive("2WD").build(), "horsepower");
+        String horsepowerFiat2WD = provider.getString(TestContextBuilder.init().model("hyundai").drive("2WD").build(), "horsepower");
         assertEquals("400", horsepowerFiat2WD);
     }
 
