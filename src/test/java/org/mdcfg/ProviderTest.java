@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mdcfg.Resources.*;
 
 public class ProviderTest {
@@ -109,5 +109,17 @@ public class ProviderTest {
                         .addin(Arrays.asList("xenon-lights"))
                         .build(), "price");
         assertEquals("45000", priceBmwXenonLights);
+    }
+
+    @Test
+    public void testRangesAndNumericDimensions() throws MdcException {
+        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
+        // check [!12..17, 19, 20] matches below
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "offroad"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
     }
 }

@@ -27,13 +27,8 @@ public class Chain {
 
     public boolean match(MdcContext context, String compare) {
         boolean match = pattern.matcher(compare).matches();
-        if(match && !ranges.isEmpty()){
-            for (Range range : ranges) {
-                if(!range.matches(context)){
-                    return false;
-                }
-            }
-        }
-        return match;
+        return match && !ranges.isEmpty()
+                ? ranges.stream().anyMatch(range -> range.matches(context))
+                : match;
     }
 }

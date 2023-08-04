@@ -18,7 +18,7 @@ public class PropertyProcessor {
     private static final String RANGE_SIGN = "..";
     private static final String ANY = "any";
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("\\s|\\[|]");
-    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile(",|\\.\\.");
+    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
 
 
@@ -133,22 +133,13 @@ public class PropertyProcessor {
     }
 
     private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
-        if(selector.contains(RANGE_SIGN)){
-            // numeric ranges
+        if (selector.contains(RANGE_SIGN)) {
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
-            int index = selector.indexOf(RANGE_SIGN);
-            String min = null;
-            String max = null;
-            if(index > 0){
-                min = selector.substring(0, index);
+            for (String selectorPart : COMMA_PATTERN.split(selector)) {
+                ranges.add(createRange(selectorPart, dimension));
             }
-            if(index < selector.length() - RANGE_SIGN.length()){
-                max = selector.substring(index + RANGE_SIGN.length());
-            }
-            ranges.add(new Range(dimension, min, max));
             selector = "(\\d|\\.)*";
-
-        } else if(selector.contains("[")) {
+        } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             selector = Arrays.stream(COMMA_PATTERN.split(selector))
@@ -159,15 +150,42 @@ public class PropertyProcessor {
         }
 
         // dimension list
-        if(dimension.isList()){
+        if (dimension.isList()) {
             selector = "\\[(.*,)*" + selector + "(,.*)*\\]";
         }
 
         pattern.append(dimension.getName()).append("@").append(selector);
     }
 
-    private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map){
+    private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map) {
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
 
+    private Range createRange(String selectorPart, Dimension dimension) {
+        int index = selectorPart.indexOf(RANGE_SIGN);
+        String min = null;
+        String max = null;
+        boolean minInclusive = true;
+        boolean maxInclusive = true;
+
+        if (index < 0) {
+            min = max = selectorPart;
+        } else {
+            if (index > 0) {
+                min = selectorPart.substring(0, index);
+                if(min.startsWith("!")){
+                    min = min.substring(1);
+                    minInclusive = false;
+                }
+            }
+            if (index < selectorPart.length() - RANGE_SIGN.length()) {
+                max = selectorPart.substring(index + RANGE_SIGN.length());
+                if(max.startsWith("!")){
+                    max = max.substring(1);
+                    maxInclusive = false;
+                }
+            }
+        }
+        return new Range(dimension, minInclusive, min, maxInclusive, max);
+    }
 }

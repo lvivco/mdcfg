@@ -1,38 +1,34 @@
 package org.mdcfg.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
+@EqualsAndHashCode
+@ToString
 public class Range {
 
     private final Dimension dimension;
 
     private double min = Double.MIN_VALUE;
-    private boolean minInclusive = true;
+    private boolean minInclusive;
     private double max= Double.MAX_VALUE;
-    private boolean maxInclusive = true;
+    private boolean maxInclusive;
 
-    public Range(Dimension dimension, String min, String max) {
+    public Range(Dimension dimension, boolean minInclusive, String min, boolean maxInclusive, String max) {
         this.dimension = dimension;
-
-        if(StringUtils.isNotBlank(min)){
-            if(min.startsWith("!")){
-                min = min.substring(1);
-                minInclusive = false;
-            }
+        this.minInclusive = minInclusive;
+        if (StringUtils.isNotBlank(min)) {
             this.min = Double.parseDouble(min);
         }
-
-        if(StringUtils.isNotBlank(max)){
-            if(max.startsWith("!")){
-                max = max.substring(1);
-                maxInclusive = false;
-            }
+        if (StringUtils.isNotBlank(max)) {
             this.max = Double.parseDouble(max);
         }
+        this.maxInclusive = maxInclusive;
     }
 
     public boolean matches(MdcContext context) {
