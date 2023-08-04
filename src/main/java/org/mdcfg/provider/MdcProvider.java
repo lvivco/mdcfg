@@ -1,5 +1,6 @@
 package org.mdcfg.provider;
 
+import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
@@ -28,14 +29,14 @@ public class MdcProvider {
     private final Processor processor;
 
     private final Source source;
-    private final Consumer<MdcException> onFail;
+    private final MdcCallback<Integer, MdcException> callback;
 
     private Map<String, Property> properties;
 
-    public MdcProvider(Source source, boolean autoReload, long reloadInterval, Consumer<MdcException> onFail,
+    public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,
                        List<Hook> loadHooks) throws MdcException {
         this.source = source;
-        this.onFail = onFail;
+        this.callback = callback;
 
         this.processor = new Processor(loadHooks);
         this.optional = new MdcOptional(this);
@@ -138,11 +139,10 @@ public class MdcProvider {
     private void updateProperties() {
         try {
             properties = processor.process(source);
+            Optional.ofNullable(callback).ifPresent(c->c.success(properties.size()));
         } catch (MdcException e) {
             properties.clear();
-            if(onFail != null) {
-                onFail.accept(e);
-            }
+            Optional.ofNullable(callback).ifPresent(c->c.fail(e));
         }
     }
 }
