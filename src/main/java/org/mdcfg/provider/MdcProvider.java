@@ -55,84 +55,83 @@ public class MdcProvider {
         return optional;
     }
 
-    public String getString(MdcContext context, String key){
+    public String getString(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_STRING);
     }
 
-    public Boolean getBoolean(MdcContext context, String key){
+    public Boolean getBoolean(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_BOOLEAN);
     }
 
-    public Float getFloat(MdcContext context, String key){
+    public Float getFloat(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_FLOAT);
     }
 
-    public Double getDouble(MdcContext context, String key){
+    public Double getDouble(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_DOUBLE);
     }
 
-    public Short getShort(MdcContext context, String key){
+    public Short getShort(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_SHORT);
     }
 
-    public Integer getInteger(MdcContext context, String key){
+    public Integer getInteger(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_INTEGER);
     }
 
-    public Long getLong(MdcContext context, String key){
+    public Long getLong(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_LONG);
     }
 
-    public <T> T getValue(MdcContext context, String key, Function<String, T> converter){
-        Property property = properties.get(key.toLowerCase(Locale.ROOT));
-        if(property != null){
-            return converter.apply(property.getString(context));
-        }
-        return null;
+    public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
+        Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
+                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+        return Optional.ofNullable(property.getString(context))
+                .map(converter)
+                .orElse(null);
     }
 
-    public List<String> getStringList(MdcContext context, String key){
+    public List<String> getStringList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_STRING);
     }
 
-    public List<Boolean> getBooleanList(MdcContext context, String key){
+    public List<Boolean> getBooleanList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_BOOLEAN);
     }
 
-    public List<Float> getFloatList(MdcContext context, String key){
+    public List<Float> getFloatList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_FLOAT);
     }
 
-    public List<Double> getDoubleList(MdcContext context, String key){
+    public List<Double> getDoubleList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_DOUBLE);
     }
 
-    public List<Short> getShortList(MdcContext context, String key){
+    public List<Short> getShortList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_SHORT);
     }
 
-    public List<Integer> getIntegerList(MdcContext context, String key){
+    public List<Integer> getIntegerList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_INTEGER);
     }
 
-    public List<Long> getLongList(MdcContext context, String key){
+    public List<Long> getLongList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_LONG);
     }
 
-    public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter){
-        Property property = properties.get(key.toLowerCase(Locale.ROOT));
-        if(property != null){
-            String listString = Optional.ofNullable(property.getString(context))
-                    .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
-                    .orElse(null);
-            if(StringUtils.isNotBlank(listString)) {
-                return Arrays.stream(listString.split(","))
-                        .map(StringUtils::trim)
-                        .map(converter)
-                        .collect(Collectors.toList());
-            }
+    public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
+        Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
+                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+        String listString = Optional.ofNullable(property.getString(context))
+                .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                .orElse(null);
+        if(StringUtils.isNotBlank(listString)) {
+            return Arrays.stream(listString.split(","))
+                    .map(StringUtils::trim)
+                    .map(converter)
+                    .collect(Collectors.toList());
         }
-        return Collections.emptyList();
+        return null;
     }
 
     private void updateProperties() {
