@@ -125,13 +125,17 @@ public class MdcProvider {
         String listString = Optional.ofNullable(property.getString(context))
                 .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
-        if(StringUtils.isNotBlank(listString)) {
+
+        if(listString == null){
+            return null;
+        }
+        if(StringUtils.isNotEmpty(listString)) {
             return Arrays.stream(listString.split(","))
                     .map(StringUtils::trim)
                     .map(converter)
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private void updateProperties() {
