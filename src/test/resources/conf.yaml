@@ -1,15 +1,13 @@
 aliases:
-  addin*:
-    addin*@leather-seats: ls
-    addin*@panoramic-roof: pr
-    addin*@cruise-control: cc
-  line:
-    model@bmw:
-      cat@crossover: x5
-    model@ford:
-      cat@crossover: kuga
-    model@toyota:
-      cat@crossover: rav4
+  addin*@leather-seats: addin*@ls
+  addin*@panoramic-roof: addin*@pr
+  addin*@cruise-control: addin*@cc
+  model@bmw:
+    cat@crossover: line@x5
+  model@ford:
+    cat@crossover: line@kuga
+  model@toyota:
+    cat@crossover: line@rav4
 
 engine:
   type: [electric, gas, diesel]

@@ -6,7 +6,6 @@ import org.mdcfg.model.Property;
 import org.mdcfg.processor.Processor;
 import org.mdcfg.source.Source;
 import org.apache.commons.lang3.StringUtils;
-import org.mdcfg.utils.ProviderUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -24,15 +23,12 @@ public class MdcProvider {
     private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
-    private static final String LIST_SIGN = "*";
 
     private final MdcOptional optional;
     private final Processor processor;
-
     private final Source source;
     private final Consumer<MdcException> onFail;
 
-    private Map<String, Property> aliases;
     private Map<String, Property> properties;
 
     public MdcProvider(Source source, boolean autoReload, long reloadInterval, Consumer<MdcException> onFail,
@@ -89,7 +85,7 @@ public class MdcProvider {
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter){
         Property property = properties.get(key.toLowerCase(Locale.ROOT));
         if(property != null){
-            return converter.apply(property.getString(processAliases(context)));
+            return converter.apply(property.getString(context));
         }
         return null;
     }
@@ -125,7 +121,7 @@ public class MdcProvider {
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter){
         Property property = properties.get(key.toLowerCase(Locale.ROOT));
         if(property != null){
-            String listString = Optional.ofNullable(property.getString(processAliases(context)))
+            String listString = Optional.ofNullable(property.getString(context))
                     .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                     .orElse(null);
             if(StringUtils.isNotBlank(listString)) {
@@ -136,30 +132,6 @@ public class MdcProvider {
             }
         }
         return Collections.emptyList();
-    }
-
-    @SuppressWarnings("unchecked")
-    private MdcContext processAliases(MdcContext context) {
-        MdcContext result = (MdcContext)context.clone();
-        for (Map.Entry<String, Property> entry : aliases.entrySet()) {
-            String dimension = entry.getKey().toLowerCase(Locale.ROOT);
-            String selector = Optional.ofNullable(aliases.get(dimension))
-                    .map(a->a.getString(context))
-                    .orElse(null);
-            if(StringUtils.isNotBlank(selector)) {
-                if (dimension.endsWith(LIST_SIGN)) {
-                    dimension = dimension.replace(LIST_SIGN, "");
-                    List<String> list = result.containsKey(dimension)
-                            ? ProviderUtils.toList(result.get(dimension))
-                            : new ArrayList<>();
-                    list.add(selector);
-                    result.put(dimension, list);
-                } else {
-                    result.put(dimension, selector);
-                }
-            }
-        }
-        return result;
     }
 
     private void updateProperties() {
@@ -175,7 +147,6 @@ public class MdcProvider {
 
     private void readProperties() throws MdcException {
         Map<String, Map<String, String>> data = source.read();
-        aliases = processor.processAliases(data);
-        properties = processor.processProperties(data);
+        properties = processor.process(data);
     }
 }
