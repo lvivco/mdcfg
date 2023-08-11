@@ -138,7 +138,7 @@ public class PropertyProcessor {
             for (String selectorPart : COMMA_PATTERN.split(selector)) {
                 ranges.add(createRange(selectorPart, dimension));
             }
-            selector = "(\\d|\\.)*";
+            selector = "-?(?:\\d|,|\\s|\\.)*";
         } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
             // selector lists
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");

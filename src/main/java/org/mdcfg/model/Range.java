@@ -14,7 +14,7 @@ public class Range {
 
     private final Dimension dimension;
 
-    private double min = Double.MIN_VALUE;
+    private double min = -Double.MAX_VALUE;
     private boolean minInclusive;
     private double max= Double.MAX_VALUE;
     private boolean maxInclusive;
