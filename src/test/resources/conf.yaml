@@ -1,3 +1,14 @@
+aliases:
+  addin*@leather-seats: addin*@ls
+  addin*@panoramic-roof: addin*@pr
+  addin*@cruise-control: addin*@cc
+  model@bmw:
+    cat@crossover: line@x5
+  model@ford:
+    cat@crossover: line@kuga
+  model@toyota:
+    cat@crossover: line@rav4
+
 engine:
   type: [electric, gas, diesel]
   drive: [4WD, 2WD]
@@ -5,6 +16,7 @@ engine:
 available-colors:
   any@: [white, black]
   model@bmw: [white, black, blue, metalic]
+  line@x5: [white, black, blue]
   model@ford:
     any@: [black, metalic]
     cat@crossover: [white, black, metalic, gray]
@@ -26,6 +38,7 @@ price:
   model@toyota:
     any@: 30000
     addin*@leather-seats: 35000
+    addin*@cc: 37000
   model@ford: 28000
 
 offroad:

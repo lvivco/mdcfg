@@ -3,7 +3,6 @@ package org.mdcfg;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.provider.MdcContext;
-import org.mdcfg.provider.MdcOptional;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
@@ -20,22 +19,22 @@ public class HookTest {
     @Test
     public void testHookToAllProps() throws MdcException {
         AtomicInteger count = new AtomicInteger();
-        MdcOptional provider = MdcBuilder.withYaml(YAML_PATH)
+        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
                 .autoReload()
                 .loadHook((v) -> {
                     count.getAndIncrement();
                     return v + "_all";
                 })
-                .build().getOptional();
+                .build();
 
-        assertEquals(23, count.get());
+        assertEquals(25, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
 
-        assertTrue(provider.getString(context, "price").orElse("").contains("_all"));
-        assertTrue(provider.getString(context, "available-colors").orElse("").contains("_all"));
-        assertTrue(provider.getString(context, "horsepower").orElse("").contains("_all"));
+        assertTrue(provider.getStringOptional(context, "price").orElse("").contains("_all"));
+        assertTrue(provider.getStringOptional(context, "available-colors").orElse("").contains("_all"));
+        assertTrue(provider.getStringOptional(context, "horsepower").orElse("").contains("_all"));
     }
 
     @Test
@@ -49,7 +48,7 @@ public class HookTest {
                 })
                 .build();
 
-        assertEquals(5, count.get());
+        assertEquals(6, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");

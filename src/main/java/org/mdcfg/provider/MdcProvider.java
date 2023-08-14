@@ -8,9 +8,7 @@ import org.mdcfg.processor.Processor;
 import org.mdcfg.source.Source;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.text.html.Option;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -27,7 +25,6 @@ public class MdcProvider {
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
 
     private final Processor processor;
-
     private final Source source;
     private final MdcCallback<Integer, MdcException> callback;
 
@@ -40,7 +37,7 @@ public class MdcProvider {
 
         this.processor = new Processor(loadHooks);
 
-        properties = processor.process(source);
+        readProperties();
 
         if(autoReload){
             source.observeChange(this::updateProperties, reloadInterval);
@@ -198,11 +195,17 @@ public class MdcProvider {
 
     private void updateProperties() {
         try {
-            properties = processor.process(source);
+            readProperties();
             Optional.ofNullable(callback).ifPresent(c->c.success(properties.size()));
         } catch (MdcException e) {
+            Optional.ofNullable(properties).ifPresent(Map::clear);
             properties.clear();
             Optional.ofNullable(callback).ifPresent(c->c.fail(e));
         }
+    }
+
+    private void readProperties() throws MdcException {
+        Map<String, Map<String, String>> data = source.read();
+        properties = processor.process(data);
     }
 }

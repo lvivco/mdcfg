@@ -1,5 +1,6 @@
 package org.mdcfg;
 
+import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.provider.MdcProvider;
@@ -12,10 +13,15 @@ import static org.mdcfg.Resources.*;
 
 public class ProviderTest {
 
+    private static MdcProvider provider;
+
+    @BeforeClass
+    public static void init() throws MdcException {
+        provider = MdcBuilder.withYaml(YAML_PATH).build();
+    }
+
     @Test
     public void testSubProperty() throws MdcException {
-        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
-
         String types = provider.getString(TestContextBuilder.EMPTY, "engine.type");
         assertEquals("[electric, gas, diesel]", types);
 
@@ -25,8 +31,6 @@ public class ProviderTest {
 
     @Test
     public void testSelectors() throws MdcException {
-        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
-
         String horsepowerAny = provider.getString(TestContextBuilder.init().model("nissan").build(), "horsepower");
         assertEquals("400", horsepowerAny);
 
@@ -60,8 +64,6 @@ public class ProviderTest {
 
     @Test
     public void testListSelectors() throws MdcException {
-        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
-
         String priceToyotaLeatherSeats = provider.getString(
                 TestContextBuilder.init()
                         .model("toyota")
@@ -113,7 +115,6 @@ public class ProviderTest {
 
     @Test
     public void testRangesAndNumericDimensions() throws MdcException {
-        MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
         // check [!12..17, 19, 20] matches below
