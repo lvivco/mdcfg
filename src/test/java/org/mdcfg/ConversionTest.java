@@ -21,13 +21,13 @@ public class ConversionTest {
     }
 
     @Test
-    public void testListProperty() {
+    public void testListProperty() throws MdcException {
         List<String> types = provider.getStringList(TestContextBuilder.EMPTY, "engine.type");
         assertEquals("[electric, gas, diesel]", types.toString());
     }
 
     @Test
-    public void testDoubleProperty() {
+    public void testDoubleProperty() throws MdcException {
         Double horsepower = provider.getDouble(TestContextBuilder.EMPTY, "horsepower");
         assertEquals(Double.valueOf(400d), horsepower);
     }

@@ -21,7 +21,7 @@ public class ProviderTest {
     }
 
     @Test
-    public void testSubProperty() {
+    public void testSubProperty() throws MdcException {
         String types = provider.getString(TestContextBuilder.EMPTY, "engine.type");
         assertEquals("[electric, gas, diesel]", types);
 
@@ -30,7 +30,7 @@ public class ProviderTest {
     }
 
     @Test
-    public void testSelectors() {
+    public void testSelectors() throws MdcException {
         String horsepowerAny = provider.getString(TestContextBuilder.init().model("nissan").build(), "horsepower");
         assertEquals("400", horsepowerAny);
 
@@ -63,7 +63,7 @@ public class ProviderTest {
     }
 
     @Test
-    public void testListSelectors() {
+    public void testListSelectors() throws MdcException {
         String priceToyotaLeatherSeats = provider.getString(
                 TestContextBuilder.init()
                         .model("toyota")
@@ -114,7 +114,7 @@ public class ProviderTest {
     }
 
     @Test
-    public void testRangesAndNumericDimensions() {
+    public void testRangesAndNumericDimensions() throws MdcException {
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
         // check [!12..17, 19, 20] matches below

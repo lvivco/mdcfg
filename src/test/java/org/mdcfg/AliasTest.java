@@ -21,7 +21,7 @@ public class AliasTest {
     }
 
     @Test
-    public void testAlias() {
+    public void testAlias() throws MdcException {
         String colorsX5 = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
@@ -31,7 +31,7 @@ public class AliasTest {
     }
 
     @Test
-    public void testListAlias() {
+    public void testListAlias() throws MdcException {
         String priceToyotaCruiseControl = provider.getString(
                 TestContextBuilder.init()
                         .model("toyota")
