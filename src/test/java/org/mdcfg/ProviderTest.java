@@ -119,7 +119,7 @@ public class ProviderTest {
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
         // check [!12..17, 19, 20] matches below
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "offroad"));
-        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
+        assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
     }

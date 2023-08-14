@@ -19,7 +19,7 @@ public class MdcBuilder {
         private final Source source;
         private boolean autoReload;
         private long reloadInterval = 1000L;
-        private Consumer<MdcException> onFail;
+        private MdcCallback<Integer, MdcException> callback;
         private final List<Hook> loadHooks = new ArrayList<>();
 
         public MdcConfigBuilder(Source source) {
@@ -31,16 +31,16 @@ public class MdcBuilder {
             return this;
         }
 
-        public MdcConfigBuilder autoReload(Consumer<MdcException> onFail){
+        public MdcConfigBuilder autoReload(MdcCallback<Integer, MdcException> callback){
             this.autoReload = true;
-            this.onFail = onFail;
+            this.callback = callback;
             return this;
         }
 
-        public MdcConfigBuilder autoReload(Consumer<MdcException> onFail, long reloadInterval){
+        public MdcConfigBuilder autoReload(long reloadInterval, MdcCallback<Integer, MdcException> callback){
             this.autoReload = true;
             this.reloadInterval = reloadInterval;
-            this.onFail = onFail;
+            this.callback = callback;
             return this;
         }
 
@@ -63,7 +63,7 @@ public class MdcBuilder {
         }
 
         public MdcProvider build() throws MdcException {
-            return new MdcProvider(source, autoReload, reloadInterval, onFail, loadHooks);
+            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks);
         }
     }
 
