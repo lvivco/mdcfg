@@ -15,7 +15,7 @@ public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
     private static final String SUB_PROPERTY_SEPARATOR = ".";
-    private static final String ALIASES= "aliases";
+    private static final String ALIASES = "aliases";
 
     private final List<Hook> loadHooks;
 
