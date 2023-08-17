@@ -6,10 +6,7 @@ import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
 import org.mdcfg.utils.SourceUtils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -81,13 +78,13 @@ public class Processor {
     }
 
     private Alias createAlias(Map.Entry<String, String> entry) {
-        Pair<String, String> from = SourceUtils.splitSelector(entry.getValue());
+        Pair<String, String> from = SourceUtils.splitSelector(entry.getValue().toLowerCase(Locale.ROOT));
         Pair<String, String> to = SourceUtils.splitSelector(entry.getKey());
         // if from dimension equals to dimension then replace only selectors
         if(from.getKey().equals(to.getKey())) {
             return new Alias(from.getKey(), from.getValue(), to.getValue());
         } else {
-            return new Alias(from.getKey(), entry.getValue(), entry.getKey());
+            return new Alias(from.getKey(), entry.getValue().toLowerCase(Locale.ROOT), entry.getKey());
         }
     }
 }
