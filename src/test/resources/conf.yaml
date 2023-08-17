@@ -34,7 +34,7 @@ horsepower:
 price:
   model@bmw:
     any@: 45000
-    addin*@[leather-seats, panoramic-roof]: 55000
+    addin*@[ls, panoramic-roof]: 55000
   model@toyota:
     any@: 30000
     addin*@leather-seats: 35000
