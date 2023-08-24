@@ -205,7 +205,7 @@ public class MdcProvider {
     }
 
     private void readProperties() throws MdcException {
-        Map<String, Map<String, String>> data = source.read();
+        Map<String, Map<String, String>> data = source.read(processor::getIncludes);
         properties = processor.process(data);
     }
 }

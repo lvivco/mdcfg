@@ -1,3 +1,6 @@
+includes:
+  prices: price-conf.yaml
+
 aliases:
   addin*@leather-seats: addin*@ls
   addin*@panoramic-roof: addin*@pr
@@ -30,16 +33,6 @@ horsepower:
   model@[toyota, ford]:
     drive@4WD: 350
     drive@2WD: 300
-
-price:
-  model@bmw:
-    any@: 45000
-    addin*@[ls, panoramic-roof]: 55000
-  model@toyota:
-    any@: 30000
-    addin*@leather-seats: 35000
-    addin*@cc: 37000
-  model@ford: 28000
 
 offroad:
   clearance@[..12]: false
