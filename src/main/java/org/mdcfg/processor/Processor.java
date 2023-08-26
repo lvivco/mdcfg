@@ -14,7 +14,9 @@ public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
     private static final String SUB_PROPERTY_SEPARATOR = ".";
-    private static final String ALIASES = "aliases";
+    private static final Pattern ALIASES = Pattern.compile("aliases(?:\\:|$).*$");
+    private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
+    private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
 
     private static final String SELECTOR_SEPARATOR= "@";
 
@@ -28,7 +30,7 @@ public class Processor {
         Map<String, List<Alias>> aliases = getAliases(data);
         Map<String, Property> properties = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
-            if(!entry.getKey().startsWith(ALIASES)) {
+            if(PROPERTY.matcher(entry.getKey()).matches()) {
                 String propertyName = SUB_PROPERTY_PATTERN.matcher(entry.getKey()).replaceAll(SUB_PROPERTY_SEPARATOR);
                 List<Hook> appropriateHooks = loadHooks.stream()
                         .filter(hook -> hook.getPattern().matcher(propertyName).matches())
@@ -67,8 +69,7 @@ public class Processor {
 
     private Map<String, List<Alias>> getAliases(Map<String, Map<String, String>> data) {
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
-            String propertyName = entry.getKey();
-            if(propertyName.startsWith(ALIASES)) {
+            if(ALIASES.matcher(entry.getKey()).matches()) {
                return entry.getValue().entrySet().stream()
                        .map(this::createAlias)
                        .collect(Collectors.groupingBy(Alias::getTargetDimension));
@@ -86,5 +87,14 @@ public class Processor {
         } else {
             return new Alias(from.getKey(), entry.getValue().toLowerCase(Locale.ROOT), entry.getKey());
         }
+    }
+
+    public Map<String, String> getIncludes(Map<String, Map<String, String>> data) {
+        for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
+            if(INCLUDES.matcher(entry.getKey()).matches()) {
+                return entry.getValue();
+            }
+        }
+        return Map.of();
     }
 }

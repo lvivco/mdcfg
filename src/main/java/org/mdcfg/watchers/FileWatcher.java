@@ -1,20 +1,23 @@
 package org.mdcfg.watchers;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class FileWatcher implements Watcher {
 
-    private final File file;
+    private final List<File> files;
     private final long interval;
     private final Runnable onChange;
     private boolean isWatching = true;
 
-    public FileWatcher(String path, Runnable onChange, long interval) {
-        file = new File(path);
-       this.onChange = onChange;
-       this.interval = interval;
+    public FileWatcher(List<File> files, Runnable onChange, long interval) {
+        this.files = files;
+        this.onChange = onChange;
+        this.interval = interval;
     }
 
     @Override
@@ -23,13 +26,14 @@ public class FileWatcher implements Watcher {
         ExecutorService executorService = Executors.newCachedThreadPool();
         executorService.execute(() -> {
             try {
-                long originTime = file.lastModified();
+                Map<File, Long> original = files.stream()
+                        .collect(Collectors.toMap(f->f, File::lastModified, (existing, replacement) -> existing));
                 while (isWatching) {
                     Thread.sleep(interval);
-                    long currentModTime = file.lastModified();
-                    if (currentModTime > originTime) {
+                    boolean changed = original.entrySet().stream().anyMatch(e -> e.getKey().lastModified() > e.getValue());
+                    if (changed) {
                         onChange.run();
-                        originTime = currentModTime;
+                        original.replaceAll((k, v) -> k.lastModified());
                     }
                 }
             } catch (InterruptedException e) {
