@@ -45,7 +45,7 @@ public abstract class FileSource implements Source {
 
     @Override
     public void observeChange(Runnable onChange, long reloadInterval) throws MdcException {
-        if(!root.exists()){
+        if(!root.exists()) {
             throw new MdcException(String.format("File or folder %s doesn't exist.", root.getAbsolutePath()));
         }
 
