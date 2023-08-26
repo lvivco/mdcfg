@@ -61,16 +61,12 @@ public abstract class FileSource implements Source {
 
     abstract File[] extractFiles(File folder);
 
-
     private Map<String, Map<String, String>> readAndMerge(List<File> files, Map<String, Map<String, String>> merged) throws MdcException {
         for (File file : files) {
             Map<String, Map<String, String>> map = readFile(file);
-
-            // check whether there are interfile keys
-            Set<String> intersection = new HashSet<>(merged.keySet());
-            intersection.retainAll(map.keySet());
-            if(!intersection.isEmpty()){
-                throw new MdcException(String.format("There is interfile configuration for keys %s", intersection));
+            Set<String> interfileKeys = getInterfileKeys(map, merged);
+            if(!interfileKeys.isEmpty()){
+                throw new MdcException(String.format("There is interfile configuration for keys %s", interfileKeys));
             }
             merged.putAll(map);
         }
@@ -79,5 +75,11 @@ public abstract class FileSource implements Source {
 
     private List<File> getAllSourceFiles(){
         return Stream.concat(Stream.of(root), includes.stream()).collect(Collectors.toList());
+    }
+
+    private Set<String> getInterfileKeys(Map<String, Map<String, String>> map, Map<String, Map<String, String>> merged) {
+        Set<String> intersection = new HashSet<>(merged.keySet());
+        intersection.retainAll(map.keySet());
+        return intersection;
     }
 }
