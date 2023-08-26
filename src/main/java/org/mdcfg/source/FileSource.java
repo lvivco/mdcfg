@@ -33,14 +33,12 @@ public abstract class FileSource implements Source {
             }
             return readAndMerge(Arrays.asList(files), new HashMap<>());
         } else {
-
             Map<String, Map<String, String>> main = readFile(root);
-            includes = includesExtractor.apply(main).entrySet().stream()
-                    .map(e -> root.getParentFile().toPath().resolve(Paths.get(e.getValue())).toFile())
+            includes = includesExtractor.apply(main).values().stream()
+                    .map(v -> root.getParentFile().toPath().resolve(Paths.get(v)).toFile())
                     .filter(File::isFile)
                     .filter(File::exists)
                     .collect(Collectors.toList());
-
             return readAndMerge(includes, main);
         }
     }
