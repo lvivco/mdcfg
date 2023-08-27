@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.watchers;
 
 import java.io.File;
@@ -7,8 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+/** Periodically checks whether file is changed by its modification time */
 public class FileWatcher implements Watcher {
-
     private final List<File> files;
     private final long interval;
     private final Runnable onChange;

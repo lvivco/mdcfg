@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg;
 
 public class Resources {

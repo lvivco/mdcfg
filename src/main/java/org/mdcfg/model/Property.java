@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.model;
 
 import lombok.AllArgsConstructor;
@@ -10,14 +13,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ *  Class that represents a property with chains.
+ */
 @AllArgsConstructor
 public class Property {
-
-    @Getter
-    private final String name;
+    @Getter private final String name;
     private final Map<String, Dimension> dimensions;
     private final List<Chain> chains;
 
+    /** create compare string and match it on chains by down to up priority */
     public String getString(MdcContext context) {
         String compare = createCompareString(context);
         for (Chain chain : chains) {
@@ -28,7 +33,23 @@ public class Property {
         return null;
     }
 
-    public String createCompareString(Map<String, Object> context) {
+    /**
+     * Create compare string by dimensions order.
+     * <p> For example for property:
+     *  <pre>
+     *    horsepower:
+     *      any@: 400
+     *      model@bmw:
+     *        drive@4WD: 500
+     *  </pre>
+     *  Context:
+     *  <pre>
+     *   model = bmw
+     *   drive = 4WD
+     *  </pre>
+     *  Compare string will be {@code model@bmw.drive@4WD}
+     */
+    private String createCompareString(Map<String, Object> context) {
         StringBuilder compare = new StringBuilder();
         for (Dimension dimension : dimensions.values()) {
             if(compare.length() > 0){

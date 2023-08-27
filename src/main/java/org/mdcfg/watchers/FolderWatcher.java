@@ -1,11 +1,14 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.watchers;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 
+/** Periodically checks whether folder is changed by its modification time */
 public class FolderWatcher implements Watcher, Runnable{
-
     private final String path;
     private final DelayTimer timer;
     private Thread thread;

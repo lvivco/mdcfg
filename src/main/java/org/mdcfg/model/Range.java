@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.model;
 
 import lombok.EqualsAndHashCode;
@@ -8,12 +11,13 @@ import org.mdcfg.utils.ProviderUtils;
 
 import java.util.List;
 
+/**
+ * Helper for number comparing.
+ */
 @EqualsAndHashCode
 @ToString
 public class Range {
-
     private final Dimension dimension;
-
     private double min = -Double.MAX_VALUE;
     private boolean minInclusive;
     private double max= Double.MAX_VALUE;
@@ -31,11 +35,11 @@ public class Range {
         this.maxInclusive = maxInclusive;
     }
 
+    /** Check whether context value fits number range. */
     public boolean matches(MdcContext context) {
         if(!context.containsKey(dimension.getName())){
             return false;
         }
-
         Object object = context.get(dimension.getName());
         if(object != null) {
             List<?> list = ProviderUtils.toList(object);

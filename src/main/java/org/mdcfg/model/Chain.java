@@ -1,30 +1,42 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.mdcfg.provider.MdcContext;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ *  Represents one config chain.
+ *  <p> For example property:
+ *  <pre>
+ *    horsepower:
+ *      any@: 400
+ *      model@bmw:
+ *        drive@4WD: 500
+ *  </pre>
+ *  contains two chains:
+ *  <ul>
+ *  <li>{@code model@any.drive@any}</li>
+ *  <li>{@code model@bmw.drive@4WD}</li>
+ *  </ul>
+ *  Those chains will be represented in RegExps:
+ *  <ul>
+ *  <li>{@code model@.*\.drive@.*$}</li>
+ *  <li>{@code model@bmw\.drive@4WD$}</li>
+ *  </ul>
+ */
+@AllArgsConstructor
 public class Chain {
-
     private Pattern pattern;
-    private String value;
+    @Getter private String value;
     private List<Range> ranges;
 
-    public Chain(String chain, String value, List<Range> ranges) {
-        this.pattern = Pattern.compile(chain);
-        this.value = value;
-        this.ranges = ranges;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
+    /** Check whether chain matches context */
     public boolean match(MdcContext context, String compare) {
         boolean match = pattern.matcher(compare).matches();
         return match && !ranges.isEmpty()

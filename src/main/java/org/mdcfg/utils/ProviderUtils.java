@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.utils;
 
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ public final class ProviderUtils {
 
     private ProviderUtils() {}
 
+    /** Convert object to list */
     public static List toList(Object object){
         List<?> list = null;
         if (object.getClass().isArray()) {
