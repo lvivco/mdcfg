@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
         ProviderTest.class,
         ConversionTest.class,
         HookTest.class,
-        AliasTest.class
+        AliasTest.class,
+        AutoUpdateTest.class
 })
 public class TestSuite {
 }
