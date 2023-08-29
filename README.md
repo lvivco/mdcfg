@@ -1,5 +1,7 @@
-# Overview
+## Project Description
+This project was initially developed by Avery & Softserve companies as an internal tool for their internal operations. It has now been open-sourced to encourage collaboration and contributions from the community.
 
+# Overview
 **mdcfg** ("Multi dimensional configuration") is a **Multi dimensional configuration library for Java distributed apps** 
 
 #### Features:

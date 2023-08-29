@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.provider;
 
 import org.mdcfg.builder.MdcCallback;
@@ -14,6 +17,9 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Main Config class. Provides configuration by property name and context.
+ */
 public class MdcProvider {
     private static final UnaryOperator<String> TO_STRING = v -> v;
     private static final Function<String, Boolean> TO_BOOLEAN = Boolean::parseBoolean;
@@ -30,6 +36,16 @@ public class MdcProvider {
 
     private Map<String, Property> properties;
 
+    /**
+     * Creates configured provider object. Do not instantiate it directly, use {@link org.mdcfg.builder.MdcBuilder}
+     *
+     * @param source Config source
+     * @param autoReload Flag that indicates whether config should autoreload on source change
+     * @param reloadInterval interval in ms for reload
+     * @param callback reload call back. See {@link MdcCallback}.
+     * @param loadHooks List of functions that used for preprocessing config values.
+     * @throws MdcException thrown in case something went wrong.
+     */
     public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,
                        List<Hook> loadHooks) throws MdcException {
         this.source = source;
@@ -44,112 +60,322 @@ public class MdcProvider {
         }
     }
 
+    /**
+     * @return property count.
+     */
     public int getSize() {
         return properties.size();
     }
 
+    /**
+     * Read property value and convert it to {@code String}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public String getString(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_STRING);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<String>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<String> getStringOptional(MdcContext context, String key){
         return getValueOptional(context, key, TO_STRING);
     }
 
+    /**
+     * Read property value and convert it to {@code Boolean}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Boolean getBoolean(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_BOOLEAN);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<Boolean>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Boolean>getBooleanOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_BOOLEAN);
     }
 
+    /**
+     * Read property value and convert it to {@code Float}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Float getFloat(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_FLOAT);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<Float>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Float> getFloatOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_FLOAT);
     }
 
+    /**
+     * Read property value and convert it to {@code Double}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Double getDouble(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_DOUBLE);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<Double>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Double> getDoubleOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_DOUBLE);
     }
 
+    /**
+     * Read property value and convert it to {@code Short}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Short getShort(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_SHORT);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<Short>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Short> getShortOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_SHORT);
     }
 
+    /**
+     * Read property value and convert it to {@code Integer}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Integer getInteger(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_INTEGER);
     }
+
+    /**
+     * Read property value and convert it to {@code Optional<Integer>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Integer> getIntegerOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_INTEGER);
     }
 
+    /**
+     * Read property value and convert it to {@code Long}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
     public Long getLong(MdcContext context, String key) throws MdcException {
         return getValue(context, key, TO_LONG);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<Long>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
     public Optional<Long> getLongOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_LONG);
     }
 
+    /**
+     * Read property value and convert it to {@code List<String>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<String> getStringList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_STRING);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List<String>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<String>> getStringListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_STRING);
     }
 
+    /**
+     * Read property value and convert it to {@code List<Boolean>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<Boolean> getBooleanList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_BOOLEAN);
     }
+
+    /**
+     * Read property value and convert it to {@code Optional<List<Boolean>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<Boolean>> getBooleanListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_BOOLEAN);
     }
 
+    /**
+     * Read property value and convert it to {@code List<Float>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<Float> getFloatList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_FLOAT);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List<Float>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<Float>> getFloatListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_FLOAT);
     }
 
+    /**
+     * Read property value and convert it to {@code List<Double>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<Double> getDoubleList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_DOUBLE);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List<Double>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<Double>> getDoubleListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_DOUBLE);
     }
 
+    /**
+     * Read property value and convert it to {@code List<Short>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<Short> getShortList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_SHORT);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List<Integer>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<Integer>> getIntegerListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_INTEGER);
     }
 
+    /**
+     * Read property value and convert it to {@code List<Long>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
     public List<Long> getLongList(MdcContext context, String key) throws MdcException {
         return getValueList(context, key, TO_LONG);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List<Long>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
     public Optional<List<Long>> getLongListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_LONG);
     }
 
+    /**
+     * Read property value and convert it to provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return property value or null.
+     * @param <T> type in which value suppose to be converted
+     * @throws MdcException  in case property not found.
+     */
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
@@ -158,6 +384,15 @@ public class MdcProvider {
                 .orElse(null);
     }
 
+    /**
+     * Read property value and convert it to {@code Optional} of provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return {@code Optional} of property value.
+     * @param <T> type in which value suppose to be converted
+     */
     public <T> Optional<T> getValueOptional(MdcContext context, String key, Function<String, T> converter) {
         try {
             return Optional.ofNullable(getValue(context, key, converter));
@@ -166,6 +401,16 @@ public class MdcProvider {
         }
     }
 
+    /**
+     * Read property value and convert it to {@code List} of provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return {@code List} of property values or null.
+     * @param <T> type in which each value in list suppose to be converted
+     * @throws MdcException in case property not found.
+     */
     private <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
@@ -185,6 +430,15 @@ public class MdcProvider {
         return Collections.emptyList();
     }
 
+    /**
+     * Read property value and convert it to {@code Optional<List>} of provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return {@code Optional<List>} of property value.
+     * @param <T> type in which each value in list suppose to be converted
+     */
     private <T> Optional<List<T>> getValueListOptional(MdcContext context, String key, Function<String, T> converter) {
         try {
             return Optional.ofNullable(getValueList(context, key, converter));

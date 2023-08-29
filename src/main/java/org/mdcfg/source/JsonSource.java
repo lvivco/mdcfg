@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.source;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -11,8 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/** Source implementation for Json based config files */
 public class JsonSource extends FileSource {
-
     private static final TypeReference<Map<String, Object>> TYPE = new TypeReference<>() {};
 
     public JsonSource(String path) {

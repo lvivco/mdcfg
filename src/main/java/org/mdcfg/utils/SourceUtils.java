@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.utils;
 
 import org.mdcfg.exceptions.MdcException;
@@ -18,10 +21,26 @@ public final class SourceUtils {
 
     private SourceUtils() {}
 
+    /**
+     * Flatten configuration List based structure separated by ":".
+     * <p> Example:
+     * <pre>
+     *  horsepower:
+     *    any@: 400
+     *    model@bmw:
+     *      drive@4WD: 500
+     *  </pre>
+     *  will be flattened to:
+     *  <ul>
+     *  <li>{@code horsepower:any@: 400}</li>
+     *  <li>{@code horsepower:model@bmw:drive@4WD: 500}</li>
+     *  </ul>
+     */
     public static Map<String, Object> flatten(Map<String, Object> map) {
         return flatten(map, "");
     }
 
+    /** Get configuration grouped by properties */
     public static Map<String, Map<String, String>> collectProperties(Map<String, Object> rawData) throws MdcException {
         Map<String, Map<String, String>> data = new HashMap<>();
         for(var entry:rawData.entrySet()) {
@@ -42,6 +61,7 @@ public final class SourceUtils {
         return data;
     }
 
+    /** Split selector {@code sel@val} to selector name and selector value */
     public static Pair<String, String> splitSelector(String selector){
         String[] split = selector.split(SELECTOR_SEPARATOR);
         String key = split[0];
@@ -71,5 +91,4 @@ public final class SourceUtils {
         data.put(key, val);
         return val;
     }
-
 }

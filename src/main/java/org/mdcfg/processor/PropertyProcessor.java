@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.processor;
 
 import org.mdcfg.exceptions.MdcException;
@@ -11,8 +14,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/** Parse data of one property and create {@link Property} object. */
 public class PropertyProcessor {
-
     private static final String DIMENSION_SEPARATOR = ":";
     private static final String LIST_SIGN = "*";
     private static final String RANGE_SIGN = "..";
@@ -20,7 +23,6 @@ public class PropertyProcessor {
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("\\s|\\[|]");
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
-
 
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
@@ -32,6 +34,7 @@ public class PropertyProcessor {
         this.loadHooks = loadHooks;
     }
 
+    /** Create {@link Property} object */
     public Property getProperty(Map<String, String> map) throws MdcException {
         createDimensions(map);
         createSelectorChains(map);
@@ -39,6 +42,7 @@ public class PropertyProcessor {
         return new Property(name, dimensions, chains);
     }
 
+    /** Create {@code List} of {@link Dimension} objects with down to up order. */
     private void createDimensions(Map<String, String> map) throws MdcException {
         ListIterator<Map.Entry<String, String>> reverseIter = reverseIterator(map);
         while(reverseIter.hasPrevious()){
@@ -47,6 +51,7 @@ public class PropertyProcessor {
         }
     }
 
+    /** Create and add all {@link Dimension} objects parsing one flattened chain string. */
     private void addDimensions(String key) throws MdcException {
         for (String selector : key.split(DIMENSION_SEPARATOR)) {
             if(!selector.contains(ANY)) {
@@ -55,6 +60,7 @@ public class PropertyProcessor {
         }
     }
 
+    /** Create and add {@link Dimension} object parsing one selector. */
     private void addDimension(String selector) throws MdcException {
         Pair<String, String> pair = SourceUtils.splitSelector(selector);
         String key = pair.getKey();
@@ -91,6 +97,7 @@ public class PropertyProcessor {
         }
     }
 
+    /** Create and add all {@link Chain} objects parsing all flattened chain strings with down to up order. */
     private void createSelectorChains(Map<String, String> map){
         for(var entry : map.entrySet()) {
             Map<String, String> chain = new HashMap<>();
@@ -104,6 +111,26 @@ public class PropertyProcessor {
         }
     }
 
+    /**
+     * Create {@link Chain} object parsing one flattened chain string splitted into map by selector name and value.
+     *  <p> For example property:
+     *  <pre>
+     *    horsepower:
+     *      any@: 400
+     *      model@bmw:
+     *        drive@4WD: 500
+     *  </pre>
+     *  contains two chains:
+     *  <ul>
+     *  <li>{@code model@any.drive@any}</li>
+     *  <li>{@code model@bmw.drive@4WD}</li>
+     *  </ul>
+     *  Those chains will be represented in RegExps:
+     *  <ul>
+     *  <li>{@code model@.*\.drive@.*$}</li>
+     *  <li>{@code model@bmw\.drive@4WD$}</li>
+     *  </ul>
+     */
     private Chain createChain(Map<String, String> selectors, String value) {
         StringBuilder pattern = new StringBuilder();
         List<Range> ranges = new ArrayList<>();
@@ -129,9 +156,10 @@ public class PropertyProcessor {
             }
         }
 
-        return new Chain(pattern.toString(), value, ranges);
+        return new Chain(Pattern.compile(pattern.toString()), value, ranges);
     }
 
+    /** Append pattern for one selector and add {@link Range} objects if needed. */
     private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
         if (selector.contains(RANGE_SIGN)) {
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
@@ -157,10 +185,12 @@ public class PropertyProcessor {
         pattern.append(dimension.getName()).append("@").append(selector);
     }
 
+    /** Return iterator in revers order */
     private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map) {
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
 
+    /** Create {@link Range} object from selector string. */
     private Range createRange(String selectorPart, Dimension dimension) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;

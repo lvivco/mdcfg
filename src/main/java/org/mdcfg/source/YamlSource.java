@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.source;
 
 import org.mdcfg.exceptions.MdcException;
@@ -12,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/** Source implementation for Yaml based config files */
 public class YamlSource extends FileSource {
 
     public YamlSource(String path) {

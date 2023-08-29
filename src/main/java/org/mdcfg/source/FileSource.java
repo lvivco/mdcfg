@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.source;
 
 import org.mdcfg.exceptions.MdcException;
@@ -12,12 +15,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/** Base class for all File based source implementations */
 public abstract class FileSource implements Source {
-
     private final File root;
-
     private List<File> includes;
-
     private Watcher watcher;
 
     protected FileSource(String path) {
@@ -55,10 +56,13 @@ public abstract class FileSource implements Source {
         watcher.start();
     }
 
+    /** Read one file */
     abstract Map<String, Map<String, String>> readFile(File source) throws MdcException;
 
+    /** Get array of appropriate files in folder */
     abstract File[] extractFiles(File folder);
 
+    /** Read properties from files and merge them into one Map */
     private Map<String, Map<String, String>> readAndMerge(List<File> files, Map<String, Map<String, String>> merged) throws MdcException {
         for (File file : files) {
             Map<String, Map<String, String>> map = readFile(file);
@@ -71,10 +75,12 @@ public abstract class FileSource implements Source {
         return merged;
     }
 
+    /** Combine root file with includes into single list */
     private List<File> getAllSourceFiles(){
         return Stream.concat(Stream.of(root), includes.stream()).collect(Collectors.toList());
     }
 
+    /** Get list of properties that exists in different source files */
     private Set<String> getInterfileKeys(Map<String, Map<String, String>> map, Map<String, Map<String, String>> merged) {
         Set<String> intersection = new HashSet<>(merged.keySet());
         intersection.retainAll(map.keySet());

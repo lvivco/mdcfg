@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2023 LvivCoffeeCoders team.
+ */
 package org.mdcfg.processor;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -10,6 +13,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ *  Process data form source and create appropriate properties with corresponding chains.
+ */
 public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
@@ -18,14 +24,19 @@ public class Processor {
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
 
-    private static final String SELECTOR_SEPARATOR= "@";
-
     private final List<Hook> loadHooks;
 
     public Processor(List<Hook> loadHooks) {
         this.loadHooks = loadHooks;
     }
 
+    /**
+     * Process data including aliases and calling appropriate hooks.
+     *
+     * @param data Map configuration to be processed.
+     * @return Map of properties.
+     * @throws MdcException thrown in case something went wrong.
+     */
     public Map<String, Property> process(Map<String, Map<String, String>> data) throws MdcException {
         Map<String, List<Alias>> aliases = getAliases(data);
         Map<String, Property> properties = new HashMap<>();
@@ -44,7 +55,37 @@ public class Processor {
         return properties;
     }
 
+    /** Parse config to find additional config sources configured in {@code includes} tag. */
+    public Map<String, String> getIncludes(Map<String, Map<String, String>> data) {
+        for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
+            if(INCLUDES.matcher(entry.getKey()).matches()) {
+                return entry.getValue();
+            }
+        }
+        return Map.of();
+    }
 
+    /**
+     *  Replace aliases with their substitutors.
+     *
+     *  <p> For example alias and property:
+     *  <pre>
+     *    aliases:
+     *      model@bmw:
+     *        cat@crossover: line@x5
+     *
+     *    horsepower:
+     *      any@: 400
+     *      line@x5: 500
+     *  </pre>
+     *  after processing final config will be following:
+     *  <pre>
+     *    horsepower:
+     *      any@: 400
+     *      model@bmw:
+     *        cat@crossover: 500
+     *  </pre>
+     */
     private Map<String, String> processAliases(Map<String, String> selectors, Map<String, List<Alias>> aliases) {
         Map<String, String> result = new LinkedHashMap<>();
         for (Map.Entry<String, String> selectorEntry : selectors.entrySet()) {
@@ -67,6 +108,7 @@ public class Processor {
         return result;
     }
 
+    /** Parse config to find aliases */
     private Map<String, List<Alias>> getAliases(Map<String, Map<String, String>> data) {
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
             if(ALIASES.matcher(entry.getKey()).matches()) {
@@ -78,6 +120,7 @@ public class Processor {
         return Map.of();
     }
 
+    /** Create alias helper */
     private Alias createAlias(Map.Entry<String, String> entry) {
         Pair<String, String> from = SourceUtils.splitSelector(entry.getValue().toLowerCase(Locale.ROOT));
         Pair<String, String> to = SourceUtils.splitSelector(entry.getKey());
@@ -87,14 +130,5 @@ public class Processor {
         } else {
             return new Alias(from.getKey(), entry.getValue().toLowerCase(Locale.ROOT), entry.getKey());
         }
-    }
-
-    public Map<String, String> getIncludes(Map<String, Map<String, String>> data) {
-        for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
-            if(INCLUDES.matcher(entry.getKey()).matches()) {
-                return entry.getValue();
-            }
-        }
-        return Map.of();
     }
 }
