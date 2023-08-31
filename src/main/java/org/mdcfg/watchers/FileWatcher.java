@@ -40,6 +40,7 @@ public class FileWatcher implements Watcher {
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         });
         executorService.shutdown();

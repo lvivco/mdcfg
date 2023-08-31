@@ -10,7 +10,6 @@ import java.util.TimerTask;
 public class DelayTimer {
     private final long delay;
     private final Timer timer;
-    private Task timerTask;
     private boolean started;
     private final Runnable executor;
 
@@ -37,8 +36,7 @@ public class DelayTimer {
     /** Schedule async delayed calls until someone calls {@code cancel()} */
     public void schedule(){
         if(!started) {
-            timerTask = new Task();
-            timer.schedule(timerTask, delay);
+            timer.schedule(new Task(), delay);
             started = true;
         }
     }

@@ -17,7 +17,7 @@ public final class SourceUtils {
     private static final String SELECTOR_SEPARATOR= "@";
     private static final String DIMENSION_SEPARATOR = ":";
     private static final String ANY = "any";
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile(":[^:]*[@].*");
+    private static final Pattern PROPERTY_PATTERN = Pattern.compile(":[^:]*@.*");
 
     private SourceUtils() {}
 

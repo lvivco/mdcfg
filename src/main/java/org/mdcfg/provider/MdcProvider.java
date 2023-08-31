@@ -415,7 +415,7 @@ public class MdcProvider {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
         String listString = Optional.ofNullable(property.getString(context))
-                .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
         if(listString == null){
