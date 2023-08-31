@@ -97,12 +97,7 @@ public class Processor {
                 List<Alias> dimensionAliases = aliases.get(SourceUtils.splitSelector(subSelector).getKey());
                 if(dimensionAliases != null){
                     for (Alias alias : dimensionAliases) {
-                        Matcher matcher = alias.getFrom().matcher(subSelector);
-                        if(matcher.find()) {
-                            int start = matcher.start(1);
-                            int end = matcher.end(1);
-                            subSelector = subSelector.substring(0, start) + alias.getTo() + subSelector.substring(end);
-                        }
+                        subSelector = SourceUtils.replaceGroup(alias.getFrom(), 1, subSelector, alias.getTo());
                     }
                 }
                 if(selectorKey.length() > 0){
