@@ -453,7 +453,6 @@ public class MdcProvider {
             Optional.ofNullable(callback).ifPresent(c->c.success(properties.size()));
         } catch (MdcException e) {
             Optional.ofNullable(properties).ifPresent(Map::clear);
-            properties.clear();
             Optional.ofNullable(callback).ifPresent(c->c.fail(e));
         }
     }
