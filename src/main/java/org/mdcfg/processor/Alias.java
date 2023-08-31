@@ -6,6 +6,8 @@ package org.mdcfg.processor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.regex.Pattern;
+
 /**
  *  Helper class for holding alias.
  *  <p> For example alias and property:
@@ -30,6 +32,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Alias {
     private String targetDimension;
-    private String from;
+    private Pattern from;
     private String to;
 }

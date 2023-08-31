@@ -69,6 +69,16 @@ public final class SourceUtils {
         return Pair.of(key, value);
     }
 
+    /** replace only specified RegExp group with specified string */
+    public static String replaceGroup(Pattern regexp, int groupIndex, String source, String replacement){
+        Matcher matcher = regexp.matcher(source);
+        if(matcher.find()) {
+            int start = matcher.start(groupIndex);
+            int end = matcher.end(groupIndex);
+            source = source.substring(0, start) + replacement + source.substring(end);
+        }
+        return source;
+    }
     private static Map<String, Object> flatten(Map<String, Object> map, String prefix) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
