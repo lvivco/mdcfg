@@ -419,7 +419,7 @@ public class MdcProvider {
                 .orElse(null);
 
         if(listString == null){
-            return null;
+            return null; //NOSONAR
         }
         if(StringUtils.isNotEmpty(listString)) {
             return Arrays.stream(listString.split(","))
