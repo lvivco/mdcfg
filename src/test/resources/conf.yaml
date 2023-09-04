@@ -5,6 +5,7 @@ aliases:
   addin*@leather-seats: addin*@ls
   addin*@panoramic-roof: addin*@pr
   addin*@cruise-control: addin*@cc
+  addin*@issue: addin*@panoramic #should not cause any issue
   model@bmw:
     cat@crossover: line@x5
   model@ford:

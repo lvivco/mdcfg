@@ -20,7 +20,7 @@ public class PropertyProcessor {
     private static final String LIST_SIGN = "*";
     private static final String RANGE_SIGN = "..";
     private static final String ANY = "any";
-    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("\\s|\\[|]");
+    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\s\\[\\]]");
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
 

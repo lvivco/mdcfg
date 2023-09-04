@@ -415,11 +415,11 @@ public class MdcProvider {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
         String listString = Optional.ofNullable(property.getString(context))
-                .map((s)->LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
         if(listString == null){
-            return null;
+            return null; //NOSONAR
         }
         if(StringUtils.isNotEmpty(listString)) {
             return Arrays.stream(listString.split(","))
@@ -453,7 +453,6 @@ public class MdcProvider {
             Optional.ofNullable(callback).ifPresent(c->c.success(properties.size()));
         } catch (MdcException e) {
             Optional.ofNullable(properties).ifPresent(Map::clear);
-            properties.clear();
             Optional.ofNullable(callback).ifPresent(c->c.fail(e));
         }
     }

@@ -23,6 +23,7 @@ public class Processor {
     private static final Pattern ALIASES = Pattern.compile("aliases(?:\\:|$).*$");
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
+    private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@)(%s)(?:,|\\s|]|$)";
 
     private final List<Hook> loadHooks;
 
@@ -95,7 +96,7 @@ public class Processor {
                 List<Alias> dimensionAliases = aliases.get(SourceUtils.splitSelector(subSelector).getKey());
                 if(dimensionAliases != null){
                     for (Alias alias : dimensionAliases) {
-                        subSelector = subSelector.replace(alias.getFrom(), alias.getTo());
+                        subSelector = SourceUtils.replaceGroup(alias.getFrom(), 1, subSelector, alias.getTo());
                     }
                 }
                 if(selectorKey.length() > 0){
@@ -124,11 +125,15 @@ public class Processor {
     private Alias createAlias(Map.Entry<String, String> entry) {
         Pair<String, String> from = SourceUtils.splitSelector(entry.getValue().toLowerCase(Locale.ROOT));
         Pair<String, String> to = SourceUtils.splitSelector(entry.getKey());
-        // if from dimension equals to dimension then replace only selectors
+        // if "from" dimension equals "to" dimension then replace only selectors
         if(from.getKey().equals(to.getKey())) {
-            return new Alias(from.getKey(), from.getValue(), to.getValue());
+            return new Alias(from.getKey(), compileAliasMatcher(from.getValue()), to.getValue());
         } else {
-            return new Alias(from.getKey(), entry.getValue().toLowerCase(Locale.ROOT), entry.getKey());
+            return new Alias(from.getKey(), compileAliasMatcher(entry.getValue().toLowerCase(Locale.ROOT)), entry.getKey());
         }
+    }
+
+    private Pattern compileAliasMatcher(String value) {
+        return Pattern.compile(String.format(ALIAS_REPLACER, Pattern.quote(value)));
     }
 }

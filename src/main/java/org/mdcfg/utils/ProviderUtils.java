@@ -13,8 +13,8 @@ public final class ProviderUtils {
     private ProviderUtils() {}
 
     /** Convert object to list */
-    public static List toList(Object object){
-        List<?> list = null;
+    public static List<Object> toList(Object object){
+        List<Object> list = null;
         if (object.getClass().isArray()) {
             list = Arrays.asList((Object[]) object);
         } else if (object instanceof Collection) {
