@@ -17,11 +17,11 @@ This project was initially developed by Avery & Softserve companies as an intern
 #### Maven
 ```xml
 <dependencies>
-  <dependency>
-    <groupId>org.mdcfg</groupId>
-    <artifactId>mdcfg</artifactId>
-    <version>1.0.0</version>
-  </dependency>
+    <dependency>
+        <groupId>io.github.lvivco</groupId>
+        <artifactId>mdcfg</artifactId>
+        <version>1.0.0</version>
+    </dependency>
 </dependencies>
 ```
 
