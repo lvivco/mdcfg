@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.mdcfg</groupId>
+    <groupId>io.github.lvivco</groupId>
     <artifactId>mdcfg</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>mdcfg</name>
     <description>A multi dimensional configuration library for Java distributed apps</description>
-    <url>https://github.com/LvivCoffeeCoders/mdcfg</url>
+    <url>https://github.com/lvivco/mdcfg</url>
 
     <licenses>
         <license>
@@ -25,20 +25,20 @@
             <name>Volodymyr Styranivskyy</name>
             <email>lvivcoffeecoders@gmail.com</email>
             <organization >lvivcoffeecoders</organization>
-            <organizationUrl>https://github.com/LvivCoffeeCoders/mdcfg</organizationUrl>
+            <organizationUrl>https://github.com/lvivco/mdcfg</organizationUrl>
         </developer>
         <developer>
             <name>Danylo Yurchyk</name>
             <email>kalesindeadvig@gmail.com</email>
             <organization >lvivcoffeecoders</organization>
-            <organizationUrl>https://github.com/LvivCoffeeCoders/mdcfg</organizationUrl>
+            <organizationUrl>https://github.com/lvivco/mdcfg</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/LvivCoffeeCoders/mdcfg.git</connection>
-        <developerConnection>scm:git:ssh://github.com/LvivCoffeeCoders/mdcfg.git</developerConnection>
-        <url>https://github.com/LvivCoffeeCoders/mdcfg/tree/master</url>
+        <connection>scm:git:git://github.com/lvivco/mdcfg.git</connection>
+        <developerConnection>scm:git:ssh://github.com/lvivco/mdcfg.git</developerConnection>
+        <url>https://github.com/lvivco/mdcfg/tree/master</url>
     </scm>
 
     <dependencies>
