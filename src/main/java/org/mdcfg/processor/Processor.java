@@ -58,12 +58,15 @@ public class Processor {
 
     /** Parse config to find additional config sources configured in {@code includes} tag. */
     public Map<String, String> getIncludes(Map<String, Map<String, String>> data) {
+        Map<String, String> result = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
             if(INCLUDES.matcher(entry.getKey()).matches()) {
-                return entry.getValue();
+                for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
+                    result.put(entry.getKey() + SUB_PROPERTY_SEPARATOR + e.getKey(), e.getValue());
+                }
             }
         }
-        return Map.of();
+        return result;
     }
 
     /**
