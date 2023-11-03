@@ -23,11 +23,11 @@ public class YamlSource extends FileSource {
     }
 
     @Override
-    Map<String, Map<String, String>> readFile(File source) throws MdcException {
+    Map<String, Map<String, String>> readFile(File source, boolean caseSensitive) throws MdcException {
         try (InputStream is = new FileInputStream(source)) {
             Map<String, Object> rawData = new Yaml().load(is);
             rawData = Optional.ofNullable(rawData).orElse(new HashMap<>());
-            Map<String, Object> flattened = SourceUtils.flatten(rawData);
+            Map<String, Object> flattened = SourceUtils.flatten(rawData, caseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
             throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);

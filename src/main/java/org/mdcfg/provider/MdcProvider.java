@@ -33,6 +33,7 @@ public class MdcProvider {
     private final Processor processor;
     private final Source source;
     private final MdcCallback<Integer, MdcException> callback;
+    private final boolean isCaseSensitive;
 
     private Map<String, Property> properties;
 
@@ -47,9 +48,10 @@ public class MdcProvider {
      * @throws MdcException thrown in case something went wrong.
      */
     public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,
-                       List<Hook> loadHooks) throws MdcException {
+                       List<Hook> loadHooks, boolean isCaseSensitive) throws MdcException {
         this.source = source;
         this.callback = callback;
+        this.isCaseSensitive = isCaseSensitive;
 
         this.processor = new Processor(loadHooks);
 
@@ -379,7 +381,7 @@ public class MdcProvider {
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
-        return Optional.ofNullable(property.getString(context))
+        return Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(converter)
                 .orElse(null);
     }
@@ -412,9 +414,9 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     private <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
+        Property property = Optional.ofNullable(properties.get(isCaseSensitive ? key : key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
-        String listString = Optional.ofNullable(property.getString(context))
+        String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
@@ -458,7 +460,7 @@ public class MdcProvider {
     }
 
     private void readProperties() throws MdcException {
-        Map<String, Map<String, String>> data = source.read(processor::getIncludes);
+        Map<String, Map<String, String>> data = source.read(processor::getIncludes, isCaseSensitive);
         properties = processor.process(data);
     }
 }

@@ -26,9 +26,15 @@ public class MdcBuilder {
         private long reloadInterval = 1000L;
         private MdcCallback<Integer, MdcException> callback;
         private final List<Hook> loadHooks = new ArrayList<>();
+        private boolean isCaseSensitive = false;
 
         public MdcConfigBuilder(Source source) {
             this.source = source;
+        }
+
+        public MdcConfigBuilder isCaseSensitive(boolean caseSensitive) {
+            this.isCaseSensitive = caseSensitive;
+            return this;
         }
 
         /**
@@ -117,7 +123,7 @@ public class MdcBuilder {
          * @throws MdcException thrown in case something went wrong.
          */
         public MdcProvider build() throws MdcException {
-            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks);
+            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks, isCaseSensitive);
         }
     }
 

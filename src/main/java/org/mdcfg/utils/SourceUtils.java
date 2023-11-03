@@ -36,8 +36,8 @@ public final class SourceUtils {
      *  <li>{@code horsepower:model@bmw:drive@4WD: 500}</li>
      *  </ul>
      */
-    public static Map<String, Object> flatten(Map<String, Object> map) {
-        return flatten(map, "");
+    public static Map<String, Object> flatten(Map<String, Object> map, boolean isCaseSensitive) {
+        return flatten(map, "", isCaseSensitive);
     }
 
     /** Get configuration grouped by properties */
@@ -79,13 +79,13 @@ public final class SourceUtils {
         }
         return source;
     }
-    private static Map<String, Object> flatten(Map<String, Object> map, String prefix) {
+    private static Map<String, Object> flatten(Map<String, Object> map, String prefix, boolean isCaseSensitive) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey().toLowerCase(Locale.ROOT);
+            String key = isCaseSensitive ? entry.getKey() : entry.getKey().toLowerCase(Locale.ROOT);
             Object value = entry.getValue();
             if (value instanceof Map) {
-                result.putAll(flatten((Map<String, Object>) value,prefix + key + DIMENSION_SEPARATOR));
+                result.putAll(flatten((Map<String, Object>) value,prefix + key + DIMENSION_SEPARATOR, isCaseSensitive));
             } else {
                 result.put(prefix + key, value);
             }
