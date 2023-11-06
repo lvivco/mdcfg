@@ -45,6 +45,7 @@ public class MdcProvider {
      * @param reloadInterval interval in ms for reload
      * @param callback reload call back. See {@link MdcCallback}.
      * @param loadHooks List of functions that used for preprocessing config values.
+     * @param isCaseSensitive Flag that indicates whether config should acknowledge case
      * @throws MdcException thrown in case something went wrong.
      */
     public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,

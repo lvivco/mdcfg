@@ -17,7 +17,7 @@ public class CaseSensitiveKeyTest {
 
     @BeforeClass
     public static void init() throws MdcException {
-        provider = MdcBuilder.withYaml(YAML_PATH).isCaseSensitive(true).build();
+        provider = MdcBuilder.withYaml(YAML_PATH).caseSensitive().build();
     }
 
     @Test(expected = MdcException.class)

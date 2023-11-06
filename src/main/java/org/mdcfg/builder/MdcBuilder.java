@@ -32,8 +32,12 @@ public class MdcBuilder {
             this.source = source;
         }
 
-        public MdcConfigBuilder isCaseSensitive(boolean caseSensitive) {
-            this.isCaseSensitive = caseSensitive;
+        /**
+         *
+         * @return current instance of {@link MdcConfigBuilder}
+         */
+        public MdcConfigBuilder caseSensitive() {
+            this.isCaseSensitive = true;
             return this;
         }
 
