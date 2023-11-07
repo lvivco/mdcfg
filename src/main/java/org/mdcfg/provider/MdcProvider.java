@@ -380,7 +380,7 @@ public class MdcProvider {
      * @throws MdcException  in case property not found.
      */
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
+        Property property = Optional.ofNullable(properties.get(isCaseSensitive ? key : key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
         return Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(converter)
