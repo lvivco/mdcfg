@@ -23,8 +23,9 @@ public class Property {
     private final List<Chain> chains;
 
     /** create compare string and match it on chains by down to up priority */
-    public String getString(MdcContext context) {
+    public String getString(MdcContext context, boolean isCaseSensitive) {
         String compare = createCompareString(context);
+        compare = isCaseSensitive ? compare : compare.toLowerCase(Locale.ROOT);
         for (Chain chain : chains) {
             if(chain.match(context, compare)){
                 return chain.getValue();
@@ -67,6 +68,6 @@ public class Property {
             }
             compare.append(object);
         }
-        return compare.toString().toLowerCase(Locale.ROOT);
+        return compare.toString();
     }
 }

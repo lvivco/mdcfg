@@ -26,21 +26,21 @@ public abstract class FileSource implements Source {
     }
 
     @Override
-    public Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor) throws MdcException {
+    public Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException {
         if(root.isDirectory()){
             File[] files = extractFiles(root);
             if(files == null || files.length == 0){
                 throw new MdcException("Folder doesn't contain any config file.");
             }
-            return readAndMerge(Arrays.asList(files), new HashMap<>());
+            return readAndMerge(Arrays.asList(files), new HashMap<>(), isCaseSensitive);
         } else {
-            Map<String, Map<String, String>> main = readFile(root);
+            Map<String, Map<String, String>> main = readFile(root, isCaseSensitive);
             includes = includesExtractor.apply(main).values().stream()
                     .map(v -> root.getParentFile().toPath().resolve(Paths.get(v)).toFile())
                     .filter(File::isFile)
                     .filter(File::exists)
                     .collect(Collectors.toList());
-            return readAndMerge(includes, main);
+            return readAndMerge(includes, main, isCaseSensitive);
         }
     }
 
@@ -57,15 +57,15 @@ public abstract class FileSource implements Source {
     }
 
     /** Read one file */
-    abstract Map<String, Map<String, String>> readFile(File source) throws MdcException;
+    abstract Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException;
 
     /** Get array of appropriate files in folder */
     abstract File[] extractFiles(File folder);
 
     /** Read properties from files and merge them into one Map */
-    private Map<String, Map<String, String>> readAndMerge(List<File> files, Map<String, Map<String, String>> merged) throws MdcException {
+    private Map<String, Map<String, String>> readAndMerge(List<File> files, Map<String, Map<String, String>> merged, boolean isCaseSensitive) throws MdcException {
         for (File file : files) {
-            Map<String, Map<String, String>> map = readFile(file);
+            Map<String, Map<String, String>> map = readFile(file, isCaseSensitive);
             Set<String> interfileKeys = getInterfileKeys(map, merged);
             if(!interfileKeys.isEmpty()){
                 throw new MdcException(String.format("There is interfile configuration for keys %s", interfileKeys));
