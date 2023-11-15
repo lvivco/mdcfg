@@ -6,6 +6,13 @@ engine:
   type: [electric, gas, diesel]
   drive: [4WD, 2WD]
 
+production-models:
+  model@toyota: |
+    Tacoma : 2005
+    Prius : 1997
+    Sequoia : 2000
+    Corolla Cross : 2020
+
 available-colors:
   any@: [white, black]
   model@bmw: [white, black, blue, metalic]
