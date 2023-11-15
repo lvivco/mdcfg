@@ -35,7 +35,7 @@ public class AutoUpdateTest {
                 .build();
 
         String count = future.get();
-        assertEquals(8, Integer.parseInt(count));
+        assertEquals(9, Integer.parseInt(count));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class AutoUpdateTest {
                 .build();
 
         String count = future.get();
-        assertEquals(8, Integer.parseInt(count));
+        assertEquals(9, Integer.parseInt(count));
     }
 
     private void modifyFile(Path from, Path to) {
