@@ -23,10 +23,10 @@ public class JsonSource extends FileSource {
     }
 
     @Override
-    Map<String, Map<String, String>> readFile(File source) throws MdcException {
+    Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException {
         try (InputStream is = new FileInputStream(source)) {
             Map<String, Object> rawData = new ObjectMapper().readValue(is, TYPE);
-            Map<String, Object> flattened = SourceUtils.flatten(rawData);
+            Map<String, Object> flattened = SourceUtils.flatten(rawData, isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
             throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);

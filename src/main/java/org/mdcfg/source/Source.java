@@ -13,7 +13,7 @@ import java.util.function.Function;
  */
 public interface Source {
     /** Read properties into Map object */
-    Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor) throws MdcException;
+    Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException;
     /** Set up change watcher */
     void observeChange(Runnable onChange, long reloadInterval) throws MdcException;
 }
