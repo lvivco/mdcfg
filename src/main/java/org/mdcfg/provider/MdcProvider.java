@@ -383,7 +383,7 @@ public class MdcProvider {
     public <K, V> Map<K, V> getMap(MdcContext context, String key, Function<String, K> keyConverter, Function<String, V> valueConverter) throws MdcException {
         Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
-        String mapString = property.getString(context);
+        String mapString = property.getString(context, isCaseSensitive);
 
         if(mapString == null){
             return null; //NOSONAR
