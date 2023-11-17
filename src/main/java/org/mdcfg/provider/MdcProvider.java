@@ -23,7 +23,10 @@ import java.util.stream.Collectors;
 public class MdcProvider {
     private static final UnaryOperator<String> TO_STRING = v -> v;
     private static final Function<String, Boolean> TO_BOOLEAN = Boolean::parseBoolean;
+    private static final Function<String, Short> TO_SHORT = Short::parseShort;
     private static final Function<String, Integer> TO_INTEGER = Integer::parseInt;
+    private static final Function<String, Long> TO_LONG = Long::parseLong;
+    private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
 
@@ -114,6 +117,29 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code Float}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
+    public Float getFloat(MdcContext context, String key) throws MdcException {
+        return getValue(context, key, TO_FLOAT);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<Float>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
+    public Optional<Float> getFloatOptional(MdcContext context, String key) {
+        return getValueOptional(context, key, TO_FLOAT);
+    }
+
+    /**
      * Read property value and convert it to {@code Double}.
      *
      * @param context reading context {@link MdcContext}.
@@ -137,6 +163,29 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code Short}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
+    public Short getShort(MdcContext context, String key) throws MdcException {
+        return getValue(context, key, TO_SHORT);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<Short>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
+    public Optional<Short> getShortOptional(MdcContext context, String key) {
+        return getValueOptional(context, key, TO_SHORT);
+    }
+
+    /**
      * Read property value and convert it to {@code Integer}.
      *
      * @param context reading context {@link MdcContext}.
@@ -157,6 +206,29 @@ public class MdcProvider {
      */
     public Optional<Integer> getIntegerOptional(MdcContext context, String key) {
         return getValueOptional(context, key, TO_INTEGER);
+    }
+
+    /**
+     * Read property value and convert it to {@code Long}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return property value or null.
+     * @throws MdcException in case property not found.
+     */
+    public Long getLong(MdcContext context, String key) throws MdcException {
+        return getValue(context, key, TO_LONG);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<Long>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional} of property value.
+     */
+    public Optional<Long> getLongOptional(MdcContext context, String key) {
+        return getValueOptional(context, key, TO_LONG);
     }
 
     /**
@@ -206,6 +278,29 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code List<Float>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public List<Float> getFloatList(MdcContext context, String key) throws MdcException {
+        return getValueList(context, key, TO_FLOAT);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<List<Float>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
+    public Optional<List<Float>> getFloatListOptional(MdcContext context, String key) {
+        return getValueListOptional(context, key, TO_FLOAT);
+    }
+
+    /**
      * Read property value and convert it to {@code List<Double>}.
      *
      * @param context reading context {@link MdcContext}.
@@ -229,6 +324,41 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code List<Short>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public List<Short> getShortList(MdcContext context, String key) throws MdcException {
+        return getValueList(context, key, TO_SHORT);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<List<Short>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
+    public Optional<List<Short>> getShortListOptional(MdcContext context, String key) {
+        return getValueListOptional(context, key, TO_SHORT);
+    }
+
+    /**
+     * Read property value and convert it to {@code List<Integer>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public List<Integer> getIntegerList(MdcContext context, String key) throws MdcException {
+        return getValueList(context, key, TO_INTEGER);
+    }
+
+    /**
      * Read property value and convert it to {@code Optional<List<Integer>>}.
      *
      * @param context reading context {@link MdcContext}.
@@ -237,6 +367,29 @@ public class MdcProvider {
      */
     public Optional<List<Integer>> getIntegerListOptional(MdcContext context, String key) {
         return getValueListOptional(context, key, TO_INTEGER);
+    }
+
+    /**
+     * Read property value and convert it to {@code List<Long>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code List} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public List<Long> getLongList(MdcContext context, String key) throws MdcException {
+        return getValueList(context, key, TO_LONG);
+    }
+
+    /**
+     * Read property value and convert it to {@code Optional<List<Long>>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Optional<List>} of property values or null.
+     */
+    public Optional<List<Long>> getLongListOptional(MdcContext context, String key) {
+        return getValueListOptional(context, key, TO_LONG);
     }
 
     /**
@@ -285,6 +438,42 @@ public class MdcProvider {
      */
     public Map<String, Boolean> getBooleanMap(MdcContext context, String key) throws MdcException {
         return getMap(context, key, TO_STRING, TO_BOOLEAN);
+    }
+
+    /**
+     * Read property value and convert it to {@code Map<String,Float>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Map} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public Map<String, Float> getFloatMap(MdcContext context, String key) throws MdcException {
+        return getMap(context, key, TO_STRING, TO_FLOAT);
+    }
+
+    /**
+     * Read property value and convert it to {@code Map<String,Long>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Map} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public Map<String, Long> getLongMap(MdcContext context, String key) throws MdcException {
+        return getMap(context, key, TO_STRING, TO_LONG);
+    }
+
+    /**
+     * Read property value and convert it to {@code Map<String,Short>}.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Map} of property values or null.
+     * @throws MdcException in case property not found.
+     */
+    public Map<String, Short> getShortMap(MdcContext context, String key) throws MdcException {
+        return getMap(context, key, TO_STRING, TO_SHORT);
     }
 
     /**
