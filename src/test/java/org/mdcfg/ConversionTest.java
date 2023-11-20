@@ -10,6 +10,7 @@ import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mdcfg.Resources.YAML_PATH;
 import static org.junit.Assert.assertEquals;
@@ -33,5 +34,12 @@ public class ConversionTest {
     public void testDoubleProperty() throws MdcException {
         Double horsepower = provider.getDouble(TestContextBuilder.EMPTY, "horsepower");
         assertEquals(Double.valueOf(400d), horsepower);
+    }
+
+    @Test
+    public void testMapProperty() throws MdcException {
+        Map<String, Integer> productionModels = provider.getIntegerMap(TestContextBuilder.init().model("toyota").build(),
+                "production-models");
+        assertEquals(Integer.valueOf(2020), productionModels.get("Corolla Cross"));
     }
 }
