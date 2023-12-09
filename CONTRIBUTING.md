@@ -31,7 +31,7 @@ Good pull requests - patches, improvements, new features - are a fantastic help.
 
 Guidelines for pull requests:
 
-1. Add issue first or choose existing
+1. Add issue first or choose existing. Clarify with us.
 2. Create a new branch
 3. Assign issue to branch
 4. Make your changes. Use similar coding style. Please note that your PR should include tests for the new codebase!
