@@ -55,5 +55,8 @@ public class MdcfgPoweredApplication {
 }
 ```
 
+# Contributing
+To contribute the project follow [guide](CONTRIBUTING.md).
+
 # License
 Licensed under the MIT License. See LICENSE file.
