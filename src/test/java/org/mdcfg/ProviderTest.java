@@ -10,6 +10,7 @@ import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mdcfg.Resources.*;
@@ -125,5 +126,15 @@ public class ProviderTest {
         assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
+    }
+
+    @Test
+    public void testCompoundMapProperty() throws MdcException {
+        Map<String, Object> engine = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine");
+        assertEquals("[electric, gas, diesel]",engine.get("type"));
+        assertEquals("inline",((Map<String, Object>) engine.get("block")).get("type"));
     }
 }
