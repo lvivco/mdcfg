@@ -586,6 +586,14 @@ public class MdcProvider {
         return Collections.emptyMap();
     }
 
+    /**
+     * Read compound property and return result as Tree (based on maps).
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Map} of property values.
+     * @throws MdcException in case property not found.
+     */
     public Map<String, Object> getCompoundMap(MdcContext context, String key) throws MdcException {
         Map<String, Object> result = new HashMap<>();
         List<Property> propertyList = listCompoundProperty(key);
