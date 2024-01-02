@@ -29,6 +29,7 @@ public class MdcProvider {
     private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
+    private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
 
     private final Processor processor;
     private final Source source;
@@ -487,8 +488,7 @@ public class MdcProvider {
      * @throws MdcException  in case property not found.
      */
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = Optional.ofNullable(properties.get(isCaseSensitive ? key : key.toLowerCase(Locale.ROOT)))
-                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+        Property property = getProperty(key);
         return Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(converter)
                 .orElse(null);
@@ -522,8 +522,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = Optional.ofNullable(properties.get(isCaseSensitive ? key : key.toLowerCase(Locale.ROOT)))
-                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+        Property property = getProperty(key);
         String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
@@ -570,8 +569,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public <K, V> Map<K, V> getMap(MdcContext context, String key, Function<String, K> keyConverter, Function<String, V> valueConverter) throws MdcException {
-        Property property = Optional.ofNullable(properties.get(key.toLowerCase(Locale.ROOT)))
-                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+        Property property = getProperty(key);
         String mapString = property.getString(context, isCaseSensitive);
 
         if(mapString == null){
@@ -587,6 +585,60 @@ public class MdcProvider {
         }
         return Collections.emptyMap();
     }
+
+    /**
+     * Read compound property and return result as Tree (based on maps).
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @return {@code Map} of property values.
+     * @throws MdcException in case property not found.
+     */
+    public Map<String, Object> getCompoundMap(MdcContext context, String key) throws MdcException {
+        Map<String, Object> result = new HashMap<>();
+        List<Property> propertyList = listCompoundProperty(key);
+        for (Property property : propertyList) {
+            String[] path = SUB_PROPERTY_SEPARATOR.split(property.getName());
+            Map<String, Object> leaf = getLeaf(result, path);
+            leaf.put(path[path.length-1], property.getString(context, isCaseSensitive));
+        }
+        return result;
+    }
+
+    private String processKey(String key) {
+        return isCaseSensitive ? key : key.toLowerCase(Locale.ROOT);
+    }
+
+    private  Property getProperty(String key) throws MdcException {
+        return Optional.ofNullable(properties.get(processKey(key)))
+                .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+    }
+
+    private  List<Property> listCompoundProperty(String key) throws MdcException {
+        final String keyPart = processKey(key);
+        List<Property> result = properties.entrySet().stream()
+                .filter(e -> e.getKey().startsWith(keyPart))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+        if(result.isEmpty()){
+            throw new MdcException(String.format("Property %s not found.", key));
+        }
+        return result;
+    }
+
+    private Map<String, Object> getLeaf(Map<String, Object> root, String[] path) {
+        Map<String, Object> leaf = root;
+        if(path.length > 2) {
+            for (int i = 1; i < path.length-1; i++) {
+                if(!leaf.containsKey(path[i])){
+                    leaf.put(path[i], new HashMap<>());
+                }
+                leaf = (Map<String, Object>) leaf.get(path[i]);
+            }
+        }
+        return leaf;
+    }
+
 
     private void updateProperties() {
         try {

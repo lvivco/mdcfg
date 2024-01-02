@@ -5,6 +5,11 @@ includes:
 engine:
   type: [electric, gas, diesel]
   drive: [4WD, 2WD]
+  block:
+    type:
+      any@: "V"
+      model@bmw: "inline"
+    cylinder-count: 6
 
 production-models:
   model@toyota: |
