@@ -3,6 +3,8 @@
  */
 package org.mdcfg.provider;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
@@ -603,6 +605,26 @@ public class MdcProvider {
             leaf.put(path[path.length-1], property.getString(context, isCaseSensitive));
         }
         return result;
+    }
+
+    /**
+     * Read compound property and return result as JSON.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param prettify prettify response.
+     * @return JSON string of property values.
+     * @throws MdcException in case property not found.
+     */
+    public String getCompoundJSON(MdcContext context, String key, boolean prettify) throws MdcException {
+        try {
+            Map<String, Object> map = getCompoundMap(context, key);
+            return prettify
+                    ? new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(map)
+                    : new ObjectMapper().writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new MdcException("Couldn't deserialize object", e);
+        }
     }
 
     private String processKey(String key) {
