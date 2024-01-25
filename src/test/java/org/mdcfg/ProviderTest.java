@@ -137,4 +137,13 @@ public class ProviderTest {
         assertEquals("[electric, gas, diesel]",engine.get("type"));
         assertEquals("inline",((Map<String, Object>) engine.get("block")).get("type"));
     }
+
+    @Test
+    public void testCompoundJSONProperty() throws MdcException {
+        String engine = provider.getCompoundJSON(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine.block", false);
+        assertEquals("{\"block\":{\"cylinder-count\":\"6\",\"type\":\"inline\"}}",engine);
+    }
 }
