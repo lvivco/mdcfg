@@ -7,12 +7,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
+import org.mdcfg.helpers.TestContextBuilder;
 import org.mdcfg.provider.MdcProvider;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
-import static org.mdcfg.Resources.YAML_PATH;
+import static org.mdcfg.helpers.Resources.YAML_PATH;
 
 public class AliasTest {
 

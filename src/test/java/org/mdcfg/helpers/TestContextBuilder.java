@@ -1,7 +1,7 @@
 /**
  *   Copyright (C) 2023 LvivCoffeeCoders team.
  */
-package org.mdcfg;
+package org.mdcfg.helpers;
 
 import org.mdcfg.provider.MdcContext;
 

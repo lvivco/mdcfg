@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import static org.mdcfg.Resources.YAML_PATH;
+import static org.mdcfg.helpers.Resources.YAML_PATH;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

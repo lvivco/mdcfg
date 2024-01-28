@@ -3,9 +3,14 @@
  */
 package org.mdcfg;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
+import org.mdcfg.helpers.TestContextBuilder;
+import org.mdcfg.helpers.EnginePOJO;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
@@ -13,7 +18,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.mdcfg.Resources.*;
+import static org.mdcfg.helpers.Resources.*;
 
 public class ProviderTest {
 
@@ -145,5 +150,41 @@ public class ProviderTest {
                         .model("bmw")
                         .build(),"engine.block", false);
         assertEquals("{\"block\":{\"cylinder-count\":\"6\",\"type\":\"inline\"}}",engine);
+    }
+
+    @Test
+    public void testCompoundObjectPropertyByClass() throws MdcException {
+        EnginePOJO engine = provider.getCompoundObject(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine", EnginePOJO.class);
+        assertEnginePOJO(engine);
+    }
+
+    @Test
+    public void testCompoundObjectPropertyByType() throws MdcException {
+        JavaType type = new ObjectMapper().getTypeFactory().constructType(EnginePOJO.class);
+        EnginePOJO engine = provider.getCompoundObject(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine", type);
+        assertEnginePOJO(engine);
+    }
+
+    @Test
+    public void testCompoundObjectPropertyByTypeReference() throws MdcException {
+        final TypeReference<EnginePOJO> typeReference = new TypeReference<>(){};
+        EnginePOJO engine = provider.getCompoundObject(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine", typeReference);
+        assertEnginePOJO(engine);
+    }
+
+    private static void assertEnginePOJO(EnginePOJO engine) {
+        assertEquals("[electric, gas, diesel]", engine.getType());
+        assertEquals("[4WD, 2WD]", engine.getDrive());
+        assertEquals("inline", engine.getBlock().getType());
+        assertEquals(6, engine.getBlock().getCylinderCount());
     }
 }

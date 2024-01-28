@@ -4,7 +4,9 @@
 package org.mdcfg.provider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JavaType;
 import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
@@ -32,6 +34,7 @@ public class MdcProvider {
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
     private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Processor processor;
     private final Source source;
@@ -620,11 +623,56 @@ public class MdcProvider {
         try {
             Map<String, Object> map = getCompoundMap(context, key);
             return prettify
-                    ? new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(map)
-                    : new ObjectMapper().writeValueAsString(map);
+                    ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(map)
+                    : OBJECT_MAPPER.writeValueAsString(map);
         } catch (JsonProcessingException e) {
             throw new MdcException("Couldn't deserialize object", e);
         }
+    }
+
+    /**
+     * Read compound property and return result as POJO object.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param clas Class in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code Map} of property values.
+     * @throws MdcException in case property not found.
+     */
+    public <T> T getCompoundObject(MdcContext context, String key, Class<T> clas) throws MdcException {
+        Map<String, Object> map = getCompoundMap(context, key);
+        return OBJECT_MAPPER.convertValue(map, clas);
+    }
+
+    /**
+     * Read compound property and return result as POJO object.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param toValueType type in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code Map} of property values.
+     * @throws MdcException in case property not found.
+     */
+    public <T> T getCompoundObject(MdcContext context, String key, JavaType toValueType) throws MdcException {
+        Map<String, Object> map = getCompoundMap(context, key);
+        return OBJECT_MAPPER.convertValue(map, toValueType);
+    }
+
+    /**
+     * Read compound property and return result as POJO object.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param toValueTypeRef type reference in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code Map} of property values.
+     * @throws MdcException in case property not found.
+     */
+    public <T> T getCompoundObject(MdcContext context, String key, TypeReference<T> toValueTypeRef) throws MdcException {
+        Map<String, Object> map = getCompoundMap(context, key);
+        return OBJECT_MAPPER.convertValue(map, toValueTypeRef);
     }
 
     private String processKey(String key) {
