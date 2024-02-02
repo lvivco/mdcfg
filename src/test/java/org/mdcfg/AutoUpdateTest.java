@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.mdcfg.Resources.YAML_PATH;
+import static org.mdcfg.helpers.Resources.YAML_PATH;
 
 public class AutoUpdateTest {
 

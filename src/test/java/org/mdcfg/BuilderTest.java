@@ -10,7 +10,7 @@ import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.mdcfg.Resources.*;
+import static org.mdcfg.helpers.Resources.*;
 
 public class BuilderTest {
 

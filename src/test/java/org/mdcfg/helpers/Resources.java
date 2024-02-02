@@ -1,7 +1,7 @@
 /**
  *   Copyright (C) 2023 LvivCoffeeCoders team.
  */
-package org.mdcfg;
+package org.mdcfg.helpers;
 
 public class Resources {
     public static final String YAML_PATH = "src/test/resources/conf.yaml";
