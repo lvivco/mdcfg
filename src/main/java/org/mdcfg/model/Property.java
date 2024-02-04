@@ -21,6 +21,7 @@ public class Property {
     @Getter private final String name;
     private final Map<String, Dimension> dimensions;
     private final List<Chain> chains;
+    @Getter private final boolean hasReference;
 
     /** create compare string and match it on chains by down to up priority */
     public String getString(MdcContext context, boolean isCaseSensitive) {

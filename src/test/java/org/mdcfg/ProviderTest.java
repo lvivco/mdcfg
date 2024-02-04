@@ -183,6 +183,26 @@ public class ProviderTest {
         assertEnginePOJO(engine);
     }
 
+    @Test
+    public void testStringPropertyResolver() throws MdcException {
+        String label = provider.getString(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine-info.label");
+        assertEquals("Block inline Type 480 Horsepower", label);
+    }
+
+    @Test
+    public void testListPropertyResolver() throws MdcException {
+        List<String> list = provider.getStringList(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine-info.list");
+        assertEquals(2, list.size());
+        assertEquals("inline", list.get(0));
+        assertEquals("Cylinders: 6", list.get(1));
+    }
+
     private static void assertEnginePOJO(EnginePOJO engine) {
         assertEquals("[electric, gas, diesel]", engine.getType());
         assertEquals("[4WD, 2WD]", engine.getDrive());

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,8 @@ public class MdcProvider {
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
     private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
+    private static final String ROOT_PROPERTY = "^%s($|\\.)";
+    private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{([^}]+)}");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Processor processor;
@@ -494,7 +497,7 @@ public class MdcProvider {
      */
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = getProperty(key);
-        return Optional.ofNullable(property.getString(context, isCaseSensitive))
+        return Optional.ofNullable(getStringValue(property, context))
                 .map(converter)
                 .orElse(null);
     }
@@ -528,7 +531,7 @@ public class MdcProvider {
      */
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = getProperty(key);
-        String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
+        String listString = Optional.ofNullable(getStringValue(property, context))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
@@ -575,7 +578,7 @@ public class MdcProvider {
      */
     public <K, V> Map<K, V> getMap(MdcContext context, String key, Function<String, K> keyConverter, Function<String, V> valueConverter) throws MdcException {
         Property property = getProperty(key);
-        String mapString = property.getString(context, isCaseSensitive);
+        String mapString = getStringValue(property, context);
 
         if(mapString == null){
             return null; //NOSONAR
@@ -605,7 +608,7 @@ public class MdcProvider {
         for (Property property : propertyList) {
             String[] path = SUB_PROPERTY_SEPARATOR.split(property.getName());
             Map<String, Object> leaf = getLeaf(result, path);
-            leaf.put(path[path.length-1], property.getString(context, isCaseSensitive));
+            leaf.put(path[path.length-1], getStringValue(property, context));
         }
         return result;
     }
@@ -679,15 +682,32 @@ public class MdcProvider {
         return isCaseSensitive ? key : key.toLowerCase(Locale.ROOT);
     }
 
-    private  Property getProperty(String key) throws MdcException {
+    private Property getProperty(String key) throws MdcException {
         return Optional.ofNullable(properties.get(processKey(key)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
     }
 
+    private String getStringValue(Property property, MdcContext context) throws MdcException {
+        String value = property.getString(context, isCaseSensitive);
+        if(property.isHasReference()) {
+            StringBuffer sb = new StringBuffer();
+            Matcher m = REFERENCE_PATTERN.matcher(value);
+            while (m.find()) {
+                String refKey = m.group(1);
+                m.appendReplacement(sb, getString(context, refKey));
+            }
+            m.appendTail(sb);
+            return sb.toString();
+        }
+        return value;
+    }
+
     private  List<Property> listCompoundProperty(String key) throws MdcException {
         final String keyPart = processKey(key);
+        Pattern pattern = Pattern.compile(String.format(ROOT_PROPERTY, keyPart));
+        // Could impact performance
         List<Property> result = properties.entrySet().stream()
-                .filter(e -> e.getKey().startsWith(keyPart))
+                .filter(e -> pattern.matcher(e.getKey()).find())
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
         if(result.isEmpty()){
