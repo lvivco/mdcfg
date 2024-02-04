@@ -19,9 +19,9 @@ import java.util.List;
 public class Range {
     private final Dimension dimension;
     private double min = -Double.MAX_VALUE;
-    private boolean minInclusive;
+    private final boolean minInclusive;
     private double max= Double.MAX_VALUE;
-    private boolean maxInclusive;
+    private final boolean maxInclusive;
 
     public Range(Dimension dimension, boolean minInclusive, String min, boolean maxInclusive, String max) {
         this.dimension = dimension;

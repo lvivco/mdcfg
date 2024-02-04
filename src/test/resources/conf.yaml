@@ -36,9 +36,9 @@ horsepower:
     drive@4WD: 350
     drive@2WD: 300
 
-offroad:
+off-road:
   clearance@[..12]: false
   clearance@[!12..17, 19, 20]: true
   clearance@[!20..]: true
 
-options: {"parktronic": true, "cruise-control": false, "lights": "led"}
+options: {"parking-assist": true, "cruise-control": false, "lights": "led"}

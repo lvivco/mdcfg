@@ -8,15 +8,15 @@ import org.mdcfg.provider.MdcContext;
 import java.util.List;
 
 public class TestContextBuilder {
-    private static String MODEl = "model";
-    private static String CATEGORY = "cat";
-    private static String DRIVE = "drive";
-    private static String ADDIN = "addin";
-    private static String CLEARANCE = "clearance";
+    private static final String MODEl = "model";
+    private static final String CATEGORY = "cat";
+    private static final String DRIVE = "drive";
+    private static final String ADD_IN = "add-in";
+    private static final String CLEARANCE = "clearance";
 
     public static MdcContext EMPTY = new MdcContext();
 
-    private MdcContext ctx;
+    private final MdcContext ctx;
 
     private TestContextBuilder() {
         ctx = new MdcContext();
@@ -45,8 +45,8 @@ public class TestContextBuilder {
         return this;
     }
 
-    public TestContextBuilder addin(List<String> addin){
-        ctx.put(ADDIN, addin);
+    public TestContextBuilder addIn(List<String> addIn){
+        ctx.put(ADD_IN, addIn);
         return this;
     }
 
