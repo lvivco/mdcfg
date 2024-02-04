@@ -15,6 +15,7 @@ import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -179,6 +180,26 @@ public class ProviderTest {
                         .model("bmw")
                         .build(),"engine", typeReference);
         assertEnginePOJO(engine);
+    }
+
+    @Test
+    public void testStringPropertyResolver() throws MdcException {
+        String label = provider.getString(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine-info.label");
+        assertEquals("Block inline Type 480 Horsepower", label);
+    }
+
+    @Test
+    public void testListPropertyResolver() throws MdcException {
+        List<String> list = provider.getStringList(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"engine-info.list");
+        assertEquals(2, list.size());
+        assertEquals("inline", list.get(0));
+        assertEquals("Cylinders: 6", list.get(1));
     }
 
     private static void assertEnginePOJO(EnginePOJO engine) {
