@@ -10,7 +10,7 @@ import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.helpers.TestContextBuilder;
 import org.mdcfg.provider.MdcProvider;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mdcfg.helpers.Resources.YAML_PATH;
@@ -39,7 +39,7 @@ public class AliasTest {
         String priceToyotaCruiseControl = provider.getString(
                 TestContextBuilder.init()
                         .model("toyota")
-                        .addin(Arrays.asList("cruise-control"))
+                        .addIn(List.of("cruise-control"))
                         .build(), "price");
         assertEquals("37000", priceToyotaCruiseControl);
     }

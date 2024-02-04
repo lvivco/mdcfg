@@ -63,10 +63,10 @@ public class ProviderTest {
         assertEquals("300", horsepowerToyota2WD);
 
         String horsepowerFord4WD = provider.getString(TestContextBuilder.init().model("ford").drive("4WD").build(), "horsepower");
-        assertEquals("350", horsepowerToyota4WD);
+        assertEquals("350", horsepowerFord4WD);
 
         String horsepowerFord2WD = provider.getString(TestContextBuilder.init().model("ford").drive("2WD").build(), "horsepower");
-        assertEquals("300", horsepowerToyota2WD);
+        assertEquals("300", horsepowerFord2WD);
 
         String horsepowerFiat2WD = provider.getString(TestContextBuilder.init().model("hyundai").drive("2WD").build(), "horsepower");
         assertEquals("400", horsepowerFiat2WD);
@@ -77,7 +77,7 @@ public class ProviderTest {
         String priceToyotaLeatherSeats = provider.getString(
                 TestContextBuilder.init()
                         .model("toyota")
-                        .addin(Arrays.asList("leather-seats"))
+                        .addIn(List.of("leather-seats"))
                         .build(), "price");
         assertEquals("35000", priceToyotaLeatherSeats);
 
@@ -90,51 +90,52 @@ public class ProviderTest {
         String priceBmwLeatherSeats = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .addin(Arrays.asList("leather-seats"))
+                        .addIn(List.of("leather-seats"))
                         .build(), "price");
         assertEquals("55000", priceBmwLeatherSeats);
 
         String priceBmwPanoramicRoof = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .addin(Arrays.asList("panoramic-roof"))
+                        .addIn(List.of("panoramic-roof"))
                         .build(), "price");
         assertEquals("55000", priceBmwPanoramicRoof);
 
         String priceBmwLeatherSeatsPanoramicRoof = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .addin(Arrays.asList("panoramic-roof, leather-seats"))
+                        .addIn(Arrays.asList("panoramic-roof", "leather-seats"))
                         .build(), "price");
         assertEquals("55000", priceBmwLeatherSeatsPanoramicRoof);
 
         String priceBmwXenonLightsPanoramicRoof = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .addin(Arrays.asList("panoramic-roof, xenon-lights"))
+                        .addIn(Arrays.asList("panoramic-roof", "xenon-lights"))
                         .build(), "price");
         assertEquals("55000", priceBmwXenonLightsPanoramicRoof);
 
         String priceBmwXenonLights = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .addin(Arrays.asList("xenon-lights"))
+                        .addIn(List.of("xenon-lights"))
                         .build(), "price");
         assertEquals("45000", priceBmwXenonLights);
     }
 
     @Test
     public void testRangesAndNumericDimensions() throws MdcException {
-        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "offroad"));
-        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "offroad"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "off-road"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "off-road"));
         // check [!12..17, 19, 20] matches below
-        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "offroad"));
-        assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "offroad"));
-        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "offroad"));
-        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "offroad"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "off-road"));
+        assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "off-road"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "off-road"));
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "off-road"));
     }
 
     @Test
+    @SuppressWarnings("UNCHECKED_CAST")
     public void testCompoundMapProperty() throws MdcException {
         Map<String, Object> engine = provider.getCompoundMap(
                 TestContextBuilder.init()

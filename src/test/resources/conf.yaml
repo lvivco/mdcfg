@@ -40,9 +40,9 @@ engine-info:
   label: Block ${engine.block.type} Type ${horsepower} Horsepower
   list: ["${engine.block.type}", "Cylinders: ${engine.block.cylinder-count}"]
 
-offroad:
+off-road:
   clearance@[..12]: false
   clearance@[!12..17, 19, 20]: true
   clearance@[!20..]: true
 
-options: {"parktronic": true, "cruise-control": false, "lights": "led"}
+options: {"parking-assist": true, "cruise-control": false, "lights": "led"}

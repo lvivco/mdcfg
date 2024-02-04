@@ -1,9 +1,9 @@
 price:
   model@bmw:
     any@: 45000
-    addin*@[ls, panoramic-roof]: 55000
+    add-in*@[ls, panoramic-roof]: 55000
   model@toyota:
     any@: 30000
-    addin*@leather-seats: 35000
-    addin*@cc: 37000
+    add-in*@leather-seats: 35000
+    add-in*@cc: 37000
   model@ford: 28000
