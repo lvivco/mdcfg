@@ -23,11 +23,13 @@ public class PropertyProcessor {
     private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\s\\[\\]]");
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
+    private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{[^}]+}");
 
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
     private final List<Chain> chains = new ArrayList<>();
     private final List<Hook> loadHooks;
+    private boolean hasReference;
 
     public PropertyProcessor(String name, List<Hook> loadHooks) {
         this.name = name;
@@ -39,7 +41,7 @@ public class PropertyProcessor {
         createDimensions(map);
         createSelectorChains(map);
 
-        return new Property(name, dimensions, chains);
+        return new Property(name, dimensions, chains, hasReference);
     }
 
     /** Create {@code List} of {@link Dimension} objects with down to up order. */
@@ -154,6 +156,10 @@ public class PropertyProcessor {
             for (var hook : loadHooks) {
                 value = hook.getFunction().apply(value);
             }
+        }
+
+        if(!hasReference){
+            hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
         return new Chain(Pattern.compile(pattern.toString()), value, ranges);
