@@ -127,6 +127,8 @@ public class ProviderTest {
     public void testRangesAndNumericDimensions() throws MdcException {
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(-5.0).build(), "off-road"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(1000.0).build(), "off-road"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(5d).build(), "off-road"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(21d).build(), "off-road"));
         // check [!12..17, 19, 20] matches below
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(14.0).build(), "off-road"));
         assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "off-road"));
