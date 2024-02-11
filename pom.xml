@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>mdcfg</name>
-    <description>A multi dimensional configuration library for Java distributed apps</description>
+    <description>A multidimensional configuration library for Java distributed apps</description>
     <url>https://github.com/lvivco/mdcfg</url>
 
     <licenses>
@@ -200,7 +200,5 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
-
 </project>

@@ -2,15 +2,28 @@
 This project was initially developed by Avery & Softserve companies as an internal tool for their internal operations. It has now been open-sourced to encourage collaboration and contributions from the community.
 
 # Overview
-**mdcfg** ("Multi dimensional configuration") is a **Multi dimensional configuration library for Java distributed apps** 
+**mdcfg** ("Multidimensional configuration") is a **Multidimensional Configuration library for Java distributed apps** 
 
-#### Features:
-* Open source
-* **Easy to use**
-* **Multi dimensional** configuration (read values by key and multi dimension context provided)
-* **Multi file source** of configuration
-* **Auto-reloads** configuration
-* **Powerful** configuration mechanisms
+### Features:
+* **[Easy to use](#quick-start)**
+* **Different source of configuration**
+  * **Hooks** 
+  * **Multi file source**
+  * **Auto-reloads** 
+* **[Multidimensional configuration](#multidimensional-configuration)**
+  * **Nested properties**
+  * **Range selectors**
+  * **List selectors**
+  * **Reference values**
+  * **Aliases**
+* **Response type casts**
+    * **Cast to primitives**
+    * **Custom type cast**
+    * **Optionals**
+* **Compound properties**
+    * **Cast to Map**
+    * **Cast to JSON**
+    * **Cast to custom object**
 
 ## Quick start
 ### Setting up dependency
@@ -24,36 +37,79 @@ This project was initially developed by Avery & Softserve companies as an intern
     </dependency>
 </dependencies>
 ```
+<details>
+  <summary>Usage</summary>
 
-### Usage
-* Create config file for example config.yaml:
-```yaml
-horsepower:
-  any@: 300
-  model@bmw: 500
-  model@toyota: 350
-  model@ford: 340
+Create config file for example:
+#### **`config.yaml`**
+``` yaml
+my-property: 100
 ```
-
-* Use the following code in your application to connect to sample configuration source:
+Add the following code to your application that loads configuration:
 ```java
 public class MdcfgPoweredApplication {
-
   public static void main(String... args) {
-    MdcProvider provider = MdcBuilder.withYaml("config.yaml")
-            .autoReload()
-            .build();
-
-    MdcContext ctx = new MdcContext();
-    ctx.put("model", "bmw");
-    
-    Integer configValue = provider.getInteger(ctx, "horsepower");
+    MdcProvider provider = MdcBuilder.withYaml("config.yaml").build();
+    Integer configValue = provider.getInteger(ctx, "my-property");
     // Use it!
     System.out.println(configValue);
   }
-
 }
 ```
+</details>
+
+## Multidimensional configuration
+Library enable you to define configuration values based on different dimensions or conditions, such as environment, platform, or any other business criteria relevant to your application. Here's how selectors work:
+
+1. **Definition:** In your configuration file, you define configuration values within nested structures. Selectors are used to specify different values for different scenarios or dimensions.
+
+2. **Syntax:** Selectors are defined using the **'@'** symbol followed by the dimension or condition. For example, **'environment@development'**, **'platform@ios'**, **'region@us'**, etc.
+
+3. **Selection:** At runtime, the library evaluates the current context or environment and selects the appropriate value based on the provided selector.
+
+4. **Priority:** If multiple selectors match the current context, the selector with the most specific match takes precedence with priority given from bottom to top. 
+
+5. **Fallback:** You can provide fallback values to handle cases where no selector matches the current context. This ensures that there's always a default value available, even if the specific conditions are not met.
+<details>
+  <summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+database:
+  type: "mysql"
+  connection:
+    any@: "default-connection"
+    platform@android: "android-connection"
+    platform@ios:
+      any@: "ios-connection"
+      environment@development: "dev-ios-connection"
+      environment@production: "prod-ios-connection"
+    environment@development: "dev-connection"
+    environment@production: "prod-connection"
+```
+### Selectors Explained:
+1. **'any@' Selector:**
+   * Represents the default value when no specific selector matches.
+   * Example: **"default-connection"** for **'connection'**.
+2. **'platform@' Selector:**
+   * Allows specifying values based on platforms (e.g., Android or iOS).
+   * Example: **"android-connection"** for **"android"** platform.
+3. **'environment@' Selector:**
+   * Specifies values based on environments (e.g., development or production).
+   * Example: **"dev-connection"** for **"development"** environment.
+
+### Example Scenario:
+#### Given context:
+
+* **"environment": "development"**
+* **"platform": "ios"**
+
+When retrieving **'connection'**, MDC follows these steps:
+
+1. Checks for a match for **"development"** environment and **"ios"** platform. Retrieves **"dev-ios-connection"** if found.
+2. If not, checks for a match only for **"development"**. Retrieves **"dev-connection"** if found.
+3. Falls back to **"default-connection"** if no match is found.
+</details>
 
 # Contributing
 To contribute the project follow [guide](CONTRIBUTING.md).
