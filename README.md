@@ -1,10 +1,10 @@
-## Project Description
+# Project Description
 This project was initially developed by Avery & Softserve companies as an internal tool for their internal operations. It has now been open-sourced to encourage collaboration and contributions from the community.
 
 # Overview
-**mdcfg** ("Multidimensional configuration") is a **Multidimensional Configuration library for Java distributed apps** 
+**mdcfg** is a **Multidimensional Configuration library for Java distributed apps** 
 
-### Features:
+## Features:
 * **[Easy to use](#quick-start)**
 * **Different source of configuration**
   * **Hooks** 
@@ -65,9 +65,9 @@ Library enable you to define configuration values based on different dimensions 
 
 2. **Syntax:** Selectors are defined using the **'@'** symbol followed by the dimension or condition. For example, **'environment@development'**, **'platform@ios'**, **'region@us'**, etc.
 
-3. **Selection:** At runtime, the library evaluates the current context or environment and selects the appropriate value based on the provided selector.
+3. **Selection:** At runtime, the library evaluates the current context and selects the appropriate value based on the provided selector.
 
-4. **Priority:** If multiple selectors match the current context, the selector with the most specific match takes precedence with priority given from bottom to top. 
+4. **Priority:** If multiple selectors match the current context, the selector with the most specific match takes precedence using priority given from bottom to top. 
 
 5. **Fallback:** You can provide fallback values to handle cases where no selector matches the current context. This ensures that there's always a default value available, even if the specific conditions are not met.
 <details>
@@ -79,24 +79,24 @@ database:
   type: "mysql"
   connection:
     any@: "default-connection"
-    platform@android: "android-connection"
-    platform@ios:
-      any@: "ios-connection"
-      environment@development: "dev-ios-connection"
-      environment@production: "prod-ios-connection"
-    environment@development: "dev-connection"
-    environment@production: "prod-connection"
+    environment@production: "prod-connection"  
+    environment@development: 
+      any@: "dev-connection" 
+      platform@ios: "dev-ios-connection"
+      platform@android: "dev-android-connection"
+
 ```
 ### Selectors Explained:
 1. **'any@' Selector:**
    * Represents the default value when no specific selector matches.
    * Example: **"default-connection"** for **'connection'**.
-2. **'platform@' Selector:**
+2. **'environment@' Selector:**
+    * Specifies values based on environments (e.g., development or production).
+    * Example: **"prod-connection"** for **"production"** environment.
+3. **'platform@' Selector:**
    * Allows specifying values based on platforms (e.g., Android or iOS).
-   * Example: **"android-connection"** for **"android"** platform.
-3. **'environment@' Selector:**
-   * Specifies values based on environments (e.g., development or production).
-   * Example: **"dev-connection"** for **"development"** environment.
+   * Example: **"dev-android-connection"** for **"android"** platform.
+
 
 ### Example Scenario:
 #### Given context:
