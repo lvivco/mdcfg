@@ -18,6 +18,8 @@ import java.util.Map;
  */
 @AllArgsConstructor
 public class Property {
+    private static final char UNIT_SEPARATOR = (char) 31;
+
     @Getter private final String name;
     private final Map<String, Dimension> dimensions;
     private final List<Chain> chains;
@@ -64,7 +66,7 @@ public class Property {
             if(object != null){
                 List<?> list = ProviderUtils.toList(object);
                 if(list != null){
-                    object = "[" + StringUtils.join(list, ',') + "]";
+                    object = "[" + StringUtils.join(list, UNIT_SEPARATOR) + "]";
                 }
             }
             compare.append(object);

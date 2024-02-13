@@ -115,6 +115,13 @@ public class ProviderTest {
                         .build(), "price");
         assertEquals("55000", priceBmwXenonLightsPanoramicRoof);
 
+        String priceBmw = provider.getString(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .addIn(List.of("panoramic-roof, xenon-lights"))
+                        .build(), "price");
+        assertEquals("45000", priceBmw);
+
         String priceBmwXenonLights = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")

@@ -24,7 +24,8 @@ public class PropertyProcessor {
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN= Pattern.compile(",");
     private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{[^}]+}");
-
+    private static final char UNIT_SEPARATOR = (char) 31;
+    private static final String LIST_EXPRESSION = "\\[(.*" + UNIT_SEPARATOR + ")*%s(" + UNIT_SEPARATOR + ".*)*\\]";
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
     private final List<Chain> chains = new ArrayList<>();
@@ -185,7 +186,7 @@ public class PropertyProcessor {
 
         // dimension list
         if (dimension.isList()) {
-            selector = "\\[(.*,)*" + selector + "(,.*)*\\]";
+            selector = String.format(LIST_EXPRESSION, selector);
         }
 
         pattern.append(dimension.getName()).append("@").append(selector);
