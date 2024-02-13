@@ -41,8 +41,10 @@ engine-info:
   list: ["${engine.block.type}", "Cylinders: ${engine.block.cylinder-count}"]
 
 off-road:
-  clearance@[..12]: false
-  clearance@[!12..17, 19, 20]: true
-  clearance@[!20..]: true
+  clearance@[..12.0]: false
+  clearance@[!12.0..17.0, 19.0, 20.0]: true
+  clearance@[!20.0..]: true
+  clearance@4.5: false
+  clearance@[21.0]: false
 
 options: {"parking-assist": true, "cruise-control": false, "lights": "led"}
