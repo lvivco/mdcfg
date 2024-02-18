@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
  * Main Config class. Provides configuration by property name and context.
  */
 public class MdcProvider {
+    @FunctionalInterface
+    private interface BiFunction<T, U, R> { R apply(T t, U u) throws MdcException; }
+
     private static final UnaryOperator<String> TO_STRING = v -> v;
     private static final Function<String, Boolean> TO_BOOLEAN = Boolean::parseBoolean;
     private static final Function<String, Short> TO_SHORT = Short::parseShort;
@@ -37,6 +40,7 @@ public class MdcProvider {
     private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
     private static final String ROOT_PROPERTY = "^%s($|\\.)";
     private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{([^}]+)}");
+    private static final Pattern COMMA_PATTERN= Pattern.compile(",");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Processor processor;
@@ -539,7 +543,7 @@ public class MdcProvider {
             return null; //NOSONAR
         }
         if(StringUtils.isNotEmpty(listString)) {
-            return Arrays.stream(listString.split(","))
+            return Arrays.stream(COMMA_PATTERN.split(listString))
                     .map(StringUtils::trim)
                     .map(converter)
                     .collect(Collectors.toList());
@@ -606,7 +610,8 @@ public class MdcProvider {
         Map<String, Object> result = new HashMap<>();
         List<Property> propertyList = listCompoundProperty(key);
         for (Property property : propertyList) {
-            String[] path = SUB_PROPERTY_SEPARATOR.split(property.getName());
+            String subKey = property.getName().substring(key.length());
+            String[] path = SUB_PROPERTY_SEPARATOR.split(subKey);
             Map<String, Object> leaf = getLeaf(result, path);
             leaf.put(path[path.length-1], getStringValue(property, context));
         }
@@ -676,6 +681,75 @@ public class MdcProvider {
     public <T> T getCompoundObject(MdcContext context, String key, TypeReference<T> toValueTypeRef) throws MdcException {
         Map<String, Object> map = getCompoundMap(context, key);
         return OBJECT_MAPPER.convertValue(map, toValueTypeRef);
+    }
+
+    /**
+     * Read List that contains references to compound properties and return result as List of objects.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param classResolver Function that takes key and returns class in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code List} of property values.
+     * @throws MdcException in case property not found or property doesn't contain references.
+     */
+    public <T> List<T> getCompoundObjectListByClass(MdcContext context, String key, Function<String, Class<? extends T>> classResolver) throws MdcException {
+        return getCompoundObjectList(context, key, (ctx, k) -> getCompoundObject(context, k, classResolver.apply(k)));
+    }
+
+    /**
+     * Read List that contains references to compound properties and return result as List of objects.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param typeResolver Function that takes key and returns type in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code List} of property values.
+     * @throws MdcException in case property not found or property doesn't contain references.
+     */
+    public <T> List<T> getCompoundObjectListByType(MdcContext context, String key, Function<String, JavaType> typeResolver) throws MdcException {
+        return getCompoundObjectList(context, key, (ctx, k) -> getCompoundObject(context, k, typeResolver.apply(k)));
+    }
+
+    /**
+     * Read List that contains references to compound properties and return result as List of objects.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param typeRefResolver Function that takes key and returns type reference in which result suppose to be converted.
+     * @param <T> type in which result suppose to be converted.
+     * @return {@code List} of property values.
+     * @throws MdcException in case property not found or property doesn't contain references.
+     */
+    public <T> List<T> getCompoundObjectListByTypeReference(MdcContext context, String key, Function<String, TypeReference<? extends T>> typeRefResolver) throws MdcException {
+        return getCompoundObjectList(context, key, (ctx, k) -> getCompoundObject(context, k, typeRefResolver.apply(k)));
+    }
+
+    private <T> List<T> getCompoundObjectList(MdcContext context, String key, BiFunction<MdcContext, String, ? extends T> itemReader) throws MdcException {
+        Property property = getProperty(key);
+        String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
+                .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                .orElse(null);
+
+        if(listString == null){
+            return null; //NOSONAR
+        }
+        if(!property.isHasReference()) {
+            throw new MdcException(String.format("Value for key %s doesn't contain property references", key));
+        }
+
+        List<T> result = new ArrayList<>();
+        if(StringUtils.isNotEmpty(listString)) {
+            for (String k: COMMA_PATTERN.split(listString)) {
+                String item = StringUtils.trim(k);
+                Matcher m = REFERENCE_PATTERN.matcher(item);
+                while (m.find()) {
+                    String refKey = m.group(1);
+                    result.add(itemReader.apply(context, refKey));
+                }
+            }
+        }
+        return result;
     }
 
     private String processKey(String key) {

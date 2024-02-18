@@ -39,6 +39,7 @@ horsepower:
 engine-info:
   label: Block ${engine.block.type} Type ${horsepower} Horsepower
   list: ["${engine.block.type}", "Cylinders: ${engine.block.cylinder-count}"]
+  objects: ["${engine}", "${engine.block}"]
 
 off-road:
   clearance@[..12.0]: false

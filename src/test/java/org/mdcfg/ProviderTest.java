@@ -9,19 +9,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
-import org.mdcfg.helpers.TestContextBuilder;
-import org.mdcfg.helpers.EnginePOJO;
+import org.mdcfg.helpers.*;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.Assert.*;
 import static org.mdcfg.helpers.Resources.*;
 
 public class ProviderTest {
+
+    private static final TypeReference<EnginePOJO> ENGINE_TYPE_REFERENCE = new TypeReference<>(){};
+    private static final TypeReference<BlockPOJO> BLOCK_TYPE_REFERENCE = new TypeReference<>(){};
 
     private static MdcProvider provider;
 
@@ -160,7 +163,7 @@ public class ProviderTest {
                 TestContextBuilder.init()
                         .model("bmw")
                         .build(),"engine.block", false);
-        assertEquals("{\"block\":{\"cylinder-count\":\"6\",\"type\":\"inline\"}}",engine);
+        assertEquals("{\"cylinder-count\":\"6\",\"type\":\"inline\"}",engine);
     }
 
     @Test
@@ -184,11 +187,10 @@ public class ProviderTest {
 
     @Test
     public void testCompoundObjectPropertyByTypeReference() throws MdcException {
-        final TypeReference<EnginePOJO> typeReference = new TypeReference<>(){};
         EnginePOJO engine = provider.getCompoundObject(
                 TestContextBuilder.init()
                         .model("bmw")
-                        .build(),"engine", typeReference);
+                        .build(),"engine", ENGINE_TYPE_REFERENCE);
         assertEnginePOJO(engine);
     }
 
@@ -212,10 +214,86 @@ public class ProviderTest {
         assertEquals("Cylinders: 6", list.get(1));
     }
 
+    @Test
+    public void testCompoundObjectListByClass() throws MdcException {
+        Function<String, Class<? extends Object>> classResolver = k -> {
+            if(k.equals("engine.block")) {
+                return BlockPOJO.class;
+            }
+            return EnginePOJO.class;
+        };
+        List<Object> list = provider.getCompoundObjectListByClass(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),
+                "engine-info.objects",
+                classResolver);
+
+        assertListPOJO(list);
+    }
+
+    @Test
+    public void testCompoundObjectListByType() throws MdcException {
+        Function<String, JavaType> typeResolver = k -> {
+            if(k.equals("engine.block")) {
+                return new ObjectMapper().getTypeFactory().constructType(BlockPOJO.class);
+            }
+            return new ObjectMapper().getTypeFactory().constructType(EnginePOJO.class);
+        };
+        List<?> list = provider.getCompoundObjectListByType(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),
+                "engine-info.objects",
+                typeResolver);
+
+        assertListPOJO(list);
+    }
+
+    @Test
+    public void testCompoundObjectListByTypeReference() throws MdcException {
+        Function<String, TypeReference<? extends Object>> referenceResolver = k -> {
+            if(k.equals("engine.block")) {
+                return BLOCK_TYPE_REFERENCE;
+            }
+            return ENGINE_TYPE_REFERENCE;
+        };
+        List<Object> list = provider.getCompoundObjectListByTypeReference(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),
+                "engine-info.objects",
+                referenceResolver);
+
+        assertListPOJO(list);
+    }
+
+    @Test(expected = MdcException.class)
+    public void testPlainListException() throws MdcException {
+        Function<String, JavaType> typeResolver = k -> null;
+        List<?> list = provider.getCompoundObjectListByType(
+                TestContextBuilder.EMPTY,
+                "engine.type",
+                typeResolver);
+    }
+
+    private static void assertListPOJO(List<?> list) {
+        assertEquals(2, list.size());
+        assertEquals(list.get(0).getClass(), EnginePOJO.class);
+        assertEquals(list.get(1).getClass(), BlockPOJO.class);
+
+        assertEnginePOJO((EnginePOJO)list.get(0));
+        assertBlockPOJO((BlockPOJO)list.get(1));
+    }
+
     private static void assertEnginePOJO(EnginePOJO engine) {
         assertEquals("[electric, gas, diesel]", engine.getType());
         assertEquals("[4WD, 2WD]", engine.getDrive());
-        assertEquals("inline", engine.getBlock().getType());
-        assertEquals(6, engine.getBlock().getCylinderCount());
+        assertBlockPOJO(engine.getBlock());
+    }
+
+    private static void assertBlockPOJO(BlockPOJO block) {
+        assertEquals("inline", block.getType());
+        assertEquals(6, block.getCylinderCount());
     }
 }
