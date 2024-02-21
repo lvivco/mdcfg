@@ -24,6 +24,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **Cast to Map**
     * **Cast to JSON**
     * **Cast to custom object**
+    * **Cast to list of custom objects**
 
 ## Quick start
 ### Setting up dependency
