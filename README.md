@@ -6,7 +6,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 
 ## Features:
 * **[Easy to use](#quick-start)**
-* **Different source of configuration**
+* **[Different source of configuration](#initialize-configuration-source)**
   * **[Hooks](#hooks)** 
   * **Multi file source**
   * **Auto-reloads** 
@@ -59,9 +59,19 @@ public class MdcfgPoweredApplication {
 ```
 </details>
 
+## Initialize configuration source
+You can use yaml or json as configuration source.
+#### **`Main.java`**
+``` java
+MdcProvider providerYaml = MdcBuilder.withYaml(YAML_PATH).build();
+MdcProvider providerJson = MdcBuilder.withJson(JSON_PATH).build();
+```
+In the future we plan to add support for additional types of configuration sources, such as XML or HOCON formats, to provide more flexibility in managing application configurations.
+
 ## Hooks
 Config builder allows you to use hooks to modify or process configuration values before they are returned by the library. This can be useful for tasks such as decrypting secret keys or transforming values based on certain conditions.
 <details>
+
   <summary>Example</summary>
 
 ### Decrypting AWS Secret Key
