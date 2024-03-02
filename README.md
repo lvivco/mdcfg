@@ -7,7 +7,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 ## Features:
 * **[Easy to use](#quick-start)**
 * **Different source of configuration**
-  * **Hooks** 
+  * **[Hooks](#hooks)** 
   * **Multi file source**
   * **Auto-reloads** 
 * **[Multidimensional configuration](#multidimensional-configuration)**
@@ -59,6 +59,22 @@ public class MdcfgPoweredApplication {
 ```
 </details>
 
+## Hooks
+Config builder allows you to use hooks to modify or process configuration values before they are returned by the library. This can be useful for tasks such as decrypting secret keys or transforming values based on certain conditions.
+<details>
+  <summary>Example</summary>
+
+### Decrypting AWS Secret Key
+Hooks are functions that are called when reading properties from the configuration file, allowing you to modify or process the values. Builder allows you to add multiple hooks and also add hooks based on a pattern. For example:
+#### **`Main.java`**
+``` java
+MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
+        .loadHook("secret_aws_key", value -> decrypt(value))
+        .loadHook(Pattern.compile("^aws_.*$"), value -> decrypt(value))
+        .build();
+```
+</details>
+
 ## Multidimensional configuration
 Library enable you to define configuration values based on different dimensions or conditions, such as environment, platform, or any other business criteria relevant to your application. Here's how selectors work:
 
@@ -85,7 +101,6 @@ database:
       any@: "dev-connection" 
       platform@ios: "dev-ios-connection"
       platform@android: "dev-android-connection"
-
 ```
 ### Selectors Explained:
 1. **'any@' Selector:**
