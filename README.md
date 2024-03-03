@@ -6,21 +6,21 @@ This project was initially developed by Avery & Softserve companies as an intern
 
 ## Features:
 * **[Easy to use](#quick-start)**
-* **[Different source of configuration](#initialize-configuration-source)**
+* **<details><summary>[Different source of configuration](#initialize-configuration-source)**</summary>
   * **[Hooks](#hooks)** 
-  * **Multi file source**
+  * **[Multi file source](#multi-file-source)**
   * **Auto-reloads** 
-* **[Multidimensional configuration](#multidimensional-configuration)**
+* **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
   * **Nested properties**
   * **Range selectors**
   * **List selectors**
   * **Reference values**
   * **Aliases**
-* **Response type casts**
+* **<details><summary>Response type casts**</summary>
     * **Cast to primitives**
     * **Custom type cast**
     * **Optionals**
-* **Compound properties**
+* **<details><summary>Compound properties**</summary>
     * **Cast to Map**
     * **Cast to JSON**
     * **Cast to custom object**
@@ -84,6 +84,21 @@ MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
         .build();
 ```
 </details>
+
+## Multi file source
+Initialize config with a path to the folder containing configuration files. Subfolders are not supported.
+#### **`Main.java`**
+``` java
+MdcProvider provider = MdcBuilder.withFolder(CONFIG_FOLDER_PATH).build();
+```
+Also MDC allows you to include the contents of other configuration files within your main configuration file. This feature can be useful for organizing and reusing configuration values across multiple files.
+To include another configuration file, use the includes directive followed by the path to the file you want to include. For example:
+#### **`config.yaml`**
+``` yaml
+includes:
+  prices: price-conf.yaml
+  aliases: aliases-conf.yaml
+```
 
 ## Multidimensional configuration
 Library enable you to define configuration values based on different dimensions or conditions, such as environment, platform, or any other business criteria relevant to your application. Here's how selectors work:
