@@ -9,7 +9,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 * **<details><summary>[Different source of configuration](#initialize-configuration-source)**</summary>
   * **[Hooks](#hooks)** 
   * **[Multi file source](#multi-file-source)**
-  * **Auto-reloads** 
+  * **[Auto-reloads](#automatic-configuration-update)** 
 * **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
   * **Nested properties**
   * **Range selectors**
@@ -38,8 +38,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     </dependency>
 </dependencies>
 ```
-<details>
-  <summary>Usage</summary>
+<details><summary>Usage</summary>
 
 Create config file for example:
 #### **`config.yaml`**
@@ -70,9 +69,7 @@ In the future we plan to add support for additional types of configuration sourc
 
 ## Hooks
 Config builder allows you to use hooks to modify or process configuration values before they are returned by the library. This can be useful for tasks such as decrypting secret keys or transforming values based on certain conditions.
-<details>
-
-  <summary>Example</summary>
+<details><summary>Example</summary>
 
 ### Decrypting AWS Secret Key
 Hooks are functions that are called when reading properties from the configuration file, allowing you to modify or process the values. Builder allows you to add multiple hooks and also add hooks based on a pattern. For example:
@@ -91,7 +88,7 @@ Initialize config with a path to the folder containing configuration files. Subf
 ``` java
 MdcProvider provider = MdcBuilder.withFolder(CONFIG_FOLDER_PATH).build();
 ```
-Also MDC allows you to include the contents of other configuration files within your main configuration file. This feature can be useful for organizing and reusing configuration values across multiple files.
+Also, MDC allows you to include the contents of other configuration files within your main configuration file. This feature can be useful for organizing and reusing configuration values across multiple files.
 To include another configuration file, use the includes directive followed by the path to the file you want to include. For example:
 #### **`config.yaml`**
 ``` yaml
@@ -99,6 +96,28 @@ includes:
   prices: price-conf.yaml
   aliases: aliases-conf.yaml
 ```
+
+## Automatic Configuration Update
+MDC provides a feature for automatically updating the configuration when the source file changes. This can be useful in situations where the configuration needs to be reloaded dynamically without restarting the application.
+
+<details><summary>Usage</summary>
+
+To enable automatic configuration update, use the autoReload method when building the MdcProvider. You can specify the interval at which the configuration file should be checked for changes and provide a callback function to handle the updated configuration.
+
+#### **`Main.java`**
+``` java
+MdcProvider provider = MdcBuilder.withYaml("path/to/config.yaml")
+                .autoReload(500, MdcCallback.<Integer, MdcException>builder()
+                        .onSuccess(count -> {
+                            // Handle updated configuration
+                        })
+                        .onFailure(ex -> {
+                            // Handle update failure
+                        })
+                        .build())
+                .build();
+```
+</details>
 
 ## Multidimensional configuration
 Library enable you to define configuration values based on different dimensions or conditions, such as environment, platform, or any other business criteria relevant to your application. Here's how selectors work:
@@ -112,8 +131,7 @@ Library enable you to define configuration values based on different dimensions 
 4. **Priority:** If multiple selectors match the current context, the selector with the most specific match takes precedence using priority given from bottom to top. 
 
 5. **Fallback:** You can provide fallback values to handle cases where no selector matches the current context. This ensures that there's always a default value available, even if the specific conditions are not met.
-<details>
-  <summary>Example</summary>
+<details><summary>Example</summary>
 
 #### **`config.yaml`**
 ``` yaml
