@@ -86,7 +86,7 @@ MdcProvider provider = MdcBuilder.withYaml(YAML_PATH)
 Initialize config with a path to the folder containing configuration files. Subfolders are not supported.
 #### **`Main.java`**
 ``` java
-MdcProvider provider = MdcBuilder.withFolder(CONFIG_FOLDER_PATH).build();
+MdcProvider provider = MdcBuilder.withYaml(CONFIG_FOLDER_PATH).build();
 ```
 Also, MDC allows you to include the contents of other configuration files within your main configuration file. This feature can be useful for organizing and reusing configuration values across multiple files.
 To include another configuration file, use the includes directive followed by the path to the file you want to include. For example:
