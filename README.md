@@ -11,7 +11,7 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Multi file source](#multi-file-source)**
   * **[Auto-reloads](#automatic-configuration-update)** 
 * **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
-  * **Nested properties**
+  * **[Nested properties](#nested-properties)**
   * **Range selectors**
   * **List selectors**
   * **Reference values**
@@ -168,6 +168,27 @@ When retrieving **'connection'**, MDC follows these steps:
 1. Checks for a match for **"development"** environment and **"ios"** platform. Retrieves **"dev-ios-connection"** if found.
 2. If not, checks for a match only for **"development"**. Retrieves **"dev-connection"** if found.
 3. Falls back to **"default-connection"** if no match is found.
+</details>
+
+## Nested properties
+The MDC library supports nested properties in the configuration, allowing you to organize related settings under a common hierarchy.
+<details><summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+project:
+  name: "Awesome Project"
+  type: "Web Application"
+  stack:
+    frontend: "React"
+    backend: "Java"
+    database: "MongoDB"
+```
+You can access nested properties using dot notation. For example, to retrieve the frontend framework:
+#### **`Main.java`**
+``` java
+String frontend = provider.getString(TestContextBuilder.EMPTY, "project.stack.frontend");
+```
 </details>
 
 # Contributing
