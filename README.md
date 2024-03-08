@@ -12,7 +12,7 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Auto-reloads](#automatic-configuration-update)** 
 * **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
   * **[Nested properties](#nested-properties)**
-  * **Range selectors**
+  * **[Numeric and range selectors](#numeric-and-range-selectors)**
   * **List selectors**
   * **Reference values**
   * **Aliases**
@@ -189,6 +189,29 @@ You can access nested properties using dot notation. For example, to retrieve th
 ``` java
 String frontend = provider.getString(TestContextBuilder.EMPTY, "project.stack.frontend");
 ```
+</details>
+
+## Numeric and range selectors
+Numeric and range selectors in the configuration allow for defining different values or behaviors based on numeric conditions. These selectors are useful for scenarios where certain actions or settings depend on specific numeric ranges.
+
+### Syntax
+- **Numeric Selector: 'selector@value'**: Selects the value based on the exact numeric value of the selector.
+- **Range Selector: 'selector@[start..end]'**: Selects the value for a range of values, including both the start and end values.
+- **Excluding Range Selector: 'selector@[!start..end]'**: Selects the value for a range of values, excluding the start value but including the end value.
+
+<details><summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+final_grade:
+  score@[..50]: "F"
+  score@[!50..60]: "D"
+  score@[!60..70]: "C"
+  score@[!70..80]: "B"
+  score@[!80..100]: "A"
+```
+These selectors provide a flexible way to define behavior or values based on numeric conditions, allowing for more dynamic and adaptable configurations.
+
 </details>
 
 # Contributing
