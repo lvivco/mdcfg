@@ -13,7 +13,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 * **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
   * **[Nested properties](#nested-properties)**
   * **[Numeric and range selectors](#numeric-and-range-selectors)**
-  * **[Multi-Value Selectors](#multi-value-selectors)**
+  * **[Multi-Value selectors](#multi-value-selectors)**
   * **[References in values](#references-in-values)**
   * **Aliases**
 * **<details><summary>Response type casts**</summary>
@@ -213,7 +213,7 @@ final_grade:
 These selectors provide a flexible way to define behavior or values based on numeric conditions, allowing for more dynamic and adaptable configurations.
 </details>
 
-## Multi-Value Selectors
+## Multi-Value selectors
 In configurations, selectors can represent lists of values. These selectors are denoted with an asterisk (*) after the selector name. This feature is useful for scenarios where certain properties depend on combinations of values.
 
 <details><summary>Example</summary>
