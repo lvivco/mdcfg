@@ -14,7 +14,7 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Nested properties](#nested-properties)**
   * **[Numeric and range selectors](#numeric-and-range-selectors)**
   * **[Multi-Value Selectors](#multi-value-selectors)**
-  * **Reference values**
+  * **[References in values](#references-in-values)**
   * **Aliases**
 * **<details><summary>Response type casts**</summary>
     * **Cast to primitives**
@@ -238,6 +238,35 @@ MdcContext ctx = ContextBuilder.init().features(List.of("audit-logging")).build(
 String subscription = provider.getString(ctx, "subscription");
 ```
 This configuration provides flexibility in defining subscription levels based on the selected features.
+</details>
+
+## References in values
+This feature allows you to use the value of one key as part of the value of another key in the configuration file.
+
+<details><summary>Example</summary>
+
+Imagine a configuration for a software product where the subscription type is based on the selected features:
+#### **`config.yaml`**
+``` yaml
+settings:
+  theme: "dark"
+  language: "en"
+
+labels:
+  welcome-message: "Welcome to our app!"
+  theme-info: "Current theme is ${settings.theme}"
+  language-info: "Selected language is ${settings.language}"
+```
+In this example, theme-info and language-info use the values of theme and language from the settings section, respectively, to form the complete text.
+#### **`Main.java`**
+``` java
+String themeInfo = provider.getString(TestContextBuilder.EMPTY, "labels.theme-info");
+// themeInfo = "Current theme is dark"
+
+String languageInfo = provider.getString(TestContextBuilder.EMPTY, "labels.language-info");
+// languageInfo = "Selected language is en"
+```
+This feature allows you to easily create dynamic messages and text strings using values from other keys in the configuration.
 </details>
 
 # Contributing
