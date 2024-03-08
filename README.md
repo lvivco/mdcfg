@@ -13,7 +13,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 * **<details><summary>[Multidimensional configuration](#multidimensional-configuration)**</summary>
   * **[Nested properties](#nested-properties)**
   * **[Numeric and range selectors](#numeric-and-range-selectors)**
-  * **List selectors**
+  * **[Multi-Value Selectors](#multi-value-selectors)**
   * **Reference values**
   * **Aliases**
 * **<details><summary>Response type casts**</summary>
@@ -211,7 +211,33 @@ final_grade:
   score@[!80..100]: "A"
 ```
 These selectors provide a flexible way to define behavior or values based on numeric conditions, allowing for more dynamic and adaptable configurations.
+</details>
 
+## Multi-Value Selectors
+In configurations, selectors can represent lists of values. These selectors are denoted with an asterisk (*) after the selector name. This feature is useful for scenarios where certain properties depend on combinations of values.
+
+<details><summary>Example</summary>
+
+Imagine a configuration for a software product where the subscription type is based on the selected features:
+#### **`config.yaml`**
+``` yaml
+subscription:
+  any@: basic
+  features*@[encryption, audit-logging]: standart
+  features*@advanced-analytics: premium
+  features*@multi-tenancy: ultra
+```
+- Defines the default subscription level as "basic".
+- **'features\*@[encryption, audit-logging]'**: Adds the "standard" subscription level if the "encryption" or "audit-logging" features are selected.
+- **'features\*@advanced-analytics'**: Upgrades the subscription level to "premium" if the "advanced-analytics" feature is selected.
+- **'features\*@multi-tenancy'**: Upgrades the subscription level to "ultra" if the "multi-tenancy" feature is selected.
+- 
+#### **`Main.java`**
+``` java
+MdcContext ctx = ContextBuilder.init().features(List.of("audit-logging")).build()
+String subscription = provider.getString(ctx, "subscription");
+```
+This configuration provides flexibility in defining subscription levels based on the selected features.
 </details>
 
 # Contributing
