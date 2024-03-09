@@ -16,8 +16,8 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Multi-Value selectors](#multi-value-selectors)**
   * **[References in values](#references-in-values)**
   * **[Aliases](#aliases)**
-* **<details><summary>Response type casts**</summary>
-    * **Cast to primitives**
+* **<details><summary>[Casting configuration values](#casting-configuration-values)**</summary>
+    * **[Casting to primitives](#casting-to-primitives)**
     * **Custom type cast**
     * **Optionals**
 * **<details><summary>Compound properties**</summary>
@@ -289,6 +289,19 @@ storage-capacity:
 In this example, the alias **'region@US'** is defined to simplify the reference to subscription plans in the US region. By using aliases for the subscription plans (**'subscription@standard'** and **'subscription@premium'**), you can easily reference these storage capacities in your code.
 </details>
 
+## Casting configuration values
+The library provides methods to cast configuration values to different types. These methods simplify the retrieval of configuration values in the desired format. In addition to that the MDC library provides methods that return values wrapped in Optional for better handling of potential null values. These methods allow developers to work with configuration values in a safer and more concise way.
+
+## Casting to primitives
+The library includes methods for easy conversion of configuration values to primitive types, such as strings, doubles, booleans, etc. Below are examples
+#### **`Main.java`**
+``` java
+Double value = provider.getDouble(TestContextBuilder.EMPTY, "key");
+
+List<String> list = provider.getStringList(TestContextBuilder.EMPTY, "key");
+
+Optional<Float> optional = provider.getFloatOptional(TestContextBuilder.EMPTY, "key");
+```
 # Contributing
 To contribute the project follow [guide](CONTRIBUTING.md).
 
