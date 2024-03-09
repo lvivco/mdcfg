@@ -300,7 +300,7 @@ Double value = provider.getDouble(TestContextBuilder.EMPTY, "key");
 
 List<String> list = provider.getStringList(TestContextBuilder.EMPTY, "key");
 
-Optional<Float> optional = provider.getFloatOptional(TestContextBuilder.EMPTY, "key");
+Float optional = provider.getFloat(TestContextBuilder.EMPTY, "key");
 ```
 # Contributing
 To contribute the project follow [guide](CONTRIBUTING.md).
