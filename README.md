@@ -19,7 +19,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 * **<details><summary>[Casting configuration values](#casting-configuration-values)**</summary>
     * **[Casting to primitives](#casting-to-primitives)**
     * **[Custom value conversion](#custom-value-conversion)**
-    * **Optionals**
+    * **[Optionals](#optionals)**
 * **<details><summary>Compound properties**</summary>
     * **Cast to Map**
     * **Cast to JSON**
@@ -328,6 +328,21 @@ Function<String, Integer> customConverter = value -> {
 Integer priority = provider.getValue(TestContextBuilder.EMPTY, "priority", customConverter);
 ```
 By providing a custom converter function, developers can easily handle non-standard or complex configuration value conversions in a flexible and reusable manner.
+</details>
+
+## Optionals
+The library provides methods that return **'Optional'** values to handle scenarios where a property may not exist, cannot be found for the given context, or if an exception occurs during retrieval. In such cases, the **'Optional'** returned will be empty (**'Optional.empty()'**).
+
+<details><summary>Usage</summary>
+
+#### **`Main.java`**
+``` java
+Optional<String> optionalString = provider.getStringOptional(context, "key");
+optionalString.ifPresent(value -> {
+    // Process the value
+});
+```
+By using Optional, you can gracefully handle cases where property values are missing or inaccessible, leading to more robust and cleaner code.
 </details>
 
 # Contributing
