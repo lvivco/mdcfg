@@ -15,7 +15,7 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Numeric and range selectors](#numeric-and-range-selectors)**
   * **[Multi-Value selectors](#multi-value-selectors)**
   * **[References in values](#references-in-values)**
-  * **Aliases**
+  * **[Aliases](#aliases)**
 * **<details><summary>Response type casts**</summary>
     * **Cast to primitives**
     * **Custom type cast**
@@ -267,6 +267,26 @@ String languageInfo = provider.getString(TestContextBuilder.EMPTY, "labels.langu
 // languageInfo = "Selected language is en"
 ```
 This feature allows you to easily create dynamic messages and text strings using values from other keys in the configuration.
+</details>
+
+## Aliases
+The MDC library includes a powerful feature for managing complex configurations using aliases. Aliases allow you to define shorthand names for configuration keys, making it easier to reference and maintain your configuration files.
+
+<details><summary>How to Use Aliases</summary>
+
+Aliases are defined in the aliases section of your configuration file. Each alias maps a short, easy-to-remember name to a longer, more complex key. For example:
+#### **`config.yaml`**
+``` yaml
+aliases:
+  region@US:
+    subscription@standard: plan@us-standard
+    subscription@premium: plan@us-premium
+
+storage-capacity:
+  plan@us-standard: 500
+  plan@us-premium: 1000    
+```
+In this example, the alias **'region@US'** is defined to simplify the reference to subscription plans in the US region. By using aliases for the subscription plans (**'subscription@standard'** and **'subscription@premium'**), you can easily reference these storage capacities in your code.
 </details>
 
 # Contributing
