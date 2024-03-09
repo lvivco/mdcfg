@@ -18,7 +18,7 @@ This project was initially developed by Avery & Softserve companies as an intern
   * **[Aliases](#aliases)**
 * **<details><summary>[Casting configuration values](#casting-configuration-values)**</summary>
     * **[Casting to primitives](#casting-to-primitives)**
-    * **Custom type cast**
+    * **[Custom value conversion](#custom-value-conversion)**
     * **Optionals**
 * **<details><summary>Compound properties**</summary>
     * **Cast to Map**
@@ -302,6 +302,34 @@ List<String> list = provider.getStringList(TestContextBuilder.EMPTY, "key");
 
 Float optional = provider.getFloat(TestContextBuilder.EMPTY, "key");
 ```
+
+## Custom value conversion
+There is method for custom value conversion, allowing developers to specify their own conversion logic for configuration values. The **'getValue'** method accepts a **'Function<String, T> converter'**, which is applied to the retrieved configuration value before returning it. This enables developers to define custom parsing or transformation logic tailored to their specific needs.
+
+<details><summary>Example</summary>
+
+The **'getValue'** method retrieves a configuration value and applies a custom converter function to it.
+#### **`Main.java`**
+``` java
+Function<String, Integer> customConverter = value -> {
+    switch (value) {
+        case "low":
+            return 1;
+        case "medium":
+            return 2;
+        case "high":
+            return 3;
+        default:
+            return 0;
+    }
+};
+
+// Retrieve the configuration value and apply the custom converter
+Integer priority = provider.getValue(TestContextBuilder.EMPTY, "priority", customConverter);
+```
+By providing a custom converter function, developers can easily handle non-standard or complex configuration value conversions in a flexible and reusable manner.
+</details>
+
 # Contributing
 To contribute the project follow [guide](CONTRIBUTING.md).
 
