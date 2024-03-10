@@ -400,7 +400,7 @@ ctx.put("theme", selectedTheme);
 
 Map<String, String> appSettings = provider.getCompoundMap(ctx, "app-settings");
 ```
-
+In this code, **'selectedTheme'** is first retrieved using getString, and then it is added to the context **'ctx'**. The **'getCompoundMap'** method is then used to read the **'app-settings'** property as a map.
 </details>
 
 # Contributing
