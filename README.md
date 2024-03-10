@@ -399,7 +399,6 @@ MdcContext ctx = new MdcContext();
 ctx.put("theme", selectedTheme);
 
 Map<String, String> appSettings = provider.getCompoundMap(ctx, "app-settings");
-});
 ```
 
 </details>
