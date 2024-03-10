@@ -21,7 +21,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **[Custom value conversion](#custom-value-conversion)**
     * **[Optionals](#optionals)**
 * **<details><summary>[Compound properties](#compound-properties)**</summary>
-    * **Cast to Map**
+    * **[Reading compound properties as a map](#Reading-compound-properties-as-a-map)**
     * **Cast to JSON**
     * **Cast to custom object**
     * **Cast to list of custom objects**
@@ -363,6 +363,45 @@ appearance:
     accent: "#ff0000"   
 ```
 This example illustrates settings for the **'appearance'** of an application, such as **'theme'**, **'font'**, and **'colors'**. All these settings are nested, allowing for a structured organization.
+</details>
+
+## Reading compound properties as a map
+he library supports reading compound properties as a map. This allows you to organize your settings in a structured manner.
+
+<details><summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+app-settings:
+  colors:
+    primary:
+      theme@light: "#FFFFFF"
+      theme@dark: "#333333"
+    secondary: 
+      theme@light: "#CCCCCC"
+      theme@dark: "#666666"
+  fonts:
+    heading:
+      theme@light: "#Arial"
+      theme@dark: "#Roboto"
+    body:
+      theme@light: "#Helvetica"
+      theme@dark: "#Open San"
+
+selected-theme: "light"
+```
+To read the **'app-settings'** as a map, you can use the following code:
+#### **`Main.java`**
+``` java
+String selectedTheme = provider.getString(TestContextBuilder.EMPTY, "selected-theme");
+
+MdcContext ctx = new MdcContext();
+ctx.put("theme", selectedTheme);
+
+Map<String, String> appSettings = provider.getCompoundMap(ctx, "app-settings");
+});
+```
+
 </details>
 
 # Contributing
