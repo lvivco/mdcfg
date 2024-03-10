@@ -20,7 +20,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **[Casting to primitives](#casting-to-primitives)**
     * **[Custom value conversion](#custom-value-conversion)**
     * **[Optionals](#optionals)**
-* **<details><summary>[Compound properties]**(#compound-properties)</summary>
+* **<details><summary>[Compound properties](#compound-properties)**</summary>
     * **Cast to Map**
     * **Cast to JSON**
     * **Cast to custom object**
