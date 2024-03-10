@@ -20,7 +20,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **[Casting to primitives](#casting-to-primitives)**
     * **[Custom value conversion](#custom-value-conversion)**
     * **[Optionals](#optionals)**
-* **<details><summary>Compound properties**</summary>
+* **<details><summary>[Compound properties]**(#compound-properties)</summary>
     * **Cast to Map**
     * **Cast to JSON**
     * **Cast to custom object**
@@ -343,6 +343,26 @@ optionalString.ifPresent(value -> {
 });
 ```
 By using Optional, you can gracefully handle cases where property values are missing or inaccessible, leading to more robust and cleaner code.
+</details>
+
+## Compound properties
+The library allows for reading compound properties, which are represented as nested objects or maps. To read such properties, you need to read the top-level key.
+
+<details><summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+appearance:
+  theme: "dark"
+  font:
+    family: "Arial"
+    size: 12
+  colors:
+    background: "#333"
+    text: "#fff"
+    accent: "#ff0000"   
+```
+This example illustrates settings for the **'appearance'** of an application, such as **'theme'**, **'font'**, and **'colors'**. All these settings are nested, allowing for a structured organization.
 </details>
 
 # Contributing
