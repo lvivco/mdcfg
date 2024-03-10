@@ -187,7 +187,7 @@ project:
 You can access nested properties using dot notation. For example, to retrieve the frontend framework:
 #### **`Main.java`**
 ``` java
-String frontend = provider.getString(TestContextBuilder.EMPTY, "project.stack.frontend");
+String frontend = provider.getString(new MdcContext(), "project.stack.frontend");
 ```
 </details>
 
@@ -260,10 +260,10 @@ labels:
 In this example, theme-info and language-info use the values of theme and language from the settings section, respectively, to form the complete text.
 #### **`Main.java`**
 ``` java
-String themeInfo = provider.getString(TestContextBuilder.EMPTY, "labels.theme-info");
+String themeInfo = provider.getString(new MdcContext(), "labels.theme-info");
 // themeInfo = "Current theme is dark"
 
-String languageInfo = provider.getString(TestContextBuilder.EMPTY, "labels.language-info");
+String languageInfo = provider.getString(new MdcContext(), "labels.language-info");
 // languageInfo = "Selected language is en"
 ```
 This feature allows you to easily create dynamic messages and text strings using values from other keys in the configuration.
@@ -296,11 +296,11 @@ The library provides methods to cast configuration values to different types. Th
 The library includes methods for easy conversion of configuration values to primitive types, such as strings, doubles, booleans, etc. Below are examples
 #### **`Main.java`**
 ``` java
-Double value = provider.getDouble(TestContextBuilder.EMPTY, "key");
+Double value = provider.getDouble(new MdcContext(), "key");
 
-List<String> list = provider.getStringList(TestContextBuilder.EMPTY, "key");
+List<String> list = provider.getStringList(new MdcContext(), "key");
 
-Float optional = provider.getFloat(TestContextBuilder.EMPTY, "key");
+Float optional = provider.getFloat(new MdcContext(), "key");
 ```
 
 ## Custom value conversion
@@ -325,7 +325,7 @@ Function<String, Integer> customConverter = value -> {
 };
 
 // Retrieve the configuration value and apply the custom converter
-Integer priority = provider.getValue(TestContextBuilder.EMPTY, "priority", customConverter);
+Integer priority = provider.getValue(new MdcContext(), "priority", customConverter);
 ```
 By providing a custom converter function, developers can easily handle non-standard or complex configuration value conversions in a flexible and reusable manner.
 </details>
@@ -393,7 +393,7 @@ selected-theme: "light"
 To read the **'app-settings'** as a map, you can use the following code:
 #### **`Main.java`**
 ``` java
-String selectedTheme = provider.getString(TestContextBuilder.EMPTY, "selected-theme");
+String selectedTheme = provider.getString(new MdcContext(), "selected-theme");
 
 MdcContext ctx = new MdcContext();
 ctx.put("theme", selectedTheme);
@@ -419,7 +419,7 @@ To read this configuration as a JSON string, you can use the following code:
 #### **`Main.java`**
 ``` java
 // Read the compound property as a JSON string
-String jsonString = provider.getCompoundJSON(TestContextBuilder.EMPTY, "service");
+String jsonString = provider.getCompoundJSON(new MdcContext(), "service");
 ```
 In this example, **'getCompoundJSON'** retrieves the compound property service as a following JSON string:
 
@@ -458,7 +458,7 @@ To represent this configuration in Java, you can create a **'DatabaseConfig'** P
 #### **`DatabaseConfig.java`**
 ``` java
 // Read the compound property as a JSON string
-String jsonString = provider.getCompoundJSON(TestContextBuilder.EMPTY, "service");
+String jsonString = provider.getCompoundJSON(new MdcContext(), "service");
 ```
 You can use the **'getCompoundObject'** method to read the database configuration properties as a **'DatabaseConfig'** object:
 #### **`Main.java`**
@@ -539,7 +539,7 @@ Function<String, Class<? extends Object>> classResolver = key -> {
 };
 
 List<Object> pipeline = provider.getCompoundObjectListByClass(
-    TestContextBuilder.EMPTY,
+    new MdcContext(),
     "pipeline",
     classResolver
 );
