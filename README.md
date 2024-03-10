@@ -24,7 +24,7 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **[Reading compound properties as a map](#reading-compound-properties-as-a-map)**
     * **[Reading compound properties as JSON](#reading-compound-properties-as-json)**
     * **[Reading properties as custom java objects](#reading-properties-as-custom-java-objects)**
-    * **Cast to list of custom objects**
+    * **[Reading list of custom java objects](#reading-list-of-custom-java-objects)**
 
 ## Quick start
 ### Setting up dependency
@@ -469,6 +469,82 @@ ctx.put("env", "prod");
 DatabaseConfig databaseConfig = provider.getCompoundObject(ctx, "database", DatabaseConfig.class);
 ```
 This feature allows you to easily map database configuration properties to a Java object, making it easier to work with database configurations in your applications.
+</details>
+
+## Reading list of custom java objects
+This feature enables reading an array of compound objects, which can be used as an example for configuring pipelines. Each object in the array represents a stage in the pipeline, allowing for a structured configuration of multi-stage processes. The pipeline configuration can be read into Java objects, providing a flexible and organized way to define complex processing pipelines.
+
+<details><summary>Example</summary>
+
+Consider the following database configuration:
+#### **`config.yaml`**
+``` yaml
+pipeline: ["${stage1}", "${stage1}", "${stage3}"]
+stage1:
+  type: "data-processing"
+  mode: "batch"
+  input: "data/input.csv"
+  output: "data/output1.csv"
+stage2:
+  type: "data-processing"
+  mode: "real-time"
+  endpoint: "http://example.com/api"
+stage3:
+  type: "reporting"
+  format: "pdf"
+  recipients: ["user1@example.com", "user2@example.com"]
+```
+This configuration defines a pipeline with three stages. Each stage is represented as an object with specific settings. Here are the corresponding Java classes for each stage:
+#### **`Stage1Config.java`**
+``` java
+public class Stage1Config {
+    private String type;
+    private String mode;
+    private String input;
+    private String output;
+
+    // Getters and setters
+}
+```
+#### **`Stage2Config.java`**
+``` java
+public class Stage2Config {
+    private String type;
+    private String mode;
+    private String endpoint;
+
+    // Getters and setters
+}
+```
+#### **`Stage3Config.java`**
+``` java
+public class Stage3Config {
+    private String type;
+    private String format;
+    private List<String> recipients;
+
+    // Getters and setters
+}
+```
+To read this configuration into Java objects, you can use the following code:
+#### **`Main.java`**
+``` java
+Function<String, Class<? extends Object>> classResolver = key -> {
+    switch (key) {
+        case "stage1": return Stage1Config.class;
+        case "stage2": return Stage2Config.class;
+        case "stage3": return Stage3Config.class;
+        default: throw new IllegalArgumentException("Unknown stage: " + key);
+    }
+};
+
+List<Object> pipeline = provider.getCompoundObjectListByClass(
+    TestContextBuilder.EMPTY,
+    "pipeline",
+    classResolver
+);
+```
+This code uses a **'classResolver'** function to map each stage key to its corresponding Java class. The **'getCompoundObjectListByClass'** method reads the **'pipeline'** key from the configuration and returns a list of objects, each representing a stage in the pipeline.
 </details>
 
 # Contributing
