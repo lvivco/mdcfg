@@ -23,7 +23,7 @@ This project was initially developed by Avery & Softserve companies as an intern
 * **<details><summary>[Compound properties](#compound-properties)**</summary>
     * **[Reading compound properties as a map](#reading-compound-properties-as-a-map)**
     * **[Reading compound properties as JSON](#reading-compound-properties-as-json)**
-    * **Cast to custom object**
+    * **[Reading properties as custom java objects](#reading-properties-as-custom-java-objects)**
     * **Cast to list of custom objects**
 
 ## Quick start
@@ -421,10 +421,10 @@ To read this configuration as a JSON string, you can use the following code:
 // Read the compound property as a JSON string
 String jsonString = provider.getCompoundJSON(TestContextBuilder.EMPTY, "service");
 ```
-In this example, getCompoundJSON retrieves the compound property service as a following JSON string:
+In this example, **'getCompoundJSON'** retrieves the compound property service as a following JSON string:
 
 #### **`object.json`**
-``` java
+``` json
 {
   "service": {
     "name": "My service",
@@ -433,7 +433,42 @@ In this example, getCompoundJSON retrieves the compound property service as a fo
   }
 }
 ```
+</details>
 
+## Reading properties as custom java objects
+The library provides functionality to read properties as custom Java objects. This feature is useful when you want to map complex configurations to Java objects for easier handling and manipulation.
+
+<details><summary>Example</summary>
+
+Consider the following database configuration:
+#### **`config.yaml`**
+``` yaml
+database:
+  url: 
+    env@test: "jdbc:mysql://localhost:3306/test_db"
+    env@prod: "jdbc:mysql://prod-db.example.com:3306/prod_db"
+  username:
+    env@test: "test_user"
+    env@prod: "prod_user"
+  password:
+    env@test: "test_password"
+    env@prod: "prod_password"
+```
+To represent this configuration in Java, you can create a **'DatabaseConfig'** POJO class:
+#### **`DatabaseConfig.java`**
+``` java
+// Read the compound property as a JSON string
+String jsonString = provider.getCompoundJSON(TestContextBuilder.EMPTY, "service");
+```
+You can use the **'getCompoundObject'** method to read the database configuration properties as a **'DatabaseConfig'** object:
+#### **`Main.java`**
+``` java
+MdcContext ctx = new MdcContext();
+ctx.put("env", "prod");
+
+DatabaseConfig databaseConfig = provider.getCompoundObject(ctx, "database", DatabaseConfig.class);
+```
+This feature allows you to easily map database configuration properties to a Java object, making it easier to work with database configurations in your applications.
 </details>
 
 # Contributing
