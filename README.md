@@ -21,8 +21,8 @@ This project was initially developed by Avery & Softserve companies as an intern
     * **[Custom value conversion](#custom-value-conversion)**
     * **[Optionals](#optionals)**
 * **<details><summary>[Compound properties](#compound-properties)**</summary>
-    * **[Reading compound properties as a map](#Reading-compound-properties-as-a-map)**
-    * **Cast to JSON**
+    * **[Reading compound properties as a map](#reading-compound-properties-as-a-map)**
+    * **[Reading compound properties as JSON](#reading-compound-properties-as-json)**
     * **Cast to custom object**
     * **Cast to list of custom objects**
 
@@ -366,7 +366,7 @@ This example illustrates settings for the **'appearance'** of an application, su
 </details>
 
 ## Reading compound properties as a map
-he library supports reading compound properties as a map. This allows you to organize your settings in a structured manner.
+The library supports reading compound properties as a map. This allows you to organize your settings in a structured manner.
 
 <details><summary>Example</summary>
 
@@ -400,7 +400,40 @@ ctx.put("theme", selectedTheme);
 
 Map<String, String> appSettings = provider.getCompoundMap(ctx, "app-settings");
 ```
-In this code, **'selectedTheme'** is first retrieved using getString, and then it is added to the context **'ctx'**. The **'getCompoundMap'** method is then used to read the **'app-settings'** property as a map.
+In this code, **'selectedTheme'** is first retrieved using **'getString'**, and then it is added to the context **'ctx'**. The **'getCompoundMap'** method is then used to read the **'app-settings'** property as a map.
+</details>
+
+## Reading compound properties as JSON
+The library allows you to read compound properties as JSON strings using the **'getCompoundJSON'** method.
+
+<details><summary>Example</summary>
+
+#### **`config.yaml`**
+``` yaml
+service:
+  name: "My service"
+  url: "https://service1.example.com"
+  timeout: 5000
+```
+To read this configuration as a JSON string, you can use the following code:
+#### **`Main.java`**
+``` java
+// Read the compound property as a JSON string
+String jsonString = provider.getCompoundJSON(TestContextBuilder.EMPTY, "service");
+```
+In this example, getCompoundJSON retrieves the compound property service as a following JSON string:
+
+#### **`object.json`**
+``` java
+{
+  "service": {
+    "name": "My service",
+    "url": "https://service1.example.com",
+    "timeout": 5000
+  }
+}
+```
+
 </details>
 
 # Contributing
