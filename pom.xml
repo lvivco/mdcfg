@@ -81,6 +81,12 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.8.10</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.honton.chas.hocon</groupId>
+            <artifactId>jackson-dataformat-hocon</artifactId>
+            <version>1.1.1</version>
+        </dependency>
     </dependencies>
 
     <properties>
