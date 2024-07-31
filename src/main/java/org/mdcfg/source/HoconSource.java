@@ -7,15 +7,19 @@ import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.utils.SourceUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class HoconSource extends FileSource {
 
     private static final TypeReference<Map<String, Object>> TYPE = new TypeReference<>() {};
+    private final Pattern pattern = Pattern.compile("[a-zA-Z]*@");
 
     public HoconSource(String path) {
         super(path);
@@ -23,10 +27,17 @@ public class HoconSource extends FileSource {
 
     @Override
     Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException {
-        try (InputStream is = new FileInputStream(source)) {
-            Map<String, Object> rawData = new ObjectMapper(new HoconFactory()).readValue(is, TYPE);
-            Map<String, Object> sortedRawData = orderData(rawData);
-            Map<String, Object> flattened = SourceUtils.flatten(sortedRawData, isCaseSensitive);
+        try {
+            String data = numberRows(Files.readString(source.toPath()));
+            Map<String, Object> rawData = new ObjectMapper(new HoconFactory()).readValue(data, TYPE);
+
+            for (Map.Entry<String, Object> entry : rawData.entrySet()) {
+                if (entry.getValue() instanceof Map) {
+                    entry.setValue(orderData((Map<String, Object>)entry.getValue()));
+                }
+            }
+
+            Map<String, Object> flattened = SourceUtils.flatten(rawData, isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
             throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);
@@ -38,26 +49,27 @@ public class HoconSource extends FileSource {
         return folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".conf"));
     }
 
+    private String numberRows(String sourceData) {
+        Matcher matcher = pattern.matcher(sourceData);
+        StringBuilder res = new StringBuilder();
+        int rowNumber = 0;
+
+        while(matcher.find()) {
+            matcher.appendReplacement(res, rowNumber + matcher.group());
+            rowNumber++;
+        }
+        matcher.appendTail(res);
+        return res.toString();
+    }
+
     private Map<String, Object> orderData(Map<String, Object> rawData) {
-        Map<String, Object> result = new LinkedHashMap<>();
-        Map<String, Object> otherData = new LinkedHashMap<>();
-        Map.Entry<String, Object> anyEntry = null;
-
-        for (Map.Entry<String, Object> entry : rawData.entrySet()) {
-            if (entry.getValue() instanceof Map) {
-                entry.setValue(orderData((Map<String, Object>) entry.getValue()));
-            }
-            if (entry.getKey().equals("any@")) {
-                anyEntry = entry;
-            } else {
-                otherData.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        if (anyEntry != null) {
-            result.put(anyEntry.getKey(), anyEntry.getValue());
-        }
-        result.putAll(otherData);
-        return result;
+        return rawData.entrySet().stream()
+                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(0, 1))))
+                .collect(Collectors.toMap(e -> e.getKey().substring(1),
+                        e -> e.getValue() instanceof Map
+                                ? orderData((Map<String, Object>)e.getValue())
+                                : e.getValue(),
+                        (k1, k2) -> k1,
+                        LinkedHashMap::new));
     }
 }

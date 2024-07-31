@@ -86,6 +86,7 @@
             <groupId>org.honton.chas.hocon</groupId>
             <artifactId>jackson-dataformat-hocon</artifactId>
             <version>1.1.1</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
