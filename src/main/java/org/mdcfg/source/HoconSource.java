@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 public class HoconSource extends FileSource {
 
     private static final TypeReference<Map<String, Object>> TYPE = new TypeReference<>() {};
-    private final Pattern pattern = Pattern.compile("[a-zA-Z]*@");
+    private static final String MARKER = "\u200B";
+    private final Pattern pattern = Pattern.compile("\"(.*@)");
 
     public HoconSource(String path) {
         super(path);
@@ -55,7 +56,7 @@ public class HoconSource extends FileSource {
         int rowNumber = 0;
 
         while(matcher.find()) {
-            matcher.appendReplacement(res, rowNumber + matcher.group());
+            matcher.appendReplacement(res, "\"" + rowNumber + MARKER + matcher.group(1));
             rowNumber++;
         }
         matcher.appendTail(res);
@@ -64,8 +65,8 @@ public class HoconSource extends FileSource {
 
     private Map<String, Object> orderData(Map<String, Object> rawData) {
         return rawData.entrySet().stream()
-                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(0, 1))))
-                .collect(Collectors.toMap(e -> e.getKey().substring(1),
+                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(0, e.getKey().indexOf(MARKER)))))
+                .collect(Collectors.toMap(e -> e.getKey().substring(e.getKey().indexOf(MARKER) + 1),
                         e -> e.getValue() instanceof Map
                                 ? orderData((Map<String, Object>)e.getValue())
                                 : e.getValue(),
