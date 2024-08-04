@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JavaType;
+import org.apache.commons.lang3.tuple.Pair;
 import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
@@ -36,11 +37,14 @@ public class MdcProvider {
     private static final Function<String, Long> TO_LONG = Long::parseLong;
     private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
-    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\[\\]]");
+    private static final Pattern LIST_SIGN_PATTERN = Pattern.compile("[\\[\\]]");
     private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
     private static final String ROOT_PROPERTY = "^%s($|\\.)";
-    private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{([^}]+)}");
-    private static final Pattern COMMA_PATTERN= Pattern.compile(",");
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    private static final String REF_KEY_SEPARATOR = ":";
+    private static final String REF_TYPE_MDC = "mdc";
+    private static final String REF_TYPE_CTX = "ctx";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Processor processor;
@@ -744,8 +748,10 @@ public class MdcProvider {
                 String item = StringUtils.trim(k);
                 Matcher m = REFERENCE_PATTERN.matcher(item);
                 while (m.find()) {
-                    String refKey = m.group(1);
-                    result.add(itemReader.apply(context, refKey));
+                    Pair<String, String> ref = getRef(m.group(1));
+                    if(ref != null && ref.getLeft().equals(REF_TYPE_MDC)) {
+                        result.add(itemReader.apply(context, ref.getRight()));
+                    }
                 }
             }
         }
@@ -767,13 +773,47 @@ public class MdcProvider {
             StringBuffer sb = new StringBuffer();
             Matcher m = REFERENCE_PATTERN.matcher(value);
             while (m.find()) {
-                String refKey = m.group(1);
-                m.appendReplacement(sb, getString(context, refKey));
+                String refValue = getRefValue(context, m.group(1));
+                if(refValue != null) {
+                    m.appendReplacement(sb, refValue);
+                }
             }
             m.appendTail(sb);
             return sb.toString();
         }
         return value;
+    }
+
+    private Pair<String, String> getRef(String refKeyGroup){
+        int refKeyIndex = refKeyGroup.indexOf(REF_KEY_SEPARATOR);
+        if(refKeyIndex > 1) {
+            String refType = refKeyGroup.substring(0, refKeyIndex);
+            String refKey = refKeyGroup.substring(refKeyIndex + 1);
+            return Pair.of(refType, refKey);
+        }
+        return null;
+    }
+
+    private String getRefValue(MdcContext context, String refKeyGroup) throws MdcException {
+        Pair<String, String> ref = getRef(refKeyGroup);
+        if(ref != null) {
+            switch (ref.getLeft()){
+                case REF_TYPE_MDC:
+                    return getString(context, ref.getRight());
+                case REF_TYPE_CTX:
+                    return getCtxStringValue(context, ref.getRight());
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+
+    private String getCtxStringValue( MdcContext context, String key) throws MdcException {
+        if(context.containsKey(key)) {
+            return String.valueOf(context.get(key));
+        }
+        return null;
     }
 
     private  List<Property> listCompoundProperty(String key) throws MdcException {

@@ -37,9 +37,9 @@ horsepower:
     drive@2WD: 300
 
 engine-info:
-  label: Block ${engine.block.type} Type ${horsepower} Horsepower
-  list: ["${engine.block.type}", "Cylinders: ${engine.block.cylinder-count}"]
-  objects: ["${engine}", "${engine.block}"]
+  label: Block ${mdc:engine.block.type} Type ${mdc:horsepower} Horsepower Year ${ctx:year} with ${outer_pattern}
+  list: ["${mdc:engine.block.type}", "Cylinders: ${mdc:engine.block.cylinder-count}", "${ctx:year}", "${outer_pattern}"]
+  objects: ["${mdc:engine}", "${mdc:engine.block}"]
 
 off-road:
   clearance@[..12.0]: false

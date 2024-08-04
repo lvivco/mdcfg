@@ -199,8 +199,9 @@ public class ProviderTest {
         String label = provider.getString(
                 TestContextBuilder.init()
                         .model("bmw")
+                        .year("2024")
                         .build(),"engine-info.label");
-        assertEquals("Block inline Type 480 Horsepower", label);
+        assertEquals("Block inline Type 480 Horsepower Year 2024 with ${outer_pattern}", label);
     }
 
     @Test
@@ -208,10 +209,13 @@ public class ProviderTest {
         List<String> list = provider.getStringList(
                 TestContextBuilder.init()
                         .model("bmw")
+                        .year("2024")
                         .build(),"engine-info.list");
-        assertEquals(2, list.size());
+        assertEquals(4, list.size());
         assertEquals("inline", list.get(0));
         assertEquals("Cylinders: 6", list.get(1));
+        assertEquals("2024", list.get(2));
+        assertEquals("${outer_pattern}", list.get(3));
     }
 
     @Test
