@@ -19,6 +19,6 @@ public class SimpleRestService {
 
     @GetMapping("/{locale}/info")
     public String info() {
-        return "App: " + name.get() + ",  rate:" + rating.get();
+        return "App: " + name.get() + ",  rate: " + rating.get();
     }
 }
