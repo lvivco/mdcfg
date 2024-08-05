@@ -13,6 +13,7 @@ public class TestContextBuilder {
     private static final String DRIVE = "drive";
     private static final String ADD_IN = "add-in";
     private static final String CLEARANCE = "clearance";
+    private static final String YEAR = "year";
 
     public static MdcContext EMPTY = new MdcContext();
 
@@ -52,6 +53,11 @@ public class TestContextBuilder {
 
     public TestContextBuilder clearance(Double clearance){
         ctx.put(CLEARANCE, clearance);
+        return this;
+    }
+
+    public TestContextBuilder year(String year){
+        ctx.put(YEAR, year);
         return this;
     }
 }
