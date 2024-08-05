@@ -28,6 +28,13 @@ public class BuilderTest {
         assertEquals(1, provider.getSize());
     }
 
+    @Test
+    public void testHocon() throws MdcException {
+        MdcProvider provider = MdcBuilder.withHocon(HOCON_PATH).build();
+        assertNotNull(provider);
+        assertEquals(6, provider.getSize());
+    }
+
     @Test(expected = MdcException.class)
     public void failTest() throws MdcException {
         MdcBuilder.withYaml("wrong path").build();

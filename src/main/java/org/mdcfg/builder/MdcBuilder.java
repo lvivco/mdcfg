@@ -6,6 +6,7 @@ package org.mdcfg.builder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
 import org.mdcfg.provider.MdcProvider;
+import org.mdcfg.source.HoconSource;
 import org.mdcfg.source.JsonSource;
 import org.mdcfg.source.Source;
 import org.mdcfg.source.YamlSource;
@@ -151,5 +152,15 @@ public class MdcBuilder {
      */
     public static MdcConfigBuilder withJson(String path){
         return new MdcConfigBuilder(new JsonSource(path));
+    }
+
+    /**
+     * Start building HOCON base config.
+     *
+     * @param path absolute path for config HOCON file or folder that contains HOCON files (sub folders will be ignored)
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withHocon(String path) {
+        return new MdcConfigBuilder(new HoconSource(path));
     }
 }
