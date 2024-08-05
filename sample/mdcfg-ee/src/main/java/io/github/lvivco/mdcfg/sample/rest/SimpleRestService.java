@@ -15,11 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(onConstructor = @__(@Inject))
 public class SimpleRestService {
 
-    @Inject
     @MdcProperty("simple-service.name")
     MdcPropertyProvider<String> name;
 
-    @Inject
     @MdcProperty(property = "simple-service.rating", fallBack = "3")
     MdcPropertyProvider<Integer> rating;
 
@@ -27,6 +25,6 @@ public class SimpleRestService {
     @Produces("text/plain")
     @Path("/{locale}/info")
     public String hello() {
-        return "App: " + name.get() + ",  rate:" + rating.get();
+        return "App: " + name.get() + ",  rate: " + rating.get();
     }
 }
