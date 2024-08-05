@@ -32,7 +32,7 @@ public class BuilderTest {
     public void testHocon() throws MdcException {
         MdcProvider provider = MdcBuilder.withHocon(HOCON_PATH).build();
         assertNotNull(provider);
-        assertEquals(2, provider.getSize());
+        assertEquals(6, provider.getSize());
     }
 
     @Test(expected = MdcException.class)

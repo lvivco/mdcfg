@@ -51,5 +51,23 @@ public class HoconProviderTest {
                         .drive("2WD")
                         .build(), "horsepower");
         assertEquals(300, toyotaHorsepower);
+
+        List<String> engineTypes = provider.getStringList(TestContextBuilder.EMPTY, "engine.type");
+        assertEquals("electric", engineTypes.get(0));
+
+        int engineBlock = provider.getInteger(TestContextBuilder.EMPTY, "engine.block.cylinder-count");
+        assertEquals(6, engineBlock);
+
+        String engineBlockBmw = provider.getString(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(), "engine.block.type");
+        assertEquals("inline", engineBlockBmw);
+
+        String engineBlockFord = provider.getString(
+                TestContextBuilder.init()
+                        .model("ford")
+                        .build(), "engine.block.type");
+        assertEquals("V", engineBlockFord);
     }
 }
