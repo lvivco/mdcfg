@@ -11,6 +11,8 @@ import org.mdcfg.source.JsonSource;
 import org.mdcfg.source.Source;
 import org.mdcfg.source.YamlSource;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -145,6 +147,26 @@ public class MdcBuilder {
     }
 
     /**
+     * Start building Yaml base config.
+     *
+     * @param file config Yaml file or folder that contains Yaml files (sub folders will be ignored)
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withYaml(File file){
+        return new MdcConfigBuilder(new YamlSource(file));
+    }
+
+    /**
+     * Start building Yaml base config.
+     *
+     * @param stream Input stream for config Yaml data
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withYaml(InputStream stream){
+        return new MdcConfigBuilder(new YamlSource(stream));
+    }
+
+    /**
      * Start building Json base config.
      *
      * @param path absolute path for config Json file or folder that contains Json files (sub folders will be ignored)
@@ -155,6 +177,26 @@ public class MdcBuilder {
     }
 
     /**
+     * Start building Json base config.
+     *
+     * @param file config Json file or folder that contains Json files (sub folders will be ignored)
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withJson(File file){
+        return new MdcConfigBuilder(new JsonSource(file));
+    }
+
+    /**
+     * Start building Json base config.
+     *
+     * @param stream Input stream for config Json data
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withJson(InputStream stream){
+        return new MdcConfigBuilder(new JsonSource(stream));
+    }
+
+    /**
      * Start building HOCON base config.
      *
      * @param path absolute path for config HOCON file or folder that contains HOCON files (sub folders will be ignored)
@@ -162,5 +204,25 @@ public class MdcBuilder {
      */
     public static MdcConfigBuilder withHocon(String path) {
         return new MdcConfigBuilder(new HoconSource(path));
+    }
+
+    /**
+     * Start building HOCON base config.
+     *
+     * @param file config HOCON file or folder that contains Json files (sub folders will be ignored)
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withHocon(File file){
+        return new MdcConfigBuilder(new HoconSource(file));
+    }
+
+    /**
+     * Start building HOCON base config.
+     *
+     * @param stream Input stream for config HOCON data
+     * @return new instance of {@link MdcConfigBuilder} for further configuration.
+     */
+    public static MdcConfigBuilder withHocon(InputStream stream){
+        return new MdcConfigBuilder(new HoconSource(stream));
     }
 }
