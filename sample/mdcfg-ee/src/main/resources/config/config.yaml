@@ -1,0 +1,7 @@
+simple-service:
+  name:
+    any@: "MDC Spring Global"
+    locale@US_en: "MDC Spring US"
+    locale@CA_en: "MDC Spring CA"
+  rating:
+    locale@US_en: 1
