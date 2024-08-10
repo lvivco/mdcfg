@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.mdcfg.helpers.Resources.YAML_PATH;
+import static org.mdcfg.helpers.Resources.YAML_SINGLE_PATH;
 
 public class AutoUpdateTest {
 
@@ -24,8 +24,6 @@ public class AutoUpdateTest {
     @Test
     public void testSingleFile() throws MdcException, ExecutionException, InterruptedException, IOException {
         final File tempFile = tempFolder.newFile("tempFile.yaml");
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(() -> modifyFile(Path.of(YAML_PATH), tempFile.toPath()), 200, TimeUnit.MILLISECONDS);
 
         CompletableFuture<String> future = new CompletableFuture<>();
         MdcProvider provider = MdcBuilder.withYaml(tempFile.getAbsolutePath())
@@ -34,15 +32,16 @@ public class AutoUpdateTest {
                         .build())
                 .build();
 
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(() -> modifyFile(Path.of(YAML_SINGLE_PATH), tempFile.toPath()), 200, TimeUnit.MILLISECONDS);
+
         String count = future.get();
-        assertEquals(14, Integer.parseInt(count));
+        assertEquals(1, Integer.parseInt(count));
     }
 
     @Test
     public void testFolder() throws MdcException, ExecutionException, InterruptedException, IOException {
         final File tempFile = tempFolder.newFile("tempFile.yaml");
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(() -> modifyFile(Path.of(YAML_PATH), tempFile.toPath()), 200, TimeUnit.MILLISECONDS);
 
         CompletableFuture<String> future = new CompletableFuture<>();
         MdcProvider provider = MdcBuilder.withYaml(tempFile.getParentFile().getAbsolutePath())
@@ -51,8 +50,11 @@ public class AutoUpdateTest {
                         .build())
                 .build();
 
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(() -> modifyFile(Path.of(YAML_SINGLE_PATH), tempFile.toPath()), 200, TimeUnit.MILLISECONDS);
+
         String count = future.get();
-        assertEquals(14, Integer.parseInt(count));
+        assertEquals(1, Integer.parseInt(count));
     }
 
     private void modifyFile(Path from, Path to) {

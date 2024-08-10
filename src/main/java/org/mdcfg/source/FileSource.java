@@ -8,7 +8,7 @@ import org.mdcfg.watchers.FileWatcher;
 import org.mdcfg.watchers.FolderWatcher;
 import org.mdcfg.watchers.Watcher;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
@@ -16,10 +16,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Base class for all File based source implementations */
-public abstract class FileSource implements Source {
-    private final File root;
+public abstract class FileSource extends StreamSource {
+    private File root;
     private List<File> includes;
     private Watcher watcher;
+
+    protected FileSource(InputStream stream) {
+        super(stream);
+    }
+
+    protected FileSource(File file) {
+        this.root = file;
+    }
 
     protected FileSource(String path) {
         this.root = new File(path);
@@ -27,63 +35,58 @@ public abstract class FileSource implements Source {
 
     @Override
     public Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException {
-        if(root.isDirectory()){
-            File[] files = extractFiles(root);
-            if(files == null || files.length == 0){
+        if(root == null){
+            return super.read(includesExtractor, isCaseSensitive);
+        }
+
+        if(!root.exists()){
+            throw new MdcException(String.format("File or folder %s doesn't exist.", root.getAbsolutePath()));
+        }
+
+        if (root.isDirectory()) {
+            File[] files = listFiles(root);
+            if (files == null || files.length == 0) {
                 throw new MdcException("Folder doesn't contain any config file.");
             }
-            return readAndMerge(Arrays.asList(files), new HashMap<>(), isCaseSensitive);
+            return readAndMerge(toStreamList(Arrays.asList(files)), new HashMap<>(), isCaseSensitive);
         } else {
-            Map<String, Map<String, String>> main = readFile(root, isCaseSensitive);
+            Map<String, Map<String, String>> main = read(toStream(root), isCaseSensitive);
             includes = includesExtractor.apply(main).values().stream()
                     .map(v -> root.getParentFile().toPath().resolve(Paths.get(v)).toFile())
-                    .filter(File::isFile)
-                    .filter(File::exists)
                     .collect(Collectors.toList());
-            return readAndMerge(includes, main, isCaseSensitive);
+            return readAndMerge(toStreamList(includes), main, isCaseSensitive);
         }
     }
 
     @Override
     public void observeChange(Runnable onChange, long reloadInterval) throws MdcException {
-        if(!root.exists()) {
-            throw new MdcException(String.format("File or folder %s doesn't exist.", root.getAbsolutePath()));
-        }
-
         watcher = root.isDirectory()
                 ? new FolderWatcher(root.getAbsolutePath(), onChange, reloadInterval)
                 : new FileWatcher(getAllSourceFiles(), onChange, reloadInterval);
         watcher.start();
     }
 
-    /** Read one file */
-    abstract Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException;
-
     /** Get array of appropriate files in folder */
-    abstract File[] extractFiles(File folder);
+    abstract File[] listFiles(File folder);
 
-    /** Read properties from files and merge them into one Map */
-    private Map<String, Map<String, String>> readAndMerge(List<File> files, Map<String, Map<String, String>> merged, boolean isCaseSensitive) throws MdcException {
+    private List<InputStream> toStreamList(List<File> files) throws MdcException {
+        List<InputStream> streams = new ArrayList<>();
         for (File file : files) {
-            Map<String, Map<String, String>> map = readFile(file, isCaseSensitive);
-            Set<String> interfileKeys = getInterfileKeys(map, merged);
-            if(!interfileKeys.isEmpty()){
-                throw new MdcException(String.format("There is interfile configuration for keys %s", interfileKeys));
-            }
-            merged.putAll(map);
+            streams.add(toStream(file));
         }
-        return merged;
+        return streams;
+    }
+
+    private InputStream toStream(File file) throws MdcException {
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new MdcException(String.format("Couldn't open stream for file %s", file.getAbsolutePath()), e);
+        }
     }
 
     /** Combine root file with includes into single list */
     private List<File> getAllSourceFiles(){
         return Stream.concat(Stream.of(root), includes.stream()).collect(Collectors.toList());
-    }
-
-    /** Get list of properties that exists in different source files */
-    private Set<String> getInterfileKeys(Map<String, Map<String, String>> map, Map<String, Map<String, String>> merged) {
-        Set<String> intersection = new HashSet<>(merged.keySet());
-        intersection.retainAll(map.keySet());
-        return intersection;
     }
 }

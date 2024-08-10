@@ -18,24 +18,32 @@ import java.util.Optional;
 /** Source implementation for Yaml based config files */
 public class YamlSource extends FileSource {
 
+    public YamlSource(InputStream stream) {
+        super(stream);
+    }
+
+    public YamlSource(File file) {
+        super(file);
+    }
+
     public YamlSource(String path) {
         super(path);
     }
 
     @Override
-    Map<String, Map<String, String>> readFile(File source, boolean caseSensitive) throws MdcException {
-        try (InputStream is = new FileInputStream(source)) {
+    Map<String, Map<String, String>> read(InputStream is, boolean caseSensitive) throws MdcException {
+        try (is) {
             Map<String, Object> rawData = new Yaml().load(is);
             rawData = Optional.ofNullable(rawData).orElse(new HashMap<>());
             Map<String, Object> flattened = SourceUtils.flatten(rawData, caseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
-            throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);
+            throw new MdcException("Couldn't read input source", e);
         }
     }
 
     @Override
-    File[] extractFiles(File folder) {
+    File[] listFiles(File folder) {
         return folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".yaml"));
     }
 }

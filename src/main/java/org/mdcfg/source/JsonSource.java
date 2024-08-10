@@ -18,23 +18,31 @@ import java.util.Map;
 public class JsonSource extends FileSource {
     private static final TypeReference<Map<String, Object>> TYPE = new TypeReference<>() {};
 
+    public JsonSource(InputStream stream) {
+        super(stream);
+    }
+
+    public JsonSource(File file) {
+        super(file);
+    }
+
     public JsonSource(String path) {
         super(path);
     }
 
     @Override
-    Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException {
-        try (InputStream is = new FileInputStream(source)) {
+    Map<String, Map<String, String>> read(InputStream is, boolean isCaseSensitive) throws MdcException {
+        try (is) {
             Map<String, Object> rawData = new ObjectMapper().readValue(is, TYPE);
             Map<String, Object> flattened = SourceUtils.flatten(rawData, isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
-            throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);
+            throw new MdcException("Couldn't read input source", e);
         }
     }
 
     @Override
-    File[] extractFiles(File folder) {
+    File[] listFiles(File folder) {
         return folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
     }
 }

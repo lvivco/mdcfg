@@ -8,7 +8,8 @@ import org.mdcfg.utils.SourceUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -23,24 +24,33 @@ public class HoconSource extends FileSource {
     private static final String MARKER = "\u200B";
     private final Pattern pattern = Pattern.compile("\"(.*@)");
 
+    public HoconSource(InputStream stream) {
+        super(stream);
+    }
+
+    public HoconSource(File file) {
+        super(file);
+    }
+
     public HoconSource(String path) {
         super(path);
     }
 
     @Override
-    Map<String, Map<String, String>> readFile(File source, boolean isCaseSensitive) throws MdcException {
-        try {
-            String data = numberRows(Files.readString(source.toPath()));
+    Map<String, Map<String, String>> read(InputStream is, boolean isCaseSensitive) throws MdcException {
+        try (is) {
+            String inputString = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            String data = numberRows(inputString);
             Map<String, Object> rawData = new ObjectMapper(new HoconFactory()).readValue(data, TYPE);
             Map<String, Object> flattened = SourceUtils.flatten(orderData(rawData), isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
         } catch (IOException e) {
-            throw new MdcException(String.format("Couldn't read source %s.", source.getAbsolutePath()), e);
+            throw new MdcException("Couldn't read input source", e);
         }
     }
 
     @Override
-    File[] extractFiles(File folder) {
+    File[] listFiles(File folder) {
         return folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".conf"));
     }
 
