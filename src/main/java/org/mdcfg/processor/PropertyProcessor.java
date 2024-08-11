@@ -29,6 +29,7 @@ public class PropertyProcessor {
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
     private final List<Chain> chains = new ArrayList<>();
+    private final Map<String, List<Chain>> listChains = new HashMap<>();
     private final List<Hook> loadHooks;
     private boolean hasReference;
 
@@ -42,7 +43,7 @@ public class PropertyProcessor {
         createDimensions(map);
         createSelectorChains(map);
 
-        return new Property(name, dimensions, chains, hasReference);
+        return new Property(name, dimensions, chains, listChains, hasReference);
     }
 
     /** Create {@code List} of {@link Dimension} objects with down to up order. */
@@ -103,19 +104,19 @@ public class PropertyProcessor {
     /** Create and add all {@link Chain} objects parsing all flattened chain strings with down to up order. */
     private void createSelectorChains(Map<String, String> map){
         for(var entry : map.entrySet()) {
-            Map<String, String> chain = new HashMap<>();
+            Map<String, String> chainMap = new HashMap<>();
             for (var item:entry.getKey().split(DIMENSION_SEPARATOR)) {
                 Pair<String, String> pair = SourceUtils.splitSelector(item);
                 if(!pair.getKey().equals(ANY)) {
-                    chain.put(pair.getKey(), pair.getValue());
+                    chainMap.put(pair.getKey(), pair.getValue());
                 }
             }
-            chains.add(0, createChain(chain, entry.getValue()));
+            createChain(chainMap, entry.getValue());
         }
     }
 
     /**
-     * Create {@link Chain} object parsing one flattened chain string splitted into map by selector name and value.
+     * Create {@link Chain} object parsing one flattened chain string split into map by selector name and value.
      *  <p> For example property:
      *  <pre>
      *    horsepower:
@@ -134,9 +135,10 @@ public class PropertyProcessor {
      *  <li>{@code model@bmw\.drive@4WD$}</li>
      *  </ul>
      */
-    private Chain createChain(Map<String, String> selectors, String value) {
+    private void createChain(Map<String, String> selectors, String value) {
         StringBuilder pattern = new StringBuilder();
         List<Range> ranges = new ArrayList<>();
+        List<Dimension> nonEmptyListDimensions = new ArrayList<>();
         for ( Dimension dimension : dimensions.values()) {
             if(pattern.length() > 0){
                 pattern.append("\\.");
@@ -145,6 +147,9 @@ public class PropertyProcessor {
             if(selectors.containsKey(dimensionKey)){
                 String selector = selectors.get(dimensionKey);
                 applySelector(selector, pattern, ranges, dimension);
+                if(dimension.isList()){
+                    nonEmptyListDimensions.add(dimension);
+                }
             } else {
                 // any
                 pattern.append(dimension.getName()).append("@.*");
@@ -163,7 +168,9 @@ public class PropertyProcessor {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
-        return new Chain(Pattern.compile(pattern.toString()), value, ranges);
+        Chain chain = new Chain(Pattern.compile(pattern.toString()), value, ranges);
+        chains.add(0, chain);
+        addListableChains(nonEmptyListDimensions, chain);
     }
 
     /** Append pattern for one selector and add {@link Range} objects if needed. */
@@ -224,5 +231,16 @@ public class PropertyProcessor {
             }
         }
         return new Range(dimension, minInclusive, min, maxInclusive, max);
+    }
+
+
+    /** Store chain in map where key is list dimension name and value is list of appropriate chains */
+    private void addListableChains(List<Dimension> dimensions, Chain chain) {
+        for (Dimension isIterableDimension : dimensions) {
+            if(!listChains.containsKey(isIterableDimension.getName())) {
+                listChains.put(isIterableDimension.getName(), new ArrayList<>());
+            }
+            listChains.get(isIterableDimension.getName()).add(0, chain);
+        }
     }
 }
