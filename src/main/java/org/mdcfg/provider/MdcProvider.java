@@ -18,10 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.mdcfg.provider.MdcConverter.*;
 
 /**
  * Main Config class. Provides configuration by property name and context.
@@ -30,13 +31,6 @@ public class MdcProvider {
     @FunctionalInterface
     private interface BiFunction<T, U, R> { R apply(T t, U u) throws MdcException; }
 
-    private static final UnaryOperator<String> TO_STRING = v -> v;
-    private static final Function<String, Boolean> TO_BOOLEAN = Boolean::parseBoolean;
-    private static final Function<String, Short> TO_SHORT = Short::parseShort;
-    private static final Function<String, Integer> TO_INTEGER = Integer::parseInt;
-    private static final Function<String, Long> TO_LONG = Long::parseLong;
-    private static final Function<String, Float> TO_FLOAT = Float::parseFloat;
-    private static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
     private static final Pattern LIST_SIGN_PATTERN = Pattern.compile("[\\[\\]]");
     private static final Pattern SUB_PROPERTY_SEPARATOR = Pattern.compile("\\.");
     private static final String ROOT_PROPERTY = "^%s($|\\.)";
@@ -109,6 +103,7 @@ public class MdcProvider {
     public Optional<String> getStringOptional(MdcContext context, String key){
         return getValueOptional(context, key, TO_STRING);
     }
+
 
     /**
      * Read property value and convert it to {@code Boolean}.
@@ -528,6 +523,24 @@ public class MdcProvider {
     }
 
     /**
+     * Iterate through list based dimension with provided name, read property value for each and convert it to provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param splitBy name of List based dimension represented in context
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return List of iterated property values or empty list.
+     * @param <T> type in which value suppose to be converted
+     * @throws MdcException  in case property not found.
+     */
+    public <T> List<T> getSplitValue(MdcContext context, String key, String splitBy, Function<String, T> converter) throws MdcException {
+        Property property = getProperty(key);
+        return getSplitStringValue(property, context, splitBy).stream()
+                .map(converter)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Read property value and convert it to {@code List} of provided type.
      *
      * @param context reading context {@link MdcContext}.
@@ -539,20 +552,10 @@ public class MdcProvider {
      */
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
         Property property = getProperty(key);
-        String listString = Optional.ofNullable(getStringValue(property, context))
+        return Optional.ofNullable(getStringValue(property, context))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                .map(s -> stringToList(converter, s))
                 .orElse(null);
-
-        if(listString == null){
-            return null; //NOSONAR
-        }
-        if(StringUtils.isNotEmpty(listString)) {
-            return Arrays.stream(COMMA_PATTERN.split(listString))
-                    .map(StringUtils::trim)
-                    .map(converter)
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
     }
 
     /**
@@ -570,6 +573,26 @@ public class MdcProvider {
         } catch (MdcException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Read property value and convert it to {@code List} of provided type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param converter {@code Function} that takes String and converts it to specified type.
+     * @return {@code List} of property values or null.
+     * @param <T> type in which each value in list suppose to be converted
+     * @throws MdcException in case property not found.
+     */
+    public <T> List<List<T>> getSplitValueList(MdcContext context, String key, String splitBy, Function<String, T> converter) throws MdcException {
+        Property property = getProperty(key);
+        return Optional.ofNullable(getSplitStringValue(property, context, splitBy))
+                .map(l -> l.stream()
+                        .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
+                        .map(s -> stringToList(converter, s))
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
     /**
@@ -770,18 +793,32 @@ public class MdcProvider {
     private String getStringValue(Property property, MdcContext context) throws MdcException {
         String value = property.getString(context, isCaseSensitive);
         if(property.isHasReference()) {
-            StringBuffer sb = new StringBuffer();
-            Matcher m = REFERENCE_PATTERN.matcher(value);
-            while (m.find()) {
-                String refValue = getRefValue(context, m.group(1));
-                if(refValue != null) {
-                    m.appendReplacement(sb, refValue);
-                }
-            }
-            m.appendTail(sb);
-            return sb.toString();
+            return processRefs(context, value);
         }
         return value;
+    }
+
+    private List<String> getSplitStringValue(Property property, MdcContext context, String splitBy) throws MdcException {
+        List<String> values = property.getSplitString(context, splitBy, isCaseSensitive);
+        if(property.isHasReference()) {
+            for (int i = 0; i < values.size(); i++) {
+                values.set(i, processRefs(context, values.get(i)));
+            }
+        }
+        return values;
+    }
+
+    private String processRefs(MdcContext context, String value) throws MdcException {
+        StringBuilder sb = new StringBuilder();
+        Matcher m = REFERENCE_PATTERN.matcher(value);
+        while (m.find()) {
+            String refValue = getRefValue(context, m.group(1));
+            if(refValue != null) {
+                m.appendReplacement(sb, refValue);
+            }
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     private Pair<String, String> getRef(String refKeyGroup){
@@ -809,7 +846,7 @@ public class MdcProvider {
         return null;
     }
 
-    private String getCtxStringValue( MdcContext context, String key) throws MdcException {
+    private String getCtxStringValue( MdcContext context, String key) {
         if(context.containsKey(key)) {
             return String.valueOf(context.get(key));
         }
@@ -830,6 +867,7 @@ public class MdcProvider {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Object> getLeaf(Map<String, Object> root, String[] path) {
         Map<String, Object> leaf = root;
         if(path.length > 2) {
@@ -858,4 +896,15 @@ public class MdcProvider {
         Map<String, Map<String, String>> data = source.read(processor::getIncludes, isCaseSensitive);
         properties = processor.process(data);
     }
+
+    private static <T> List<T> stringToList(Function<String, T> converter, String listString) {
+        if(StringUtils.isNotEmpty(listString)) {
+            return Arrays.stream(COMMA_PATTERN.split(listString))
+                    .map(StringUtils::trim)
+                    .map(converter)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
 }

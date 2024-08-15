@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.helpers.*;
+import org.mdcfg.provider.MdcConverter;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
 
@@ -147,7 +148,7 @@ public class ProviderTest {
     }
 
     @Test
-    @SuppressWarnings("UNCHECKED_CAST")
+    @SuppressWarnings("unchecked")
     public void testCompoundMapProperty() throws MdcException {
         Map<String, Object> engine = provider.getCompoundMap(
                 TestContextBuilder.init()
@@ -220,7 +221,7 @@ public class ProviderTest {
 
     @Test
     public void testCompoundObjectListByClass() throws MdcException {
-        Function<String, Class<? extends Object>> classResolver = k -> {
+        Function<String, Class<?>> classResolver = k -> {
             if(k.equals("engine.block")) {
                 return BlockPOJO.class;
             }
@@ -256,7 +257,7 @@ public class ProviderTest {
 
     @Test
     public void testCompoundObjectListByTypeReference() throws MdcException {
-        Function<String, TypeReference<? extends Object>> referenceResolver = k -> {
+        Function<String, TypeReference<?>> referenceResolver = k -> {
             if(k.equals("engine.block")) {
                 return BLOCK_TYPE_REFERENCE;
             }
@@ -275,10 +276,43 @@ public class ProviderTest {
     @Test(expected = MdcException.class)
     public void testPlainListException() throws MdcException {
         Function<String, JavaType> typeResolver = k -> null;
-        List<?> list = provider.getCompoundObjectListByType(
+        provider.getCompoundObjectListByType(
                 TestContextBuilder.EMPTY,
                 "engine.type",
                 typeResolver);
+    }
+
+    @Test
+    public void testSplitValue() throws MdcException {
+        List<Float> priceToyota = provider.getSplitValue(
+                TestContextBuilder.init()
+                        .model("toyota")
+                        .addIn(List.of("leather-seats", "panoramic-roof", "cruise-control"))
+                        .build(), "price", "add-in", MdcConverter.TO_FLOAT);
+        assertEquals(2, priceToyota.size());
+        assertEquals(Float.valueOf(35000), priceToyota.get(0));
+        assertEquals(Float.valueOf(37000), priceToyota.get(1));
+
+        List<Float> priceBmw = provider.getSplitValue(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .addIn(List.of("leather-seats", "panoramic-roof", "cruise-control"))
+                        .build(), "price", "add-in", MdcConverter.TO_FLOAT);
+        assertEquals(2, priceBmw.size());
+        assertEquals(Float.valueOf(55000), priceBmw.get(0));
+        assertEquals(Float.valueOf(55000), priceBmw.get(1));
+    }
+
+    @Test
+    public void testSplitValueList() throws MdcException {
+        List<List<String>> colorsToyota = provider.getSplitValueList(
+                TestContextBuilder.init()
+                        .model("ford")
+                        .addIn(List.of("leather-seats", "panoramic-roof", "cruise-control"))
+                        .build(), "available-colors", "add-in", MdcConverter.TO_STRING);
+        assertEquals(2, colorsToyota.size());
+        assertEquals("[white, black]", colorsToyota.get(0).toString());
+        assertEquals("[white, black, metalic]", colorsToyota.get(1).toString());
     }
 
     private static void assertListPOJO(List<?> list) {

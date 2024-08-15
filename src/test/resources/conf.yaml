@@ -25,6 +25,8 @@ available-colors:
   model@ford:
     any@: [black, metalic]
     cat@crossover: [white, black, metalic, gray]
+    add-in*@ls: [white, black]
+    add-in*@panoramic-roof: [white, black, metalic]
 
 horsepower:
   any@: 400
