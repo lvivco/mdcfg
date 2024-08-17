@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2024 LvivCoffeeCoders team.
+ */
 package io.github.lvivco.mdcfg.sample;
 
 import org.springframework.boot.SpringApplication;
