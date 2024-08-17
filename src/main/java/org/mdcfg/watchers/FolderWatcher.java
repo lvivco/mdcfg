@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2023 LvivCoffeeCoders team.
+ *   Copyright (C) 2024 LvivCoffeeCoders team.
  */
 package org.mdcfg.watchers;
 

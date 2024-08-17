@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2024 LvivCoffeeCoders team.
+ */
 package org.mdcfg.helpers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

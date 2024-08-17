@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2024 LvivCoffeeCoders team.
+ */
 package org.mdcfg.source;
 
 import com.fasterxml.jackson.core.type.TypeReference;
