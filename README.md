@@ -22,7 +22,7 @@ The library focuses on managing configurations in a multidimensional manner, all
     <dependency>
         <groupId>io.github.lvivco</groupId>
         <artifactId>mdcfg</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 </dependencies>
 ```
