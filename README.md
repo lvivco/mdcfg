@@ -24,6 +24,11 @@ The library focuses on managing configurations in a multidimensional manner, all
         <artifactId>mdcfg</artifactId>
         <version>1.0.1</version>
     </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.14.0</version>
+    </dependency>
 </dependencies>
 ```
 ### Usage
