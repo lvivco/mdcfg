@@ -164,7 +164,7 @@ public class ProviderTest {
                 TestContextBuilder.init()
                         .model("bmw")
                         .build(),"engine.block", false);
-        assertEquals("{\"cylinder-count\":\"6\",\"type\":\"inline\"}",engine);
+        assertEquals("{\"type\":\"inline\",\"cylinder-count\":\"6\"}",engine);
     }
 
     @Test
