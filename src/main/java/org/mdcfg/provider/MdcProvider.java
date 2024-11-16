@@ -44,7 +44,8 @@ public class MdcProvider {
     private final Processor processor;
     private final Source source;
     private final MdcCallback<Integer, MdcException> callback;
-    private final boolean isCaseSensitive;
+    private final boolean isCaseInsensitiveKeys;
+    private final boolean isCaseSensitiveSelectors;
 
     private Map<String, Property> properties;
 
@@ -56,14 +57,16 @@ public class MdcProvider {
      * @param reloadInterval interval in ms for reload
      * @param callback reload call back. See {@link MdcCallback}.
      * @param loadHooks List of functions that used for preprocessing config values.
-     * @param isCaseSensitive Flag that indicates whether config should acknowledge case
+     * @param isCaseInsensitiveKeys Flag that indicates whether config should acknowledge case for keys
+     * @param isCaseSensitiveSelectors Flag that indicates whether config should acknowledge case for selectors
      * @throws MdcException thrown in case something went wrong.
      */
     public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,
-                       List<Hook> loadHooks, boolean isCaseSensitive) throws MdcException {
+                       List<Hook> loadHooks, boolean isCaseInsensitiveKeys, boolean isCaseSensitiveSelectors) throws MdcException {
         this.source = source;
         this.callback = callback;
-        this.isCaseSensitive = isCaseSensitive;
+        this.isCaseInsensitiveKeys = isCaseInsensitiveKeys;
+        this.isCaseSensitiveSelectors = isCaseSensitiveSelectors;
 
         this.processor = new Processor(loadHooks);
 
@@ -754,7 +757,7 @@ public class MdcProvider {
 
     private <T> List<T> getCompoundObjectList(MdcContext context, String key, BiFunction<MdcContext, String, ? extends T> itemReader) throws MdcException {
         Property property = getProperty(key);
-        String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
+        String listString = Optional.ofNullable(property.getString(context, isCaseSensitiveSelectors))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
@@ -782,7 +785,7 @@ public class MdcProvider {
     }
 
     private String processKey(String key) {
-        return isCaseSensitive ? key : key.toLowerCase(Locale.ROOT);
+        return isCaseInsensitiveKeys ? key.toLowerCase(Locale.ROOT) : key;
     }
 
     private Property getProperty(String key) throws MdcException {
@@ -791,7 +794,7 @@ public class MdcProvider {
     }
 
     private String getStringValue(Property property, MdcContext context) throws MdcException {
-        String value = property.getString(context, isCaseSensitive);
+        String value = property.getString(context, isCaseSensitiveSelectors);
         if(property.isHasReference()) {
             return processRefs(context, value);
         }
@@ -799,7 +802,7 @@ public class MdcProvider {
     }
 
     private List<String> getSplitStringValue(Property property, MdcContext context, String splitBy) throws MdcException {
-        List<String> values = property.getSplitString(context, splitBy, isCaseSensitive);
+        List<String> values = property.getSplitString(context, splitBy, isCaseSensitiveSelectors);
         if(property.isHasReference()) {
             for (int i = 0; i < values.size(); i++) {
                 values.set(i, processRefs(context, values.get(i)));

@@ -29,18 +29,30 @@ public class MdcBuilder {
         private long reloadInterval = 1000L;
         private MdcCallback<Integer, MdcException> callback;
         private final List<Hook> loadHooks = new ArrayList<>();
-        private boolean isCaseSensitive = false;
+        private boolean isCaseSensitiveKeys = true;
+        private boolean isCaseSensitiveSelectors = false;
 
         public MdcConfigBuilder(Source source) {
             this.source = source;
         }
 
         /**
+         * Set up  case sensitivity for keys, default true
          *
          * @return current instance of {@link MdcConfigBuilder}
          */
-        public MdcConfigBuilder caseSensitive() {
-            this.isCaseSensitive = true;
+        public MdcConfigBuilder caseInsensitiveKeys() {
+            this.isCaseSensitiveKeys = false;
+            return this;
+        }
+
+        /**
+         * Set up  case sensitivity for selectors, default false
+         *
+         * @return current instance of {@link MdcConfigBuilder}
+         */
+        public MdcConfigBuilder caseSensitiveSelectors() {
+            this.isCaseSensitiveSelectors = true;
             return this;
         }
 
@@ -130,7 +142,7 @@ public class MdcBuilder {
          * @throws MdcException thrown in case something went wrong.
          */
         public MdcProvider build() throws MdcException {
-            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks, isCaseSensitive);
+            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks, isCaseSensitiveKeys, isCaseSensitiveSelectors);
         }
     }
 
