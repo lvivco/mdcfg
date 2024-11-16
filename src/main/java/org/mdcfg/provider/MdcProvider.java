@@ -634,7 +634,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public Map<String, Object> getCompoundMap(MdcContext context, String key) throws MdcException {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         List<Property> propertyList = listCompoundProperty(key);
         for (Property property : propertyList) {
             String subKey = property.getName().substring(key.length());
@@ -873,7 +873,7 @@ public class MdcProvider {
         if(path.length > 2) {
             for (int i = 1; i < path.length-1; i++) {
                 if(!leaf.containsKey(path[i])){
-                    leaf.put(path[i], new HashMap<>());
+                    leaf.put(path[i], new LinkedHashMap<>());
                 }
                 leaf = (Map<String, Object>) leaf.get(path[i]);
             }
