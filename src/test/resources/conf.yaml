@@ -51,4 +51,3 @@ off-road:
   clearance@[21.0]: false
 
 options: {"parking-assist": true, "cruise-control": false, "lights": "led"}
-
