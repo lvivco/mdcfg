@@ -24,6 +24,12 @@ public class Property {
     private final List<Chain> chains;
     private final Map<String, List<Chain>> listChainMap;
     @Getter private final boolean hasReference;
+    Property enabled;
+
+    /** check whether property contains enabled@ and if it returns true*/
+    public boolean isEnabled(MdcContext context, boolean isCaseSensitive) {
+        return enabled == null || Boolean.parseBoolean(enabled.getString(context, isCaseSensitive));
+    }
 
     /** create compare string and match it on chains by down to up priority */
     public String getString(MdcContext context, boolean isCaseSensitive) {

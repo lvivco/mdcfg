@@ -20,6 +20,7 @@ public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
     private static final String SUB_PROPERTY_SEPARATOR = ".";
+    private static final String ENABLED_PREFIX = "enabled@:";
     private static final Pattern ALIASES = Pattern.compile("aliases(?:\\:|$).*$");
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
@@ -48,8 +49,12 @@ public class Processor {
                         .filter(hook -> hook.getPattern().matcher(propertyName).matches())
                         .collect(Collectors.toList());
                 Map<String, String> processedSelectors = processAliases(entry.getValue(), aliases);
+                Map<String, String> enabledSelectors = filterByPrefix(processedSelectors, ENABLED_PREFIX);
+                Property enabledProperty = !enabledSelectors.isEmpty()
+                        ? new PropertyProcessor(propertyName, null).getProperty(enabledSelectors, null)
+                        : null;
                 Property property = new PropertyProcessor(propertyName, appropriateHooks)
-                        .getProperty(processedSelectors);
+                        .getProperty(processedSelectors, enabledProperty);
                 properties.put(propertyName, property);
             }
         }
@@ -66,6 +71,26 @@ public class Processor {
                 }
             }
         }
+        return result;
+    }
+
+    /**
+     * Extract selectors that starts with prefix into result map and remove them from original map
+     * @param selectors map to process
+     * @param prefix string that will be used to compare selectors
+     * @return new filtered map
+     */
+    private Map<String, String> filterByPrefix(Map<String, String> selectors, String prefix) {
+        Map<String, String> result = new LinkedHashMap<>();
+        List<String> toRemove = new ArrayList<>();
+        for (Map.Entry<String, String> selectorEntry : selectors.entrySet()) {
+          if(selectorEntry.getKey().startsWith(prefix)){
+              toRemove.add(selectorEntry.getKey());
+              result.put(selectorEntry.getKey().substring(prefix.length()), selectorEntry.getValue());
+          }
+        }
+
+        toRemove.forEach(selectors::remove);
         return result;
     }
 

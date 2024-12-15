@@ -499,7 +499,7 @@ public class MdcProvider {
      * @throws MdcException  in case property not found.
      */
     public <T> T getValue(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         return Optional.ofNullable(getStringValue(property, context))
                 .map(converter)
                 .orElse(null);
@@ -534,7 +534,7 @@ public class MdcProvider {
      * @throws MdcException  in case property not found.
      */
     public <T> List<T> getSplitValue(MdcContext context, String key, String splitBy, Function<String, T> converter) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         return getSplitStringValue(property, context, splitBy).stream()
                 .map(converter)
                 .collect(Collectors.toList());
@@ -551,7 +551,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public <T> List<T> getValueList(MdcContext context, String key, Function<String, T> converter) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         return Optional.ofNullable(getStringValue(property, context))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .map(s -> stringToList(converter, s))
@@ -586,7 +586,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public <T> List<List<T>> getSplitValueList(MdcContext context, String key, String splitBy, Function<String, T> converter) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         return Optional.ofNullable(getSplitStringValue(property, context, splitBy))
                 .map(l -> l.stream()
                         .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
@@ -608,7 +608,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found.
      */
     public <K, V> Map<K, V> getMap(MdcContext context, String key, Function<String, K> keyConverter, Function<String, V> valueConverter) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         String mapString = getStringValue(property, context);
 
         if(mapString == null){
@@ -635,7 +635,7 @@ public class MdcProvider {
      */
     public Map<String, Object> getCompoundMap(MdcContext context, String key) throws MdcException {
         Map<String, Object> result = new LinkedHashMap<>();
-        List<Property> propertyList = listCompoundProperty(key);
+        List<Property> propertyList = listCompoundProperty(context, key);
         for (Property property : propertyList) {
             String subKey = property.getName().substring(key.length());
             String[] path = SUB_PROPERTY_SEPARATOR.split(subKey);
@@ -753,7 +753,7 @@ public class MdcProvider {
     }
 
     private <T> List<T> getCompoundObjectList(MdcContext context, String key, BiFunction<MdcContext, String, ? extends T> itemReader) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
@@ -785,9 +785,14 @@ public class MdcProvider {
         return isCaseSensitive ? key : key.toLowerCase(Locale.ROOT);
     }
 
-    private Property getProperty(String key) throws MdcException {
-        return Optional.ofNullable(properties.get(processKey(key)))
+    private Property getProperty(String key, MdcContext context) throws MdcException {
+        Property property = Optional.ofNullable(properties.get(processKey(key)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
+
+        if(!property.isEnabled(context, isCaseSensitive)){
+            throw new MdcException(String.format("Property %s is disabled.", key));
+        }
+        return property;
     }
 
     private String getStringValue(Property property, MdcContext context) throws MdcException {
@@ -853,13 +858,14 @@ public class MdcProvider {
         return null;
     }
 
-    private  List<Property> listCompoundProperty(String key) throws MdcException {
+    private  List<Property> listCompoundProperty(MdcContext context, String key) throws MdcException {
         final String keyPart = processKey(key);
         Pattern pattern = Pattern.compile(String.format(ROOT_PROPERTY, keyPart));
         // Could impact performance
         List<Property> result = properties.entrySet().stream()
                 .filter(e -> pattern.matcher(e.getKey()).find())
                 .map(Map.Entry::getValue)
+                .filter(p->p.isEnabled(context, isCaseSensitive))
                 .collect(Collectors.toList());
         if(result.isEmpty()){
             throw new MdcException(String.format("Property %s not found.", key));

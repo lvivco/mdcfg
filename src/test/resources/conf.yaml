@@ -9,6 +9,9 @@ engine:
     type:
       any@: "V"
       model@bmw: "inline"
+      enabled@:
+        any@: true
+        line@kuga: false
     cylinder-count: 6
 
 production-models:
@@ -17,6 +20,9 @@ production-models:
     Prius : 1997
     Sequoia : 2000
     Corolla Cross : 2020
+  enabled@:
+    any@: false
+    model@toyota: true
 
 available-colors:
   any@: [white, black]
