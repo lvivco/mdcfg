@@ -1,11 +1,4 @@
 aliases:
-  add-in*@leather-seats: add-in*@ls
-  add-in*@panoramic-roof: add-in*@pr
+
   add-in*@cruise-control: add-in*@cc
-  add-in*@issue: add-in*@panoramic #should not cause any issue
-  model@bmw:
-    cat@crossover: line@x5
-  model@ford:
-    cat@crossover: line@kuga
-  model@toyota:
-    cat@crossover: line@rav4
+

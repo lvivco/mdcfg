@@ -12,6 +12,7 @@ import org.mdcfg.utils.SourceUtils;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *  Process data form source and create appropriate properties with corresponding chains.
@@ -20,10 +21,12 @@ public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
     private static final String SUB_PROPERTY_SEPARATOR = ".";
+    private static final String SELECTOR_SEPARATOR= "@";
+    private static final String NEGATIVE_SELECTOR= "!";
     private static final Pattern ALIASES = Pattern.compile("aliases(?:\\:|$).*$");
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
-    private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@)(%s)(?:,|\\s|]|$)";
+    private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
 
     private final List<Hook> loadHooks;
 
@@ -117,22 +120,35 @@ public class Processor {
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
             if(ALIASES.matcher(entry.getKey()).matches()) {
                return entry.getValue().entrySet().stream()
-                       .map(this::createAlias)
+                       .flatMap(this::createAliases)
                        .collect(Collectors.groupingBy(Alias::getTargetDimension));
             }
         }
         return Map.of();
     }
 
+    /** Create positive and negative aliases helpers */
+    private Stream<Alias> createAliases(Map.Entry<String, String> entry) {
+        return Stream.of(
+                createAlias(entry, false),
+                createAlias(entry, true));
+    }
+
     /** Create alias helper */
-    private Alias createAlias(Map.Entry<String, String> entry) {
+    private Alias createAlias(Map.Entry<String, String> entry, boolean negative) {
         Pair<String, String> from = SourceUtils.splitSelector(entry.getValue().toLowerCase(Locale.ROOT));
         Pair<String, String> to = SourceUtils.splitSelector(entry.getKey());
         // if "from" dimension equals "to" dimension then replace only selectors
         if(from.getKey().equals(to.getKey())) {
             return new Alias(from.getKey(), compileAliasMatcher(from.getValue()), to.getValue());
         } else {
-            return new Alias(from.getKey(), compileAliasMatcher(entry.getValue().toLowerCase(Locale.ROOT)), entry.getKey());
+            String fromValue = negative
+                    ? entry.getValue().replace(SELECTOR_SEPARATOR, SELECTOR_SEPARATOR + NEGATIVE_SELECTOR)
+                    : entry.getValue();
+            String toValue = negative
+                    ? entry.getKey().replace(SELECTOR_SEPARATOR, SELECTOR_SEPARATOR + NEGATIVE_SELECTOR)
+                    : entry.getKey();
+            return new Alias(from.getKey(), compileAliasMatcher(fromValue.toLowerCase(Locale.ROOT)), toValue);
         }
     }
 

@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.helpers.*;
+import org.mdcfg.provider.MdcContext;
 import org.mdcfg.provider.MdcConverter;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
@@ -145,6 +146,16 @@ public class ProviderTest {
         assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "off-road"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "off-road"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "off-road"));
+    }
+
+    @Test
+    public void testNegativeSelectors() throws MdcException {
+        MdcContext ctx = TestContextBuilder.init().model("bmw").category("1crossover").drive("4WD1").addIn(List.of("cruise-control1"))
+                .clearance(12.0).build();
+        List<String> engineTypes = provider.getStringList(ctx, "engine.type");
+        assertEquals("gas", engineTypes.get(0));
+
+
     }
 
     @Test

@@ -1,53 +1,7 @@
 includes:
-  prices: price-conf.yaml
   aliases: aliases-conf.yaml
 
 engine:
-  type: [electric, gas, diesel]
-  drive: [4WD, 2WD]
-  block:
-    type:
-      any@: "V"
-      model@bmw: "inline"
-    cylinder-count: 6
-
-production-models:
-  model@toyota: |
-    Tacoma : 2005
-    Prius : 1997
-    Sequoia : 2000
-    Corolla Cross : 2020
-
-available-colors:
-  any@: [white, black]
-  model@bmw: [white, black, blue, metalic]
-  line@x5: [white, black, blue]
-  model@ford:
-    any@: [black, metalic]
-    cat@crossover: [white, black, metalic, gray]
-    add-in*@ls: [white, black]
-    add-in*@panoramic-roof: [white, black, metalic]
-
-horsepower:
-  any@: 400
-  model@fiat: 380
-  model@bmw:
-    any@: 480
-    drive@4WD: 500
-  model@[toyota, ford]:
-    drive@4WD: 350
-    drive@2WD: 300
-
-engine-info:
-  label: Block ${mdc:engine.block.type} Type ${mdc:horsepower} Horsepower Year ${ctx:year} with ${outer_pattern}
-  list: ["${mdc:engine.block.type}", "Cylinders: ${mdc:engine.block.cylinder-count}", "${ctx:year}", "${outer_pattern}"]
-  objects: ["${mdc:engine}", "${mdc:engine.block}"]
-
-off-road:
-  clearance@[..12.0]: false
-  clearance@[!12.0..17.0, 19.0, 20.0]: true
-  clearance@[!20.0..]: true
-  clearance@4.5: false
-  clearance@[21.0]: false
-
-options: {"parking-assist": true, "cruise-control": false, "lights": "led"}
+  type:
+    any@: [electric, gas, diesel]
+    clearance@![..!12.0]: [gas]

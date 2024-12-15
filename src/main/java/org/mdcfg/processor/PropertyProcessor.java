@@ -20,10 +20,13 @@ public class PropertyProcessor {
     private static final String LIST_SIGN = "*";
     private static final String RANGE_SIGN = "..";
     private static final String ANY = "any";
-    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\s\\[\\]]");
-    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
-    private static final Pattern COMMA_PATTERN= Pattern.compile(",");
-    private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{[^}]+}");
+    private static final String NEGATIVE_SELECTOR= "!";
+    private static final Pattern LIST_SIGN_PATTERN = Pattern.compile("[\\s\\[\\]]");
+    private static final Pattern NUMERIC_SPLITERATOR_PATTERN = Pattern.compile("!|,\\s*|\\.\\.");
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{[^}]+}");
+    private static final String NEGATIVE_LOOKAHEAD_PATTERN = "((?!%s%s)).*";
+    private static final String POSITIVE_LOOKAHEAD_PATTERN = "%s%s";
     private static final char UNIT_SEPARATOR = (char) 31;
     private static final String LIST_EXPRESSION = "\\[(.*" + UNIT_SEPARATOR + ")*%s(" + UNIT_SEPARATOR + ".*)*\\]";
     private final String name;
@@ -139,24 +142,28 @@ public class PropertyProcessor {
         StringBuilder pattern = new StringBuilder();
         List<Range> ranges = new ArrayList<>();
         List<Dimension> nonEmptyListDimensions = new ArrayList<>();
-        for ( Dimension dimension : dimensions.values()) {
+        Iterator<Dimension> iterator = dimensions.values().iterator();
+        while (iterator.hasNext()){
+            Dimension dimension = iterator.next();
             if(pattern.length() > 0){
                 pattern.append("\\.");
             }
             String dimensionKey = dimension.getName() + (dimension.isList() ? LIST_SIGN : "");
             if(selectors.containsKey(dimensionKey)){
                 String selector = selectors.get(dimensionKey);
-                applySelector(selector, pattern, ranges, dimension);
+                applySelector(selector, pattern, ranges, dimension, !iterator.hasNext());
                 if(dimension.isList()){
                     nonEmptyListDimensions.add(dimension);
                 }
             } else {
                 // any
                 pattern.append(dimension.getName()).append("@.*");
+                if(!iterator.hasNext()){
+                    // end
+                    pattern.append("$");
+                }
             }
         }
-        // end
-        pattern.append("$");
 
         if (null != loadHooks) {
             for (var hook : loadHooks) {
@@ -174,11 +181,17 @@ public class PropertyProcessor {
     }
 
     /** Append pattern for one selector and add {@link Range} objects if needed. */
-    private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
+    private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension, boolean last) {
+        boolean negative = selector.startsWith(NEGATIVE_SELECTOR);
+        if(negative){
+            // remove "!" from selector
+            selector = selector.substring(NEGATIVE_SELECTOR.length());
+        }
+
         if (selector.contains(RANGE_SIGN)) {
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             for (String selectorPart : COMMA_PATTERN.split(selector)) {
-                ranges.add(createRange(selectorPart, dimension));
+                ranges.add(createRange(selectorPart, dimension, negative));
             }
             selector = "-?(?:\\d|,|\\s|\\.)*";
         } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
@@ -196,7 +209,13 @@ public class PropertyProcessor {
             selector = String.format(LIST_EXPRESSION, selector);
         }
 
-        pattern.append(dimension.getName()).append("@").append(selector);
+        pattern.append(dimension.getName()).append("@");
+        // do not apply negative lookahead for numeric ranges, they should be checked separately
+        if(negative && !dimension.isRange()){
+            pattern.append(String.format(NEGATIVE_LOOKAHEAD_PATTERN, selector, last ? "$" : "\\."));
+        } else {
+            pattern.append(String.format(POSITIVE_LOOKAHEAD_PATTERN, selector, last ? "$" : ""));
+        }
     }
 
     /** Return iterator in revers order */
@@ -205,7 +224,7 @@ public class PropertyProcessor {
     }
 
     /** Create {@link Range} object from selector string. */
-    private Range createRange(String selectorPart, Dimension dimension) {
+    private Range createRange(String selectorPart, Dimension dimension, boolean negative) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;
         String max = null;
@@ -230,7 +249,7 @@ public class PropertyProcessor {
                 }
             }
         }
-        return new Range(dimension, minInclusive, min, maxInclusive, max);
+        return new Range(dimension, minInclusive, min, maxInclusive, max, negative);
     }
 
 
