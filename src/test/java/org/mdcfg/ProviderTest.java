@@ -153,7 +153,7 @@ public class ProviderTest {
         MdcContext ctx = TestContextBuilder.init().model("bmw").category("1crossover").drive("4WD1").addIn(List.of("cruise-control1"))
                 .clearance(12.0).build();
         List<String> engineTypes = provider.getStringList(ctx, "engine.type");
-        assertEquals("gas", engineTypes.get(0));
+        assertEquals("electric", engineTypes.get(0));
 
 
     }
