@@ -40,11 +40,11 @@ public class PropertyProcessor {
     }
 
     /** Create {@link Property} object */
-    public Property getProperty(Map<String, String> map) throws MdcException {
+    public Property getProperty(Map<String, String> map, Property enabled) throws MdcException {
         createDimensions(map);
         createSelectorChains(map);
 
-        return new Property(name, dimensions, chains, listChains, hasReference);
+        return new Property(name, dimensions, chains, listChains, hasReference, enabled);
     }
 
     /** Create {@code List} of {@link Dimension} objects with down to up order. */
