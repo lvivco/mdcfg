@@ -523,6 +523,41 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code Optional} of provided primitive class.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param clas Class in which result suppose to be converted.
+     * @return property value or null.
+     * @param <T> type in which value suppose to be converted
+     * @throws MdcException in case property not found or provided class is not primitive.
+     */
+    public <T> T getPrimitive(MdcContext context, String key, Class<T> clas) throws MdcException {
+        Property property = getProperty(key);
+        String stringValue = getStringValue(property, context);
+        return StringUtils.isNotBlank(stringValue)
+                ? convertPrimitive(clas, stringValue)
+                : null;
+    }
+
+    /**
+     * Read property value and convert it to provided primitive type.
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param clas Class in which result suppose to be converted.
+     * @return {@code Optional} of property value.
+     * @param <T> type in which value suppose to be converted
+     */
+    public <T> Optional<T> getPrimitivOptional(MdcContext context, String key, Class<T> clas) {
+        try {
+            return Optional.ofNullable(getPrimitive(context, key, clas));
+        } catch (MdcException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Iterate through list based dimension with provided name, read property value for each and convert it to provided type.
      *
      * @param context reading context {@link MdcContext}.
