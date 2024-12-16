@@ -6,4 +6,6 @@ price:
     any@: 30000
     add-in*@leather-seats: 35000
     add-in*@cc: 37000
-  model@ford: 28000
+  model@ford:
+    any@: 43000
+    add-in*@![leather-seats, cc]: 35000
