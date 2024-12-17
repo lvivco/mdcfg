@@ -543,7 +543,7 @@ public class MdcProvider {
      * @throws MdcException in case property not found or provided class is not primitive.
      */
     public <T> T getScalar(MdcContext context, String key, Class<T> clas) throws MdcException {
-        Property property = getProperty(key);
+        Property property = getProperty(key, context);
         String stringValue = getStringValue(property, context);
         return StringUtils.isNotBlank(stringValue)
                 ? convertScalar(clas, stringValue)
