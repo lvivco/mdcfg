@@ -20,7 +20,7 @@ public class MdcConverter {
     public static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
 
     @SuppressWarnings("unchecked")
-    public static <T> T convertPrimitive(Class<T> clas, String value) throws MdcException {
+    public static <T> T convertScalar(Class<T> clas, String value) throws MdcException {
         switch(clas.getCanonicalName()) {
             case "java.lang.String":
                 return (T)TO_STRING.apply(value);
@@ -43,7 +43,7 @@ public class MdcConverter {
             case "java.lang.Double":
                 return (T)TO_DOUBLE.apply(value);
             default:
-                throw new MdcException(String.format("Provided class: %s is not primitive", clas.getCanonicalName()));
+                throw new MdcException(String.format("Provided class: %s is not scalar or supported", clas.getCanonicalName()));
         }
     }
 }

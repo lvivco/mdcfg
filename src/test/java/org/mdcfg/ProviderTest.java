@@ -316,19 +316,19 @@ public class ProviderTest {
         assertEquals("[white, black, metalic]", colorsToyota.get(1).toString());
     }
     @Test
-    public void testPrimitive() throws MdcException {
+    public void testScalar() throws MdcException {
         MdcContext ctx = TestContextBuilder.EMPTY;
-        assertEquals("V", provider.getPrimitive(ctx, "engine.block.type", String.class));
-        assertEquals(Integer.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", int.class));
-        assertEquals(Integer.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", Integer.class));
-        assertEquals(Double.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", double.class));
-        assertEquals(Double.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", Double.class));
-        assertEquals(Long.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", long.class));
-        assertEquals(Long.valueOf(6), provider.getPrimitive(ctx, "engine.block.cylinder-count", Long.class));
-        assertEquals(Short.valueOf("6"), provider.getPrimitive(ctx, "engine.block.cylinder-count", short.class));
-        assertEquals(Short.valueOf("6"), provider.getPrimitive(ctx, "engine.block.cylinder-count", Short.class));
-        assertTrue(provider.getPrimitive(TestContextBuilder.init().clearance(20.0).build(), "off-road", boolean.class));
-        assertTrue(provider.getPrimitive(TestContextBuilder.init().clearance(20.0).build(), "off-road", Boolean.class));
+        assertEquals("V", provider.getScalar(ctx, "engine.block.type", String.class));
+        assertEquals(Integer.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", int.class));
+        assertEquals(Integer.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", Integer.class));
+        assertEquals(Double.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", double.class));
+        assertEquals(Double.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", Double.class));
+        assertEquals(Long.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", long.class));
+        assertEquals(Long.valueOf(6), provider.getScalar(ctx, "engine.block.cylinder-count", Long.class));
+        assertEquals(Short.valueOf("6"), provider.getScalar(ctx, "engine.block.cylinder-count", short.class));
+        assertEquals(Short.valueOf("6"), provider.getScalar(ctx, "engine.block.cylinder-count", Short.class));
+        assertTrue(provider.getScalar(TestContextBuilder.init().clearance(20.0).build(), "off-road", boolean.class));
+        assertTrue(provider.getScalar(TestContextBuilder.init().clearance(20.0).build(), "off-road", Boolean.class));
     }
 
     private static void assertListPOJO(List<?> list) {
