@@ -3,13 +3,19 @@ includes:
   aliases: aliases-conf.yaml
 
 engine:
-  type: [electric, gas, diesel]
-  drive: [4WD, 2WD]
+  type:
+    any@: [gas, diesel]
+    line@!kuga: [electric, gas, diesel]
+  drive:
+    any@: [2WD]
+    model@![fiat, ford]: [4WD, 2WD]
   block:
     type:
       any@: "V"
       model@bmw: "inline"
-    cylinder-count: 6
+    cylinder-count:
+      any@: 4
+      drive@!2WD: 6
 
 production-models:
   model@toyota: |
@@ -49,5 +55,7 @@ off-road:
   clearance@[!20.0..]: true
   clearance@4.5: false
   clearance@[21.0]: false
+  clearance@28.0: false
+  clearance@![..28.0]: true
 
 options: {"parking-assist": true, "cruise-control": false, "lights": "led"}

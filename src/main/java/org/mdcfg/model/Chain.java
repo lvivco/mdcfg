@@ -32,13 +32,15 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor
 public class Chain {
-    private Pattern pattern;
+    private Pattern plusPattern;
+    private Pattern minusPattern;
     @Getter private String value;
     private List<Range> ranges;
 
     /** Check whether chain matches context */
     public boolean match(MdcContext context, String compare) {
-        boolean match = pattern.matcher(compare).matches();
+        boolean minusMatch = minusPattern != null && minusPattern.matcher(compare).matches();
+        boolean match = !minusMatch && plusPattern.matcher(compare).matches();
         return match && !ranges.isEmpty()
                 ? ranges.stream().anyMatch(range -> range.matches(context))
                 : match;

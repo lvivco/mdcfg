@@ -22,8 +22,9 @@ public class Range {
     private final boolean minInclusive;
     private double max= Double.MAX_VALUE;
     private final boolean maxInclusive;
+    private final boolean negative;
 
-    public Range(Dimension dimension, boolean minInclusive, String min, boolean maxInclusive, String max) {
+    public Range(Dimension dimension, boolean minInclusive, String min, boolean maxInclusive, String max, boolean negative) {
         this.dimension = dimension;
         this.minInclusive = minInclusive;
         if (StringUtils.isNotBlank(min)) {
@@ -33,6 +34,7 @@ public class Range {
             this.max = Double.parseDouble(max);
         }
         this.maxInclusive = maxInclusive;
+        this.negative = negative;
     }
 
     /** Check whether context value fits number range. */
@@ -56,6 +58,9 @@ public class Range {
         double value = Double.parseDouble(object.toString());
         boolean minMatch = minInclusive ? value >= min : value > min;
         boolean maxMatch = maxInclusive ? value <= max : value < max;
-        return minMatch && maxMatch;
+        boolean matchRange = minMatch && maxMatch;
+
+        return negative ? !matchRange : matchRange;
     }
+
 }

@@ -20,10 +20,11 @@ public class PropertyProcessor {
     private static final String LIST_SIGN = "*";
     private static final String RANGE_SIGN = "..";
     private static final String ANY = "any";
-    private static final Pattern LIST_SIGN_PATTERN= Pattern.compile("[\\s\\[\\]]");
-    private static final Pattern NUMERIC_SPLITERATOR_PATTERN= Pattern.compile("!|,\\s*|\\.\\.");
-    private static final Pattern COMMA_PATTERN= Pattern.compile(",");
-    private static final Pattern REFERENCE_PATTERN= Pattern.compile("\\$\\{[^}]+}");
+    private static final String NEGATIVE_SELECTOR= "!";
+    private static final Pattern LIST_SIGN_PATTERN = Pattern.compile("[\\s\\[\\]]");
+    private static final Pattern NUMERIC_SPLITERATOR_PATTERN = Pattern.compile("!|,\\s*|\\.\\.");
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{[^}]+}");
     private static final char UNIT_SEPARATOR = (char) 31;
     private static final String LIST_EXPRESSION = "\\[(.*" + UNIT_SEPARATOR + ")*%s(" + UNIT_SEPARATOR + ".*)*\\]";
     private final String name;
@@ -136,27 +137,44 @@ public class PropertyProcessor {
      *  </ul>
      */
     private void createChain(Map<String, String> selectors, String value) {
-        StringBuilder pattern = new StringBuilder();
+        StringBuilder plusBuilder = new StringBuilder();
+        StringBuilder minusBuilder = new StringBuilder();
+        boolean negativeUsed = false;
         List<Range> ranges = new ArrayList<>();
         List<Dimension> nonEmptyListDimensions = new ArrayList<>();
         for ( Dimension dimension : dimensions.values()) {
-            if(pattern.length() > 0){
-                pattern.append("\\.");
+            if(plusBuilder.length() > 0){
+                plusBuilder.append("\\.");
+            }
+            if(minusBuilder.length() > 0){
+                minusBuilder.append("\\.");
             }
             String dimensionKey = dimension.getName() + (dimension.isList() ? LIST_SIGN : "");
-            if(selectors.containsKey(dimensionKey)){
+            if(selectors.containsKey(dimensionKey)) {
                 String selector = selectors.get(dimensionKey);
-                applySelector(selector, pattern, ranges, dimension);
-                if(dimension.isList()){
+                boolean negative = selector.startsWith(NEGATIVE_SELECTOR);
+                if(negative) {
+                    negativeUsed = true;
+                    // remove "!" from selector
+                    selector = selector.substring(NEGATIVE_SELECTOR.length());
+                    applySelector(selector, minusBuilder, ranges, dimension, true);
+                    plusBuilder.append(dimension.getName()).append("@.*");
+                } else {
+                    applySelector(selector, plusBuilder, ranges, dimension, false);
+                    minusBuilder.append(dimension.getName()).append("@.*");
+                }
+                if(dimension.isList()) {
                     nonEmptyListDimensions.add(dimension);
                 }
             } else {
                 // any
-                pattern.append(dimension.getName()).append("@.*");
+                plusBuilder.append(dimension.getName()).append("@.*");
+                minusBuilder.append(dimension.getName()).append("@.*");
             }
         }
         // end
-        pattern.append("$");
+        plusBuilder.append("$");
+        minusBuilder.append("$");
 
         if (null != loadHooks) {
             for (var hook : loadHooks) {
@@ -164,21 +182,23 @@ public class PropertyProcessor {
             }
         }
 
-        if(!hasReference){
+        if(!hasReference) {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
-        Chain chain = new Chain(Pattern.compile(pattern.toString()), value, ranges);
+        Pattern positivePattern = Pattern.compile(plusBuilder.toString());
+        Pattern negativePattern = negativeUsed ? Pattern.compile(minusBuilder.toString()) : null;
+        Chain chain = new Chain(positivePattern, negativePattern, value, ranges);
         chains.add(0, chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
 
     /** Append pattern for one selector and add {@link Range} objects if needed. */
-    private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension) {
+    private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension, boolean negative) {
         if (selector.contains(RANGE_SIGN)) {
             selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
             for (String selectorPart : COMMA_PATTERN.split(selector)) {
-                ranges.add(createRange(selectorPart, dimension));
+                ranges.add(createRange(selectorPart, dimension, negative));
             }
             selector = "-?(?:\\d|,|\\s|\\.)*";
         } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
@@ -205,7 +225,7 @@ public class PropertyProcessor {
     }
 
     /** Create {@link Range} object from selector string. */
-    private Range createRange(String selectorPart, Dimension dimension) {
+    private Range createRange(String selectorPart, Dimension dimension, boolean negative) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;
         String max = null;
@@ -230,7 +250,7 @@ public class PropertyProcessor {
                 }
             }
         }
-        return new Range(dimension, minInclusive, min, maxInclusive, max);
+        return new Range(dimension, minInclusive, min, maxInclusive, max, negative);
     }
 
 

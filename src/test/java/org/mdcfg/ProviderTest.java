@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.helpers.*;
+import org.mdcfg.provider.MdcContext;
 import org.mdcfg.provider.MdcConverter;
 import org.mdcfg.provider.MdcProvider;
 import org.junit.Test;
@@ -145,6 +146,68 @@ public class ProviderTest {
         assertNull(provider.getBoolean(TestContextBuilder.init().clearance(18.0).build(), "off-road"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(19.0).build(), "off-road"));
         assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(20.0).build(), "off-road"));
+    }
+
+    @Test
+    public void testNegativeSelectors() throws MdcException {
+        assertEquals(
+                Integer.valueOf(6),
+                provider.getInteger(TestContextBuilder.EMPTY, "engine.block.cylinder-count")
+        );
+        assertEquals(
+                Integer.valueOf(6),
+                provider.getInteger(TestContextBuilder.init().drive("4WD").build(), "engine.block.cylinder-count")
+        );
+        assertEquals(
+                Integer.valueOf(4),
+                provider.getInteger(TestContextBuilder.init().drive("2WD").build(), "engine.block.cylinder-count")
+        );
+        assertEquals(
+                "[2WD]",
+                provider.getStringList(TestContextBuilder.init().model("fiat").build(), "engine.drive").toString()
+        );
+        assertEquals(
+                "[2WD]",
+                provider.getStringList(TestContextBuilder.init().model("ford").build(), "engine.drive").toString()
+        );
+        assertEquals(
+                "[4WD, 2WD]",
+                provider.getStringList(TestContextBuilder.init().model("bmw").build(), "engine.drive").toString()
+        );
+        assertEquals(
+                "[electric, gas, diesel]",
+                provider.getStringList(TestContextBuilder.init().model("ford").build(), "engine.type").toString()
+        );
+        assertEquals(
+                "[electric, gas, diesel]",
+                provider.getStringList(TestContextBuilder.init().category("crossover").build(), "engine.type").toString()
+        );
+        assertEquals(
+                "[gas, diesel]",
+                provider.getStringList(TestContextBuilder.init().model("ford").category("crossover").build(), "engine.type").toString()
+        );
+        assertEquals(
+                Integer.valueOf(43000),
+                provider.getInteger(TestContextBuilder.init().model("ford").addIn(List.of("cruise-control")).build(), "price")
+        );
+        assertEquals(
+                Integer.valueOf(43000),
+                provider.getInteger(TestContextBuilder.init().model("ford").addIn(List.of("leather-seats")).build(), "price")
+        );
+        assertEquals(
+                Integer.valueOf(43000),
+                provider.getInteger(TestContextBuilder.init().model("ford").addIn(List.of("leather-seats", "panoramic-roof")).build(), "price")
+        );
+        assertEquals(
+                Integer.valueOf(35000),
+                provider.getInteger(TestContextBuilder.init().model("ford").addIn(List.of("panoramic-roof")).build(), "price")
+        );
+        assertEquals(
+                Integer.valueOf(35000),
+                provider.getInteger(TestContextBuilder.init().model("ford").build(), "price")
+        );
+        assertTrue(provider.getBoolean(TestContextBuilder.init().clearance(29.0).build(), "off-road"));
+        assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(28.0).build(), "off-road"));
     }
 
     @Test
