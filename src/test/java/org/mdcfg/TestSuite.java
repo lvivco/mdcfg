@@ -14,6 +14,7 @@ import org.junit.runners.Suite;
         ConversionTest.class,
         HookTest.class,
         AliasTest.class,
+        EnablingTest.class,
         AutoUpdateTest.class
 })
 public class TestSuite {
