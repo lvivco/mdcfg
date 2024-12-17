@@ -523,6 +523,61 @@ public class MdcProvider {
     }
 
     /**
+     * Read property value and convert it to {@code Optional} of provided scalar class.
+     * Supported classes:
+     * <ul>
+     *   <li>String</li>
+     *   <li>Boolean, boolean</li>
+     *   <li>Integer, int</li>
+     *   <li>Long, long</li>
+     *   <li>Short, short</li>
+     *   <li>Double, double</li>
+     *   <li>Float, float</li>
+     * </ul>
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param clas Class in which result suppose to be converted.
+     * @return property value or null.
+     * @param <T> type in which value suppose to be converted
+     * @throws MdcException in case property not found or provided class is not primitive.
+     */
+    public <T> T getScalar(MdcContext context, String key, Class<T> clas) throws MdcException {
+        Property property = getProperty(key);
+        String stringValue = getStringValue(property, context);
+        return StringUtils.isNotBlank(stringValue)
+                ? convertScalar(clas, stringValue)
+                : null;
+    }
+
+    /**
+     * Read property value and convert it to provided scalar type.
+     * Supported classes:
+     * <ul>
+     *   <li>String</li>
+     *   <li>Boolean, boolean</li>
+     *   <li>Integer, int</li>
+     *   <li>Long, long</li>
+     *   <li>Short, short</li>
+     *   <li>Double, double</li>
+     *   <li>Float, float</li>
+     * </ul>
+     *
+     * @param context reading context {@link MdcContext}.
+     * @param key property name.
+     * @param clas Class in which result suppose to be converted.
+     * @return {@code Optional} of property value.
+     * @param <T> type in which value suppose to be converted
+     */
+    public <T> Optional<T> getScalarOptional(MdcContext context, String key, Class<T> clas) {
+        try {
+            return Optional.ofNullable(getScalar(context, key, clas));
+        } catch (MdcException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Iterate through list based dimension with provided name, read property value for each and convert it to provided type.
      *
      * @param context reading context {@link MdcContext}.
