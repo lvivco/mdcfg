@@ -529,8 +529,8 @@ public class MdcProvider {
      *   <li>String</li>
      *   <li>Boolean, boolean</li>
      *   <li>Integer, int</li>
-     *    <li>Long, long</li>
-     *    <li>Short, short</li>
+     *   <li>Long, long</li>
+     *   <li>Short, short</li>
      *   <li>Double, double</li>
      *   <li>Float, float</li>
      * </ul>
@@ -557,8 +557,8 @@ public class MdcProvider {
      *   <li>String</li>
      *   <li>Boolean, boolean</li>
      *   <li>Integer, int</li>
-     *    <li>Long, long</li>
-     *    <li>Short, short</li>
+     *   <li>Long, long</li>
+     *   <li>Short, short</li>
      *   <li>Double, double</li>
      *   <li>Float, float</li>
      * </ul>
