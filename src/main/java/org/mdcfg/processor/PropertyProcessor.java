@@ -150,10 +150,10 @@ public class PropertyProcessor {
                 minusBuilder.append("\\.");
             }
             String dimensionKey = dimension.getName() + (dimension.isList() ? LIST_SIGN : "");
-            if(selectors.containsKey(dimensionKey)){
+            if(selectors.containsKey(dimensionKey)) {
                 String selector = selectors.get(dimensionKey);
                 boolean negative = selector.startsWith(NEGATIVE_SELECTOR);
-                if(negative){
+                if(negative) {
                     negativeUsed = true;
                     // remove "!" from selector
                     selector = selector.substring(NEGATIVE_SELECTOR.length());
@@ -163,7 +163,7 @@ public class PropertyProcessor {
                     applySelector(selector, plusBuilder, ranges, dimension, false);
                     minusBuilder.append(dimension.getName()).append("@.*");
                 }
-                if(dimension.isList()){
+                if(dimension.isList()) {
                     nonEmptyListDimensions.add(dimension);
                 }
             } else {
@@ -182,7 +182,7 @@ public class PropertyProcessor {
             }
         }
 
-        if(!hasReference){
+        if(!hasReference) {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
