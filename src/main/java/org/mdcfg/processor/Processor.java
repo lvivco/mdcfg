@@ -31,6 +31,7 @@ public class Processor {
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
     private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
+    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@\\w+(?::\\w+@\\w+)*):\\w+[^@]\\w+(?::|$)");
 
     private final List<Hook> loadHooks;
 
@@ -81,13 +82,10 @@ public class Processor {
         return result;
     }
 
-    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(.*):[^@]*(?::|$)");
-
+    /** Process selectors to change root:dim@sel:property -> root:property:dim@sel */
     private Map<String, Map<String, String>> processHyperSelectors(Map<String, Map<String, String>> data) throws MdcException {
         Map<String, Map<String, String>> result = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> propertyEntry : data.entrySet()) {
-            LinkedHashMap<String, String> propertyResult = new LinkedHashMap<>();
-            String propertyName = propertyEntry.getKey();
             for (Map.Entry<String, String> selectorEntry : propertyEntry.getValue().entrySet()) {
                 String selectors = selectorEntry.getKey();
                 Matcher matcher = HYPER_SELECTOR_PATTERN.matcher(selectors);
@@ -98,16 +96,23 @@ public class Processor {
                     }
                     selectors = tail + DIMENSION_SEPARATOR + matcher.group(1);
                     Pair<String, String> propertyMap = SourceUtils.splitProperty(selectors);
-                    propertyName = propertyEntry.getKey() + DIMENSION_SEPARATOR + propertyMap.getKey();
-                    propertyResult.put(propertyMap.getValue(), selectorEntry.getValue());
+                    putSafe(result,propertyEntry.getKey() + DIMENSION_SEPARATOR + propertyMap.getKey(),
+                            propertyMap.getValue(), selectorEntry.getValue());
                 } else {
-                    propertyResult.put(selectorEntry.getKey(), selectorEntry.getValue());
+                    putSafe(result, propertyEntry.getKey(),
+                            selectorEntry.getKey(), selectorEntry.getValue());
                 }
             }
-            result.put(propertyName, propertyResult);
         }
-
         return result;
+    }
+
+    /** Put value to sub map creating it if absent */
+    private void putSafe(Map<String, Map<String, String>> map, String propertyName, String key, String value ) {
+        if(!map.containsKey(propertyName)){
+            map.put(propertyName, new LinkedHashMap<>());
+        }
+        map.get(propertyName).put(key, value);
     }
 
     /**

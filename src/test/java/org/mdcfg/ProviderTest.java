@@ -210,6 +210,14 @@ public class ProviderTest {
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(28.0).build(), "off-road"));
     }
 
+
+    @Test
+    public void testHyperSelectors() throws MdcException {
+        Integer intensity = provider.getInteger(TestContextBuilder.init().model("bmw").category("crossover").build(), "headlights.led.intensity");
+        assertEquals(Integer.valueOf(4000), intensity);
+
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     public void testCompoundMapProperty() throws MdcException {

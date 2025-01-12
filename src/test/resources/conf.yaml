@@ -36,7 +36,7 @@ headlights:
     laser:
       color: 5500
       intensity: 5000
-  line@!kuga:
+  line@kuga:
     xenon:
       color: 3200
       intensity: 1000

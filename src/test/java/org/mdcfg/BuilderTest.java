@@ -22,14 +22,14 @@ public class BuilderTest {
     public void testYamlPath() throws MdcException {
         MdcProvider provider = MdcBuilder.withYaml(YAML_PATH).build();
         assertNotNull(provider);
-        assertEquals(15, provider.getSize());
+        assertEquals(23, provider.getSize());
     }
 
     @Test
     public void testYamlFile() throws MdcException {
         MdcProvider provider = MdcBuilder.withYaml(new File(YAML_PATH)).build();
         assertNotNull(provider);
-        assertEquals(15, provider.getSize());
+        assertEquals(23, provider.getSize());
     }
 
     @Test
