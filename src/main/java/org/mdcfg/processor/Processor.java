@@ -9,7 +9,9 @@ import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
 import org.mdcfg.utils.SourceUtils;
 
+import java.nio.channels.Selector;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
+    private static final String DIMENSION_SEPARATOR = ":";
     private static final String SUB_PROPERTY_SEPARATOR = ".";
     private static final String ENABLED_PREFIX = "enabled@:";
     private static final String SELECTOR_SEPARATOR= "@";
@@ -43,6 +46,7 @@ public class Processor {
      * @throws MdcException thrown in case something went wrong.
      */
     public Map<String, Property> process(Map<String, Map<String, String>> data) throws MdcException {
+        data = processHyperSelectors(data);
         Map<String, List<Alias>> aliases = getAliases(data);
         Map<String, Property> properties = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
@@ -74,6 +78,35 @@ public class Processor {
                 }
             }
         }
+        return result;
+    }
+
+    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(.*):[^@]*(?::|$)");
+
+    private Map<String, Map<String, String>> processHyperSelectors(Map<String, Map<String, String>> data) throws MdcException {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        for (Map.Entry<String, Map<String, String>> propertyEntry : data.entrySet()) {
+            LinkedHashMap<String, String> propertyResult = new LinkedHashMap<>();
+            String propertyName = propertyEntry.getKey();
+            for (Map.Entry<String, String> selectorEntry : propertyEntry.getValue().entrySet()) {
+                String selectors = selectorEntry.getKey();
+                Matcher matcher = HYPER_SELECTOR_PATTERN.matcher(selectors);
+                if(matcher.find()){
+                    String tail = selectors.substring(matcher.group(1).length() + 1);
+                    if(tail.endsWith(":any@")){
+                        tail = tail.substring(0, tail.length()-5);
+                    }
+                    selectors = tail + DIMENSION_SEPARATOR + matcher.group(1);
+                    Pair<String, String> propertyMap = SourceUtils.splitProperty(selectors);
+                    propertyName = propertyEntry.getKey() + DIMENSION_SEPARATOR + propertyMap.getKey();
+                    propertyResult.put(propertyMap.getValue(), selectorEntry.getValue());
+                } else {
+                    propertyResult.put(selectorEntry.getKey(), selectorEntry.getValue());
+                }
+            }
+            result.put(propertyName, propertyResult);
+        }
+
         return result;
     }
 
