@@ -25,8 +25,8 @@ headlights:
     color: 3200
     intensity: 1000
   xenon:
-    color: 3200
-    intensity: 1000
+    color: 3300
+    intensity: 1100
   model@bmw:
     led:
       color: 4500
@@ -38,13 +38,11 @@ headlights:
       intensity: 5000
   line@kuga:
     xenon:
-      color: 3200
-      intensity: 1000
+      color: 3500
+      intensity: 1200
     led:
       color: 4500
-      intensity:
-        any@: 3500
-        cat@crossover: 4000
+      intensity: 4000
 
 production-models:
   model@toyota: |

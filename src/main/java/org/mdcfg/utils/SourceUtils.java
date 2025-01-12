@@ -42,7 +42,7 @@ public final class SourceUtils {
 
     /** Get configuration grouped by properties */
     public static Map<String, Map<String, String>> collectProperties(Map<String, Object> rawData) throws MdcException {
-        Map<String, Map<String, String>> data = new HashMap<>();
+        Map<String, Map<String, String>> data = new LinkedHashMap<>();
         for(var entry:rawData.entrySet()) {
             String key = entry.getKey();
             if(key.contains(SELECTOR_SEPARATOR)){

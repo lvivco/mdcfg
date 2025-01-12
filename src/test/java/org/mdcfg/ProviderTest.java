@@ -210,12 +210,47 @@ public class ProviderTest {
         assertFalse(provider.getBoolean(TestContextBuilder.init().clearance(28.0).build(), "off-road"));
     }
 
-
     @Test
+    @SuppressWarnings("unchecked")
     public void testHyperSelectors() throws MdcException {
-        Integer intensity = provider.getInteger(TestContextBuilder.init().model("bmw").category("crossover").build(), "headlights.led.intensity");
-        assertEquals(Integer.valueOf(4000), intensity);
+        Map<String, Object> headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("toyota")
+                        .build(),"headlights");
+        assertEquals(2, headlights.size());
+        assertEquals("3200", ((Map<String, Object>)headlights.get("halogen")).get("color"));
+        assertEquals("1000", ((Map<String, Object>)headlights.get("halogen")).get("intensity"));
+        assertEquals("3300", ((Map<String, Object>)headlights.get("xenon")).get("color"));
+        assertEquals("1100", ((Map<String, Object>)headlights.get("xenon")).get("intensity"));
 
+        headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .build(),"headlights");
+        assertEquals(4, headlights.size());
+        assertEquals("4500", ((Map<String, Object>)headlights.get("led")).get("color"));
+        assertEquals("3500", ((Map<String, Object>)headlights.get("led")).get("intensity"));
+        assertEquals("5500", ((Map<String, Object>)headlights.get("laser")).get("color"));
+        assertEquals("5000", ((Map<String, Object>)headlights.get("laser")).get("intensity"));
+
+        headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("bmw")
+                        .category("crossover")
+                        .build(),"headlights");
+        assertEquals(4, headlights.size());
+        assertEquals("4000", ((Map<String, Object>)headlights.get("led")).get("intensity"));
+
+        headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("ford")
+                        .category("crossover")
+                        .build(),"headlights");
+        assertEquals(3, headlights.size());
+        assertEquals("3500", ((Map<String, Object>)headlights.get("xenon")).get("color"));
+        assertEquals("1200", ((Map<String, Object>)headlights.get("xenon")).get("intensity"));
+        assertEquals("4500", ((Map<String, Object>)headlights.get("led")).get("color"));
+        assertEquals("4000", ((Map<String, Object>)headlights.get("led")).get("intensity"));
     }
 
     @Test
