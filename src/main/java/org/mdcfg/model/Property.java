@@ -75,7 +75,10 @@ public class Property {
     /** Check chains by down to up priority */
     private String getString(MdcContext context, List<Chain> activeChains, String splitBy, Object splitValue, boolean isCaseSensitive) {
         if(splitBy != null){
-            context = new MdcContext() {{ putAll(context); put(splitBy, List.of(splitValue)); }};
+            MdcContext newContext = new MdcContext();
+            newContext.putAll(context);
+            newContext.put(splitBy, List.of(splitValue));
+            context = newContext;
         }
         for (Chain chain : activeChains) {
             if(chain.match(context, isCaseSensitive)){
