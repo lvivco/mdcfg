@@ -17,7 +17,6 @@ public class Selector {
     private final boolean negative;
     private final boolean list;
     private final List<String> values;
-    private final boolean any;
     private final List<Range> ranges;
 
     /** Return true if this selector fits provided value and context. */
@@ -26,7 +25,7 @@ public class Selector {
             return ranges.stream().anyMatch(r -> r.matches(context));
         }
 
-        if (any) {
+        if (values.isEmpty()) {
             return true;
         }
         if (value == null) {
