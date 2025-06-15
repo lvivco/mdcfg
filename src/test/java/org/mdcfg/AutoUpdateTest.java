@@ -63,6 +63,13 @@ public class AutoUpdateTest {
         assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
     }
 
+    @Test(expected = MdcException.class)
+    public void testAutoReloadNotSupportedForStream() throws MdcException, FileNotFoundException {
+        MdcBuilder.withYaml(new FileInputStream(YAML_SINGLE_PATH))
+                .autoReload()
+                .build();
+    }
+
     private void modifyFile(Path from, Path to) {
         try {
             String read = Files.readString(from);
