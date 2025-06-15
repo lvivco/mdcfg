@@ -39,9 +39,16 @@ public class Chain {
 
     /** Check whether chain matches context */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
-        for (var entry : minusSelectors.entrySet()) {
-            Object ctxVal = context.get(entry.getKey());
-            if (entry.getValue().matches(ctxVal, isCaseSensitive)) {
+        if (!minusSelectors.isEmpty()) {
+            boolean minusMatch = true;
+            for (var entry : minusSelectors.entrySet()) {
+                Object ctxVal = context.get(entry.getKey());
+                if (!entry.getValue().matches(ctxVal, isCaseSensitive)) {
+                    minusMatch = false;
+                    break;
+                }
+            }
+            if (minusMatch) {
                 return false;
             }
         }
