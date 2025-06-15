@@ -112,10 +112,6 @@ public class PropertyProcessor {
             }
             createChain(chainMap, entry.getValue());
         }
-        chains.sort(Comparator.comparingInt(Chain::getSelectorCount).reversed());
-        for (List<Chain> list : listChains.values()) {
-            list.sort(Comparator.comparingInt(Chain::getSelectorCount).reversed());
-        }
     }
 
     /**
