@@ -70,7 +70,7 @@ public abstract class FileSource extends StreamSource {
     }
 
     @Override
-    public void stopWatching() {
+    public void stopAutoReload() {
         Optional.ofNullable(watcher).ifPresent(Watcher::stop);
     }
 

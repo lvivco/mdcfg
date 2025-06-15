@@ -77,8 +77,8 @@ public class MdcProvider {
     /**
      * Stop watching configuration source for changes.
      */
-    public void stopWatching() {
-        source.stopWatching();
+    public void stopAutoReload() {
+        source.stopAutoReload();
     }
 
     /**

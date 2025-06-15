@@ -42,7 +42,7 @@ public class AutoUpdateTest {
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
         assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
-        provider.stopWatching();
+        provider.stopAutoReload();
     }
 
     @Test
@@ -62,7 +62,7 @@ public class AutoUpdateTest {
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
         assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
-        provider.stopWatching();
+        provider.stopAutoReload();
     }
 
     @Test(expected = MdcException.class)

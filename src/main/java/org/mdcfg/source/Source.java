@@ -21,7 +21,7 @@ public interface Source {
      * Stop watching for source changes. Default implementation does nothing
      * allowing stream-based sources to ignore this call.
      */
-    default void stopWatching() {
+    default void stopAutoReload() {
         // no-op
     }
 }
