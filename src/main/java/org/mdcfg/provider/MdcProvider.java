@@ -703,7 +703,7 @@ public class MdcProvider {
             String[] path = SUB_PROPERTY_SEPARATOR.split(subKey);
             String value = getStringValue(property, context);
             if (value != null) {
-                Map<String, Object> leaf = getLeaf(result, path);
+                Map<String, Object> leaf = getOrCreateLeaf(result, path);
                 leaf.put(path[path.length - 1], value);
             }
         }
@@ -939,7 +939,7 @@ public class MdcProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getLeaf(Map<String, Object> root, String[] path) {
+    private Map<String, Object> getOrCreateLeaf(Map<String, Object> root, String[] path) {
         Map<String, Object> leaf = root;
         if(path.length > 2) {
             for (int i = 1; i < path.length-1; i++) {
