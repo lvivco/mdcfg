@@ -46,9 +46,8 @@ public class Chain {
 
         for (var entry : selectors.entrySet()) {
             Selector selector = entry.getValue();
-            Object ctxVal = context.get(entry.getKey());
 
-            boolean raw = selector.rawMatch(context, ctxVal, isCaseSensitive);
+            boolean raw = selector.rawMatch(context, isCaseSensitive);
             if (selector.isNegative()) {
                 hasNegative = true;
                 if (!raw) {
