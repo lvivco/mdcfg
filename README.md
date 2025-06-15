@@ -58,20 +58,18 @@ Add the following code to your application that loads configuration:
 public class MdcfgPoweredApplication {
   public static void main(String... args) {
       // load config
-      MDCConfig config = MDCConfig.builder()
-              .source("config.yaml")
-              .build();
-      
+      MdcProvider provider = MdcBuilder.withYaml("config.yaml").build();
+
       // Define a context for the configuration
       MdcContext context = new MdcContext();
-      context.put("environment", "production");
+      context.put("env", "production");
       context.put("region", "us-west");
 
       // Retrieve a configuration value using the context
-      String databaseUrl = config.getString(context, "database.url");
-      String databaseUsername = config.getString(context, "database.username");
-      String databasePassword = config.getString(context, "database.password");
-      int maxConnections = config.getInt(context, "database.maxConnections");
+      String databaseUrl = provider.getString(context, "database.url");
+      String databaseUsername = provider.getString(context, "database.username");
+      String databasePassword = provider.getString(context, "database.password");
+      int maxConnections = provider.getInt(context, "database.maxConnections");
 
       // use it
   }
