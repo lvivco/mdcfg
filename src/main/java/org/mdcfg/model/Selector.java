@@ -48,11 +48,6 @@ public class Selector {
         return match;
     }
 
-    /** Return true if this selector fits provided value considering positivity or negativity. */
-    public boolean matches(MdcContext context, Object value, boolean isCaseSensitive) {
-        boolean match = rawMatch(context, value, isCaseSensitive);
-        return negative ? !match : match;
-    }
 
     private boolean compare(String val, boolean isCaseSensitive) {
         for (String allowed : values) {
