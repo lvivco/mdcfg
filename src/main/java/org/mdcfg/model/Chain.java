@@ -40,16 +40,31 @@ public class Chain {
         return selectors.size();
     }
 
-    /** Check whether chain matches context */
+    /**
+     * Check whether chain matches context.
+     * <p>All positive selectors must match. The chain is discarded only when
+     * every negative selector matches.</p>
+     */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
+        boolean hasNegative = false;
+        boolean allNegativesMatch = true;
+
         for (var entry : selectors.entrySet()) {
             Selector selector = entry.getValue();
             Object ctxVal = context.get(entry.getKey());
-            if (!selector.matches(context, ctxVal, isCaseSensitive)) {
+
+            boolean raw = selector.rawMatch(context, ctxVal, isCaseSensitive);
+            if (selector.isNegative()) {
+                hasNegative = true;
+                if (!raw) {
+                    allNegativesMatch = false;
+                }
+            } else if (!raw) {
                 return false;
             }
         }
-        return true;
+
+        return !(hasNegative && allNegativesMatch);
     }
 
 

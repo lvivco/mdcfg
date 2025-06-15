@@ -19,8 +19,8 @@ public class Selector {
     private final List<String> values;
     private final List<Range> ranges;
 
-    /** Return true if this selector fits provided value and context. */
-    public boolean matches(MdcContext context, Object value, boolean isCaseSensitive) {
+    /** Return true if this selector fits provided value ignoring negativity. */
+    public boolean rawMatch(MdcContext context, Object value, boolean isCaseSensitive) {
         boolean match;
         if (!ranges.isEmpty()) {
             match = ranges.stream().anyMatch(r -> r.matches(context));
@@ -45,6 +45,12 @@ public class Selector {
             }
         }
 
+        return match;
+    }
+
+    /** Return true if this selector fits provided value considering positivity or negativity. */
+    public boolean matches(MdcContext context, Object value, boolean isCaseSensitive) {
+        boolean match = rawMatch(context, value, isCaseSensitive);
         return negative ? !match : match;
     }
 
