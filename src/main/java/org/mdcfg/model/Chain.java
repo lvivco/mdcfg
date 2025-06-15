@@ -6,7 +6,8 @@ package org.mdcfg.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.mdcfg.provider.MdcContext;
-import java.util.*;
+
+import java.util.Map;
 
 
 /**
@@ -33,7 +34,6 @@ import java.util.*;
 public class Chain {
     private final Map<String, Selector> selectors;
     @Getter private String value;
-    private final List<Range> ranges;
 
     /** Check whether chain matches context */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
@@ -44,11 +44,11 @@ public class Chain {
             Object ctxVal = context.get(entry.getKey());
             if (selector.isNegative()) {
                 hasNegative = true;
-                if (!selector.matches(ctxVal, isCaseSensitive)) {
+                if (!selector.matches(context, ctxVal, isCaseSensitive)) {
                     negativeMatch = false;
                 }
             } else {
-                if (!selector.matches(ctxVal, isCaseSensitive)) {
+                if (!selector.matches(context, ctxVal, isCaseSensitive)) {
                     return false;
                 }
             }
@@ -58,9 +58,6 @@ public class Chain {
             return false;
         }
 
-        if (!ranges.isEmpty()) {
-            return ranges.stream().anyMatch(range -> range.matches(context));
-        }
         return true;
     }
 

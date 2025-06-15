@@ -2,9 +2,11 @@ package org.mdcfg.model;
 
 import lombok.AllArgsConstructor;
 
+import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
 
 import java.util.List;
+import org.mdcfg.model.Range;
 
 /**
  * Represents single selector inside a chain. It knows
@@ -16,9 +18,14 @@ public class Selector {
     private final boolean list;
     private final List<String> values;
     private final boolean any;
+    private final List<Range> ranges;
 
-    /** Return true if this selector fits provided value. */
-    public boolean matches(Object value, boolean isCaseSensitive) {
+    /** Return true if this selector fits provided value and context. */
+    public boolean matches(MdcContext context, Object value, boolean isCaseSensitive) {
+        if (!ranges.isEmpty()) {
+            return ranges.stream().anyMatch(r -> r.matches(context));
+        }
+
         if (any) {
             return true;
         }

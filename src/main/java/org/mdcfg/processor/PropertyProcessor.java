@@ -136,7 +136,6 @@ public class PropertyProcessor {
      */
     private void createChain(Map<String, String> selectors, String value) {
         Map<String, Selector> selectorMap = new LinkedHashMap<>();
-        List<Range> ranges = new ArrayList<>();
         List<Dimension> nonEmptyListDimensions = new ArrayList<>();
 
         for (Dimension dimension : dimensions.values()) {
@@ -147,7 +146,7 @@ public class PropertyProcessor {
                 if(negative) {
                     selector = selector.substring(NEGATIVE_SELECTOR.length());
                 }
-                Selector data = parseSelector(selector, dimension, ranges, negative);
+                Selector data = parseSelector(selector, dimension, negative);
                 selectorMap.put(dimension.getName(), data);
                 if(dimension.isList()) {
                     nonEmptyListDimensions.add(dimension);
@@ -165,7 +164,7 @@ public class PropertyProcessor {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
-        Chain chain = new Chain(selectorMap, value, ranges);
+        Chain chain = new Chain(selectorMap, value);
         chains.add(0, chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
@@ -206,7 +205,8 @@ public class PropertyProcessor {
     }
 
     /** Parse selector string into {@link Selector} */
-    private Selector parseSelector(String selector, Dimension dimension, List<Range> ranges, boolean negative){
+    private Selector parseSelector(String selector, Dimension dimension, boolean negative){
+        List<Range> ranges = new ArrayList<>();
         if(selector.contains(RANGE_SIGN)) {
             selector = selector.replace("[", "").replace("]", "").replace(" ", "");
             for(String part : selector.split(",")) {
@@ -214,7 +214,7 @@ public class PropertyProcessor {
                     ranges.add(createRange(part, dimension, negative));
                 }
             }
-            return new Selector(negative, dimension.isList(), List.of(), true);
+            return new Selector(negative, dimension.isList(), List.of(), true, ranges);
         }
 
         selector = selector.replace("[", "").replace("]", "");
@@ -226,7 +226,7 @@ public class PropertyProcessor {
             }
         }
         boolean any = values.isEmpty();
-        return new Selector(negative, dimension.isList(), values, any);
+        return new Selector(negative, dimension.isList(), values, any, ranges);
     }
 
 
