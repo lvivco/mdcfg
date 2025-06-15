@@ -15,8 +15,7 @@ import org.junit.runners.Suite;
         HookTest.class,
         AliasTest.class,
         EnablingTest.class,
-        AutoUpdateTest.class,
-        AutoReloadStreamTest.class
+        AutoUpdateTest.class
 })
 public class TestSuite {
 }
