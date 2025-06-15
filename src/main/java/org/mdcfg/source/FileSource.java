@@ -60,6 +60,9 @@ public abstract class FileSource extends StreamSource {
 
     @Override
     public void observeChange(Runnable onChange, long reloadInterval) throws MdcException {
+        if(root == null){
+            throw new MdcException("Auto reload not supported for stream-based sources.");
+        }
         watcher = root.isDirectory()
                 ? new FolderWatcher(root.getAbsolutePath(), onChange, reloadInterval)
                 : new FileWatcher(getAllSourceFiles(), onChange, reloadInterval);
