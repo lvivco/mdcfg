@@ -219,7 +219,7 @@ public class PropertyProcessor {
         pattern.append(dimension.getName()).append("@").append(selector);
     }
 
-    /** Return iterator in revers order */
+    /** Return iterator in reverse order */
     private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map) {
         return new ArrayList<>(map.entrySet()).listIterator(map.size());
     }
