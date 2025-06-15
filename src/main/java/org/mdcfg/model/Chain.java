@@ -35,6 +35,11 @@ public class Chain {
     private final Map<String, Selector> selectors;
     @Getter private String value;
 
+    /** Number of selectors in this chain. */
+    public int getSelectorCount() {
+        return selectors.size();
+    }
+
     /** Check whether chain matches context */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
         for (var entry : selectors.entrySet()) {

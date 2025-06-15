@@ -112,6 +112,10 @@ public class PropertyProcessor {
             }
             createChain(chainMap, entry.getValue());
         }
+        chains.sort(Comparator.comparingInt(Chain::getSelectorCount).reversed());
+        for (List<Chain> list : listChains.values()) {
+            list.sort(Comparator.comparingInt(Chain::getSelectorCount).reversed());
+        }
     }
 
     /**
@@ -165,7 +169,7 @@ public class PropertyProcessor {
         }
 
         Chain chain = new Chain(selectorMap, value);
-        chains.add(0, chain);
+        chains.add(chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
 
@@ -235,7 +239,7 @@ public class PropertyProcessor {
             if(!listChains.containsKey(isIterableDimension.getName())) {
                 listChains.put(isIterableDimension.getName(), new ArrayList<>());
             }
-            listChains.get(isIterableDimension.getName()).add(0, chain);
+            listChains.get(isIterableDimension.getName()).add(chain);
         }
     }
 }
