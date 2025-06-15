@@ -20,6 +20,30 @@ engine:
       any@: 4
       drive@!2WD: 6
 
+headlights:
+  halogen:
+    color: 3200
+    intensity: 1000
+  xenon:
+    color: 3300
+    intensity: 1100
+  model@bmw:
+    led:
+      color: 4500
+      intensity:
+        any@: 3500
+        cat@crossover: 4000
+    laser:
+      color: 5500
+      intensity: 5000
+  line@kuga:
+    xenon:
+      color: 3500
+      intensity: 1200
+    led:
+      color: 4500
+      intensity: 4000
+
 production-models:
   model@toyota: |
     Tacoma : 2005

@@ -42,23 +42,29 @@ public final class SourceUtils {
 
     /** Get configuration grouped by properties */
     public static Map<String, Map<String, String>> collectProperties(Map<String, Object> rawData) throws MdcException {
-        Map<String, Map<String, String>> data = new HashMap<>();
+        Map<String, Map<String, String>> data = new LinkedHashMap<>();
         for(var entry:rawData.entrySet()) {
             String key = entry.getKey();
             if(key.contains(SELECTOR_SEPARATOR)){
-                Matcher matcher = PROPERTY_PATTERN.matcher(key);
-                if(!matcher.find()){
-                    throw new MdcException(String.format("Invalid property %s", key));
-                }
-                int index = matcher.start();
-                Map<String, String> prop = getProperty(data, key.substring(0, index));
-                prop.put(key.substring(index + 1), entry.getValue().toString());
+                Pair<String, String> propertyMap = splitProperty(key);
+                Map<String, String> prop = getProperty(data, propertyMap.getKey());
+                prop.put(propertyMap.getValue(), entry.getValue().toString());
             } else {
                 Map<String, String> prop = getProperty(data, key);
                 prop.put(ANY, entry.getValue().toString());
             }
         }
         return data;
+    }
+
+    /** Split property {@code prop1:prop2:sel@val} to property key {@code prop1:prop2} and selector values {@code sel@val}*/
+    public static Pair<String, String> splitProperty(String key) throws MdcException {
+        Matcher matcher = PROPERTY_PATTERN.matcher(key);
+        if(!matcher.find()){
+            throw new MdcException(String.format("Invalid property %s", key));
+        }
+        int index = matcher.start();
+        return Pair.of(key.substring(0, index), key.substring(index + 1));
     }
 
     /** Split selector {@code sel@val} to selector name and selector value */

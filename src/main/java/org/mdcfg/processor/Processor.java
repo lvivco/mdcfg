@@ -9,7 +9,9 @@ import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
 import org.mdcfg.utils.SourceUtils;
 
+import java.nio.channels.Selector;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 public class Processor {
 
     private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(":");
+    private static final String DIMENSION_SEPARATOR = ":";
     private static final String SUB_PROPERTY_SEPARATOR = ".";
     private static final String ENABLED_PREFIX = "enabled@:";
     private static final String SELECTOR_SEPARATOR= "@";
@@ -28,6 +31,7 @@ public class Processor {
     private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
     private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
+    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@\\w+(?::\\w+@\\w+)*):\\w+[^@]\\w+(?::|$)");
 
     private final List<Hook> loadHooks;
 
@@ -43,6 +47,7 @@ public class Processor {
      * @throws MdcException thrown in case something went wrong.
      */
     public Map<String, Property> process(Map<String, Map<String, String>> data) throws MdcException {
+        data = processHyperSelectors(data);
         Map<String, List<Alias>> aliases = getAliases(data);
         Map<String, Property> properties = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
@@ -75,6 +80,39 @@ public class Processor {
             }
         }
         return result;
+    }
+
+    /** Process selectors to change root:dim@sel:property -> root:property:dim@sel */
+    private Map<String, Map<String, String>> processHyperSelectors(Map<String, Map<String, String>> data) throws MdcException {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        for (Map.Entry<String, Map<String, String>> propertyEntry : data.entrySet()) {
+            for (Map.Entry<String, String> selectorEntry : propertyEntry.getValue().entrySet()) {
+                String selectors = selectorEntry.getKey();
+                Matcher matcher = HYPER_SELECTOR_PATTERN.matcher(selectors);
+                if(matcher.find()){
+                    String tail = selectors.substring(matcher.group(1).length() + 1);
+                    if(tail.endsWith(":any@")){
+                        tail = tail.substring(0, tail.length()-5);
+                    }
+                    selectors = tail + DIMENSION_SEPARATOR + matcher.group(1);
+                    Pair<String, String> propertyMap = SourceUtils.splitProperty(selectors);
+                    putSafe(result,propertyEntry.getKey() + DIMENSION_SEPARATOR + propertyMap.getKey(),
+                            propertyMap.getValue(), selectorEntry.getValue());
+                } else {
+                    putSafe(result, propertyEntry.getKey(),
+                            selectorEntry.getKey(), selectorEntry.getValue());
+                }
+            }
+        }
+        return result;
+    }
+
+    /** Put value to sub map creating it if absent */
+    private void putSafe(Map<String, Map<String, String>> map, String propertyName, String key, String value ) {
+        if(!map.containsKey(propertyName)){
+            map.put(propertyName, new LinkedHashMap<>());
+        }
+        map.get(propertyName).put(key, value);
     }
 
     /**
