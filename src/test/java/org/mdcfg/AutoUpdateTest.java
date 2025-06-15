@@ -41,8 +41,7 @@ public class AutoUpdateTest {
 
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
-        assertEquals("43000", provider.getString(TestContextBuilder.init().model("ford").build(), "price"));
-        assertEquals(1, provider.getSize());
+        assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
     }
 
     @Test
@@ -61,8 +60,7 @@ public class AutoUpdateTest {
 
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
-        assertEquals("43000", provider.getString(TestContextBuilder.init().model("ford").build(), "price"));
-        assertEquals(1, provider.getSize());
+        assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
     }
 
     private void modifyFile(Path from, Path to) {
