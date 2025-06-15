@@ -72,58 +72,18 @@ public class Property {
         return result;
     }
 
-    /** create compare string using (plitBy@plitValue as replacement for List based context dimension)
-     * and match it on active chains by down to up priority */
+    /** Check chains by down to up priority */
     private String getString(MdcContext context, List<Chain> activeChains, String splitBy, Object splitValue, boolean isCaseSensitive) {
-        String compare = createCompareString(context, splitBy, splitValue);
-        compare = isCaseSensitive ? compare : compare.toLowerCase(Locale.ROOT);
+        if(splitBy != null){
+            context = new MdcContext() {{ putAll(context); put(splitBy, List.of(splitValue)); }};
+        }
         for (Chain chain : activeChains) {
-            if(chain.match(context, compare)){
+            if(chain.match(context, isCaseSensitive)){
                 return chain.getValue();
             }
         }
         return null;
     }
 
-    /**
-     * Create compare string by dimensions order.
-     * <p> For example for property:
-     *  <pre>
-     *    horsepower:
-     *      any@: 400
-     *      model@bmw:
-     *        drive@4WD: 500
-     *  </pre>
-     *  Context:
-     *  <pre>
-     *   model = bmw
-     *   drive = 4WD
-     *  </pre>
-     *  Compare string will be {@code model@bmw.drive@4WD}
-     */
-    private String createCompareString(Map<String, Object> context, String overrideName, Object overrideValue) {
-        StringBuilder compare = new StringBuilder();
-        for (Dimension dimension : dimensions.values()) {
-            if(compare.length() > 0){
-                compare.append(".");
-            }
-            compare.append(dimension.getName());
-            compare.append("@");
 
-            Object object;
-            if(dimension.getName().equals(overrideName)) {
-                object = "[" + overrideValue + "]";
-            } else {
-                object = context.getOrDefault(dimension.getName(), null);
-                if (object != null) {
-                    List<?> list = ProviderUtils.toList(object);
-                    if (list != null) {
-                        object = "[" + StringUtils.join(list, UNIT_SEPARATOR) + "]";
-                    }
-                }
-            }
-            compare.append(object);
-        }
-        return compare.toString();
-    }
 }

@@ -6,9 +6,9 @@ package org.mdcfg.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.mdcfg.provider.MdcContext;
+import org.mdcfg.utils.ProviderUtils;
 
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  *  Represents one config chain.
@@ -32,17 +32,66 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor
 public class Chain {
-    private Pattern plusPattern;
-    private Pattern minusPattern;
+    private final Map<String, SelectorData> plusSelectors;
+    private final Map<String, SelectorData> minusSelectors;
     @Getter private String value;
-    private List<Range> ranges;
+    private final List<Range> ranges;
 
     /** Check whether chain matches context */
-    public boolean match(MdcContext context, String compare) {
-        boolean minusMatch = minusPattern != null && minusPattern.matcher(compare).matches();
-        boolean match = !minusMatch && plusPattern.matcher(compare).matches();
-        return match && !ranges.isEmpty()
-                ? ranges.stream().anyMatch(range -> range.matches(context))
-                : match;
+    public boolean match(MdcContext context, boolean isCaseSensitive) {
+        for (var entry : minusSelectors.entrySet()) {
+            Object ctxVal = context.get(entry.getKey());
+            if (entry.getValue().matches(ctxVal, isCaseSensitive)) {
+                return false;
+            }
+        }
+
+        for (var entry : plusSelectors.entrySet()) {
+            Object ctxVal = context.get(entry.getKey());
+            if (!entry.getValue().matches(ctxVal, isCaseSensitive)) {
+                return false;
+            }
+        }
+
+        if (!ranges.isEmpty()) {
+            return ranges.stream().anyMatch(range -> range.matches(context));
+        }
+        return true;
+    }
+
+    /** Helper that stores selector information for one dimension */
+    @AllArgsConstructor
+    public static class SelectorData {
+        private final boolean list;
+        private final List<String> values;
+        private final boolean any;
+
+        boolean matches(Object value, boolean isCaseSensitive) {
+            if (any) {
+                return true;
+            }
+            if (value == null) {
+                return false;
+            }
+            List<?> listVal = ProviderUtils.toList(value);
+            if (list && listVal != null) {
+                for (Object val : listVal) {
+                    if (compare(val.toString(), isCaseSensitive)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return compare(value.toString(), isCaseSensitive);
+        }
+
+        private boolean compare(String val, boolean isCaseSensitive) {
+            for (String allowed : values) {
+                if (isCaseSensitive ? val.equals(allowed) : val.equalsIgnoreCase(allowed)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
