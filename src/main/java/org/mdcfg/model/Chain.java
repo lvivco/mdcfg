@@ -37,27 +37,13 @@ public class Chain {
 
     /** Check whether chain matches context */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
-        boolean hasNegative = false;
-        boolean negativeMatch = true;
         for (var entry : selectors.entrySet()) {
             Selector selector = entry.getValue();
             Object ctxVal = context.get(entry.getKey());
-            if (selector.isNegative()) {
-                hasNegative = true;
-                if (!selector.matches(context, ctxVal, isCaseSensitive)) {
-                    negativeMatch = false;
-                }
-            } else {
-                if (!selector.matches(context, ctxVal, isCaseSensitive)) {
-                    return false;
-                }
+            if (!selector.matches(context, ctxVal, isCaseSensitive)) {
+                return false;
             }
         }
-
-        if (hasNegative && negativeMatch) {
-            return false;
-        }
-
         return true;
     }
 

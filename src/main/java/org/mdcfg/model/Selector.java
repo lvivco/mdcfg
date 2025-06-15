@@ -21,26 +21,31 @@ public class Selector {
 
     /** Return true if this selector fits provided value and context. */
     public boolean matches(MdcContext context, Object value, boolean isCaseSensitive) {
+        boolean match;
         if (!ranges.isEmpty()) {
-            return ranges.stream().anyMatch(r -> r.matches(context));
-        }
-
-        if (values.isEmpty()) {
-            return true;
-        }
-        if (value == null) {
-            return false;
-        }
-        List<?> listVal = ProviderUtils.toList(value);
-        if (list && listVal != null) {
-            for (Object val : listVal) {
-                if (compare(val.toString(), isCaseSensitive)) {
-                    return true;
+            match = ranges.stream().anyMatch(r -> r.matches(context));
+        } else {
+            if (values.isEmpty()) {
+                match = true;
+            } else if (value == null) {
+                match = false;
+            } else {
+                List<?> listVal = ProviderUtils.toList(value);
+                if (list && listVal != null) {
+                    match = false;
+                    for (Object val : listVal) {
+                        if (compare(val.toString(), isCaseSensitive)) {
+                            match = true;
+                            break;
+                        }
+                    }
+                } else {
+                    match = compare(value.toString(), isCaseSensitive);
                 }
             }
-            return false;
         }
-        return compare(value.toString(), isCaseSensitive);
+
+        return negative ? !match : match;
     }
 
     private boolean compare(String val, boolean isCaseSensitive) {
