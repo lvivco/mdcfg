@@ -213,7 +213,7 @@ public class PropertyProcessor {
                     ranges.add(createRange(part, dimension));
                 }
             }
-            return new Selector(dimension.getName(), negative, dimension.isList(), List.of(), ranges);
+            return new Selector(dimension, negative, List.of(), ranges);
         }
 
         selector = selector.replace("[", "").replace("]", "");
@@ -224,7 +224,7 @@ public class PropertyProcessor {
                 values.add(val);
             }
         }
-        return new Selector(dimension.getName(), negative, dimension.isList(), values, ranges);
+        return new Selector(dimension, negative, values, ranges);
     }
 
 

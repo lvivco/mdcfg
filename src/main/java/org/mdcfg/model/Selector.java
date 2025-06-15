@@ -6,7 +6,6 @@ import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
 
 import java.util.List;
-import org.mdcfg.model.Range;
 
 /**
  * Represents single selector inside a chain. It knows
@@ -14,15 +13,14 @@ import org.mdcfg.model.Range;
  */
 @AllArgsConstructor
 public class Selector {
-    private final String dimension;
+    private final Dimension dimension;
     private final boolean negative;
-    private final boolean list;
     private final List<String> values;
     private final List<Range> ranges;
 
     /** Return true if this selector fits provided value ignoring negativity. */
     public boolean rawMatch(MdcContext context, boolean isCaseSensitive) {
-        Object value = context.get(dimension);
+        Object value = context.get(dimension.getName());
         boolean match;
         if (!ranges.isEmpty()) {
             match = ranges.stream().anyMatch(r -> r.matches(context));
@@ -33,7 +31,7 @@ public class Selector {
                 match = false;
             } else {
                 List<?> listVal = ProviderUtils.toList(value);
-                if (list && listVal != null) {
+                if (dimension.isList() && listVal != null) {
                     match = false;
                     for (Object val : listVal) {
                         if (compare(val.toString(), isCaseSensitive)) {
