@@ -694,8 +694,11 @@ public class MdcProvider {
         for (Property property : propertyList) {
             String subKey = property.getName().substring(key.length());
             String[] path = SUB_PROPERTY_SEPARATOR.split(subKey);
-            Map<String, Object> leaf = getLeaf(result, path);
-            leaf.put(path[path.length-1], getStringValue(property, context));
+            String value = getStringValue(property, context);
+            if (value != null) {
+                Map<String, Object> leaf = getLeaf(result, path);
+                leaf.put(path[path.length - 1], value);
+            }
         }
         return result;
     }
