@@ -69,6 +69,11 @@ public abstract class FileSource extends StreamSource {
         watcher.start();
     }
 
+    @Override
+    public void stopWatching() {
+        Optional.ofNullable(watcher).ifPresent(Watcher::stop);
+    }
+
     /** Get array of appropriate files in folder */
     abstract File[] listFiles(File folder);
 
