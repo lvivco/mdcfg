@@ -169,7 +169,7 @@ public class PropertyProcessor {
         }
 
         Chain chain = new Chain(selectorMap, value);
-        chains.add(chain);
+        chains.add(0, chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
 
@@ -239,7 +239,7 @@ public class PropertyProcessor {
             if(!listChains.containsKey(isIterableDimension.getName())) {
                 listChains.put(isIterableDimension.getName(), new ArrayList<>());
             }
-            listChains.get(isIterableDimension.getName()).add(chain);
+            listChains.get(isIterableDimension.getName()).add(0, chain);
         }
     }
 }
