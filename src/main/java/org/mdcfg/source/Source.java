@@ -16,4 +16,12 @@ public interface Source {
     Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException;
     /** Set up change watcher */
     void observeChange(Runnable onChange, long reloadInterval) throws MdcException;
+
+    /**
+     * Stop watching for source changes. Default implementation does nothing
+     * allowing stream-based sources to ignore this call.
+     */
+    default void stopAutoReload() {
+        // no-op
+    }
 }

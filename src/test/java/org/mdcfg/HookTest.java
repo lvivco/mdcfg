@@ -38,6 +38,7 @@ public class HookTest {
         assertTrue(provider.getStringOptional(context, "price").orElse("").contains("_all"));
         assertTrue(provider.getStringOptional(context, "available-colors").orElse("").contains("_all"));
         assertTrue(provider.getStringOptional(context, "horsepower").orElse("").contains("_all"));
+        provider.stopAutoReload();
     }
 
     @Test
@@ -56,6 +57,7 @@ public class HookTest {
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
         assertEquals(Integer.valueOf(450000), provider.getInteger(context, "price"));
+        provider.stopAutoReload();
     }
 
     @Test
@@ -75,6 +77,7 @@ public class HookTest {
         context.put("model", "bmw");
         context.put("drive", "4WD");
         assertEquals(Integer.valueOf(5000), provider.getInteger(context, "horsepower"));
+        provider.stopAutoReload();
     }
 
     @Test
@@ -88,5 +91,6 @@ public class HookTest {
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
         assertEquals(Integer.valueOf(48000), provider.getInteger(context, "horsepower"));
+        provider.stopAutoReload();
     }
 }

@@ -75,6 +75,13 @@ public class MdcProvider {
     }
 
     /**
+     * Stop watching configuration source for changes.
+     */
+    public void stopAutoReload() {
+        source.stopAutoReload();
+    }
+
+    /**
      * @return property count.
      */
     public int getSize() {
