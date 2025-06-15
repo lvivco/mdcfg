@@ -176,7 +176,7 @@ public class PropertyProcessor {
     }
 
     /** Create {@link Range} object from selector string. */
-    private Range createRange(String selectorPart, Dimension dimension, boolean negative) {
+    private Range createRange(String selectorPart, Dimension dimension) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;
         String max = null;
@@ -201,7 +201,7 @@ public class PropertyProcessor {
                 }
             }
         }
-        return new Range(dimension, minInclusive, min, maxInclusive, max, negative);
+        return new Range(dimension, minInclusive, min, maxInclusive, max);
     }
 
     /** Parse selector string into {@link Selector} */
@@ -211,7 +211,7 @@ public class PropertyProcessor {
             selector = selector.replace("[", "").replace("]", "").replace(" ", "");
             for(String part : selector.split(",")) {
                 if(!part.isBlank()) {
-                    ranges.add(createRange(part, dimension, negative));
+                    ranges.add(createRange(part, dimension));
                 }
             }
             return new Selector(negative, dimension.isList(), List.of(), true, ranges);
