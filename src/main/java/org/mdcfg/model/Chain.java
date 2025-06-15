@@ -35,11 +35,6 @@ public class Chain {
     private final Map<String, Selector> selectors;
     @Getter private String value;
 
-    /** Number of selectors in this chain. */
-    public int getSelectorCount() {
-        return selectors.size();
-    }
-
     /**
      * Check whether chain matches context.
      * <p>All positive selectors must match. The chain is discarded only when
