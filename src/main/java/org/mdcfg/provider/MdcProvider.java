@@ -915,7 +915,7 @@ public class MdcProvider {
 
     private  List<Property> listCompoundProperty(MdcContext context, String key) throws MdcException {
         final String keyPart = processKey(key);
-        Pattern pattern = Pattern.compile(String.format(ROOT_PROPERTY, keyPart));
+        Pattern pattern = Pattern.compile(String.format(ROOT_PROPERTY, Pattern.quote(keyPart)));
         // Could impact performance
         List<Property> result = properties.entrySet().stream()
                 .filter(e -> pattern.matcher(e.getKey()).find())
