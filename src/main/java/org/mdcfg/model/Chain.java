@@ -6,9 +6,8 @@ package org.mdcfg.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.mdcfg.provider.MdcContext;
-import org.mdcfg.utils.ProviderUtils;
-
 import java.util.*;
+
 
 /**
  *  Represents one config chain.
@@ -32,32 +31,31 @@ import java.util.*;
  */
 @AllArgsConstructor
 public class Chain {
-    private final Map<String, SelectorData> plusSelectors;
-    private final Map<String, SelectorData> minusSelectors;
+    private final Map<String, Selector> selectors;
     @Getter private String value;
     private final List<Range> ranges;
 
     /** Check whether chain matches context */
     public boolean match(MdcContext context, boolean isCaseSensitive) {
-        if (!minusSelectors.isEmpty()) {
-            boolean minusMatch = true;
-            for (var entry : minusSelectors.entrySet()) {
-                Object ctxVal = context.get(entry.getKey());
-                if (!entry.getValue().matches(ctxVal, isCaseSensitive)) {
-                    minusMatch = false;
-                    break;
+        boolean hasNegative = false;
+        boolean negativeMatch = true;
+        for (var entry : selectors.entrySet()) {
+            Selector selector = entry.getValue();
+            Object ctxVal = context.get(entry.getKey());
+            if (selector.isNegative()) {
+                hasNegative = true;
+                if (!selector.matches(ctxVal, isCaseSensitive)) {
+                    negativeMatch = false;
                 }
-            }
-            if (minusMatch) {
-                return false;
+            } else {
+                if (!selector.matches(ctxVal, isCaseSensitive)) {
+                    return false;
+                }
             }
         }
 
-        for (var entry : plusSelectors.entrySet()) {
-            Object ctxVal = context.get(entry.getKey());
-            if (!entry.getValue().matches(ctxVal, isCaseSensitive)) {
-                return false;
-            }
+        if (hasNegative && negativeMatch) {
+            return false;
         }
 
         if (!ranges.isEmpty()) {
@@ -66,39 +64,5 @@ public class Chain {
         return true;
     }
 
-    /** Helper that stores selector information for one dimension */
-    @AllArgsConstructor
-    public static class SelectorData {
-        private final boolean list;
-        private final List<String> values;
-        private final boolean any;
 
-        boolean matches(Object value, boolean isCaseSensitive) {
-            if (any) {
-                return true;
-            }
-            if (value == null) {
-                return false;
-            }
-            List<?> listVal = ProviderUtils.toList(value);
-            if (list && listVal != null) {
-                for (Object val : listVal) {
-                    if (compare(val.toString(), isCaseSensitive)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return compare(value.toString(), isCaseSensitive);
-        }
-
-        private boolean compare(String val, boolean isCaseSensitive) {
-            for (String allowed : values) {
-                if (isCaseSensitive ? val.equals(allowed) : val.equalsIgnoreCase(allowed)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
 }

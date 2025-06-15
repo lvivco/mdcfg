@@ -135,8 +135,7 @@ public class PropertyProcessor {
      *  </ul>
      */
     private void createChain(Map<String, String> selectors, String value) {
-        Map<String, Chain.SelectorData> plusSelectors = new LinkedHashMap<>();
-        Map<String, Chain.SelectorData> minusSelectors = new LinkedHashMap<>();
+        Map<String, Selector> selectorMap = new LinkedHashMap<>();
         List<Range> ranges = new ArrayList<>();
         List<Dimension> nonEmptyListDimensions = new ArrayList<>();
 
@@ -148,12 +147,8 @@ public class PropertyProcessor {
                 if(negative) {
                     selector = selector.substring(NEGATIVE_SELECTOR.length());
                 }
-                Chain.SelectorData data = parseSelectorData(selector, dimension, ranges, negative);
-                if(negative) {
-                    minusSelectors.put(dimension.getName(), data);
-                } else {
-                    plusSelectors.put(dimension.getName(), data);
-                }
+                Selector data = parseSelector(selector, dimension, ranges, negative);
+                selectorMap.put(dimension.getName(), data);
                 if(dimension.isList()) {
                     nonEmptyListDimensions.add(dimension);
                 }
@@ -170,7 +165,7 @@ public class PropertyProcessor {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
-        Chain chain = new Chain(plusSelectors, minusSelectors, value, ranges);
+        Chain chain = new Chain(selectorMap, value, ranges);
         chains.add(0, chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
@@ -210,8 +205,8 @@ public class PropertyProcessor {
         return new Range(dimension, minInclusive, min, maxInclusive, max, negative);
     }
 
-    /** Parse selector string into {@link Chain.SelectorData} */
-    private Chain.SelectorData parseSelectorData(String selector, Dimension dimension, List<Range> ranges, boolean negative){
+    /** Parse selector string into {@link Selector} */
+    private Selector parseSelector(String selector, Dimension dimension, List<Range> ranges, boolean negative){
         if(selector.contains(RANGE_SIGN)) {
             selector = selector.replace("[", "").replace("]", "").replace(" ", "");
             for(String part : selector.split(",")) {
@@ -219,7 +214,7 @@ public class PropertyProcessor {
                     ranges.add(createRange(part, dimension, negative));
                 }
             }
-            return new Chain.SelectorData(dimension.isList(), List.of(), true);
+            return new Selector(negative, dimension.isList(), List.of(), true);
         }
 
         selector = selector.replace("[", "").replace("]", "");
@@ -231,7 +226,7 @@ public class PropertyProcessor {
             }
         }
         boolean any = values.isEmpty();
-        return new Chain.SelectorData(dimension.isList(), values, any);
+        return new Selector(negative, dimension.isList(), values, any);
     }
 
 
