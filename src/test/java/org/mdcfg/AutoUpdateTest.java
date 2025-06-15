@@ -10,6 +10,7 @@ import org.mdcfg.builder.MdcBuilder;
 import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.provider.MdcProvider;
+import org.mdcfg.helpers.TestContextBuilder;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -40,6 +41,7 @@ public class AutoUpdateTest {
 
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
+        assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
     }
 
     @Test
@@ -58,6 +60,7 @@ public class AutoUpdateTest {
 
         String count = future.get();
         assertEquals(1, Integer.parseInt(count));
+        assertEquals("45000", provider.getString(TestContextBuilder.init().model("bmw").build(), "price"));
     }
 
     private void modifyFile(Path from, Path to) {
