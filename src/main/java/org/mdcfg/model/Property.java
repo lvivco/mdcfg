@@ -17,10 +17,7 @@ import java.util.*;
  */
 @AllArgsConstructor
 public class Property {
-    private static final char UNIT_SEPARATOR = (char) 31;
-
     @Getter private final String name;
-    private final Map<String, Dimension> dimensions;
     private final List<Chain> chains;
     private final Map<String, List<Chain>> listChainMap;
     @Getter private final boolean hasReference;
