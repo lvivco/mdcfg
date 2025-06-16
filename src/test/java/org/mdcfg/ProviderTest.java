@@ -436,6 +436,11 @@ public class ProviderTest {
         assertTrue(provider.getScalar(TestContextBuilder.init().clearance(20.0).build(), "off-road", Boolean.class));
     }
 
+    @Test
+    public void testRangeMatchesDimensionNotPresent() throws MdcException {
+        assertTrue(provider.getBoolean(new MdcContext(), "off-road"));
+    }
+
     private static void assertListPOJO(List<?> list) {
         assertEquals(2, list.size());
         assertEquals(list.get(0).getClass(), EnginePOJO.class);
