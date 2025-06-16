@@ -1,3 +1,6 @@
+/**
+ *   Copyright (C) 2024 LvivCoffeeCoders team.
+ */
 package org.mdcfg.model;
 
 import lombok.AllArgsConstructor;
