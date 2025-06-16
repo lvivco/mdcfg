@@ -5,6 +5,7 @@ package org.mdcfg.source;
 
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.utils.SourceUtils;
+import org.mdcfg.model.Config;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -31,11 +32,12 @@ public class YamlSource extends FileSource {
     }
 
     @Override
-    Map<String, Map<String, String>> read(InputStream is, boolean caseSensitive) throws MdcException {
+    Map<String, Map<String, String>> read(InputStream is,
+                                          Config config) throws MdcException {
         try (is) {
             Map<String, Object> rawData = new Yaml().load(is);
             rawData = Optional.ofNullable(rawData).orElse(new HashMap<>());
-            Map<String, Object> flattened = SourceUtils.flatten(rawData, caseSensitive);
+            Map<String, Object> flattened = SourceUtils.flatten(rawData, config);
             return SourceUtils.collectProperties(flattened);
         } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);

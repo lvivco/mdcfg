@@ -4,6 +4,7 @@
 package org.mdcfg.source;
 
 import org.mdcfg.exceptions.MdcException;
+import org.mdcfg.model.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -22,17 +23,19 @@ public abstract class StreamSource implements Source {
     }
 
     @Override
-    public Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException {
-        Map<String, Map<String, String>> main = read(sourceStream, isCaseSensitive);
+    public Map<String, Map<String, String>> read(
+            Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor,
+            Config config) throws MdcException {
+        Map<String, Map<String, String>> main = read(sourceStream, config);
         List<InputStream> streams = new ArrayList<>();
         for (String value : includesExtractor.apply(main).values()) {
             streams.add(toInputStream(value));
         }
-        return readAndMerge(streams, main, isCaseSensitive);
+        return readAndMerge(streams, main, config);
     }
 
     /** Read one file */
-    abstract Map<String, Map<String, String>> read(InputStream is, boolean isCaseSensitive) throws MdcException;
+    abstract Map<String, Map<String, String>> read(InputStream is, Config config) throws MdcException;
 
     private InputStream toInputStream(String source) throws MdcException {
         try {
@@ -43,9 +46,11 @@ public abstract class StreamSource implements Source {
     }
 
     /** Read properties from files and merge them into one Map */
-    protected Map<String, Map<String, String>> readAndMerge(List<InputStream> inputStreams, Map<String, Map<String, String>> merged, boolean isCaseSensitive) throws MdcException {
+    protected Map<String, Map<String, String>> readAndMerge(List<InputStream> inputStreams,
+                                                            Map<String, Map<String, String>> merged,
+                                                            Config config) throws MdcException {
         for (InputStream is : inputStreams) {
-            Map<String, Map<String, String>> map = read(is, isCaseSensitive);
+            Map<String, Map<String, String>> map = read(is, config);
             Set<String> interfileKeys = getInterfileKeys(map, merged);
             if(!interfileKeys.isEmpty()){
                 throw new MdcException(String.format("There is interfile configuration for keys %s", interfileKeys));
