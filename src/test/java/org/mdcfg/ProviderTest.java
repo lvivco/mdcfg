@@ -438,7 +438,7 @@ public class ProviderTest {
 
     @Test
     public void testRangeMatchesDimensionNotPresent() throws MdcException {
-        assertNull(provider.getBoolean(new MdcContext(), "off-road"));
+        assertTrue(provider.getBoolean(new MdcContext(), "off-road"));
     }
 
     private static void assertListPOJO(List<?> list) {
