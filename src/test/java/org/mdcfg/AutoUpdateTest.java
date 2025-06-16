@@ -16,6 +16,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.*;
+import java.nio.file.attribute.FileTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.mdcfg.helpers.Resources.YAML_SINGLE_PATH;
@@ -106,6 +107,7 @@ public class AutoUpdateTest {
         try {
             String data = "invalid:\n  any: 42\n";
             Files.writeString(to, data);
+            Files.setLastModifiedTime(to, FileTime.fromMillis(System.currentTimeMillis()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
