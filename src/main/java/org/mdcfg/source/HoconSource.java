@@ -47,7 +47,7 @@ public class HoconSource extends FileSource {
             Map<String, Object> rawData = new ObjectMapper(new HoconFactory()).readValue(data, TYPE);
             Map<String, Object> flattened = SourceUtils.flatten(orderData(rawData), isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);
         }
     }

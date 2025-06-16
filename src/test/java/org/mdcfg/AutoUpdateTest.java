@@ -72,10 +72,42 @@ public class AutoUpdateTest {
                 .build();
     }
 
+    @Test
+    public void testFailureCallback() throws MdcException, ExecutionException, InterruptedException, IOException {
+        final File tempFile = tempFolder.newFile("tempFile.yaml");
+        Files.writeString(tempFile.toPath(), Files.readString(Path.of(YAML_SINGLE_PATH)));
+
+        CompletableFuture<String> future = new CompletableFuture<>();
+        MdcProvider provider = MdcBuilder.withYaml(tempFile.getAbsolutePath())
+                .autoReload(200, MdcCallback.<Integer, MdcException>builder()
+                        .onFailure(e -> future.complete(e.getMessage()))
+                        .onSuccess(c->future.complete(c.toString()))
+                        .build())
+                .build();
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        //scheduler.schedule(() -> modifyFile(Path.of(YAML_SINGLE_PATH), tempFile.toPath()), 200, TimeUnit.MILLISECONDS);
+        scheduler.schedule(() -> writeInvalidYaml(tempFile.toPath()), 300, TimeUnit.MILLISECONDS);
+
+        String message = future.get();
+        assertEquals("Invalid nesting for wrong_nesting", message);
+        assertEquals(0, provider.getSize());
+        provider.stopAutoReload();
+    }
+
     private void modifyFile(Path from, Path to) {
         try {
             String read = Files.readString(from);
             Files.writeString(to, read);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writeInvalidYaml(Path to) {
+        try {
+            String data = "invalid:\n  wrong_nesting@: 42\n";
+            Files.writeString(to, data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

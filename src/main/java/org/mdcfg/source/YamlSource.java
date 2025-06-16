@@ -37,7 +37,7 @@ public class YamlSource extends FileSource {
             rawData = Optional.ofNullable(rawData).orElse(new HashMap<>());
             Map<String, Object> flattened = SourceUtils.flatten(rawData, caseSensitive);
             return SourceUtils.collectProperties(flattened);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);
         }
     }

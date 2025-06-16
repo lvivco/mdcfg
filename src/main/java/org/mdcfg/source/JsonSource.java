@@ -36,7 +36,7 @@ public class JsonSource extends FileSource {
             Map<String, Object> rawData = new ObjectMapper().readValue(is, TYPE);
             Map<String, Object> flattened = SourceUtils.flatten(rawData, isCaseSensitive);
             return SourceUtils.collectProperties(flattened);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);
         }
     }
