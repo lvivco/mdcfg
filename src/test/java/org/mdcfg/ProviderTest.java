@@ -13,8 +13,6 @@ import org.mdcfg.helpers.*;
 import org.mdcfg.provider.MdcContext;
 import org.mdcfg.provider.MdcConverter;
 import org.mdcfg.provider.MdcProvider;
-import org.mdcfg.model.Dimension;
-import org.mdcfg.model.Range;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -439,11 +437,8 @@ public class ProviderTest {
     }
 
     @Test
-    public void testRangeMatchesDimensionNotPresent() {
-        Dimension dimension = new Dimension("clearance", true, false, true);
-        Range range = new Range(dimension, true, "0", true, "10");
-        MdcContext context = new MdcContext();
-        assertFalse(range.matches(context));
+    public void testRangeMatchesDimensionNotPresent() throws MdcException {
+        assertNull(provider.getBoolean(new MdcContext(), "off-road"));
     }
 
     private static void assertListPOJO(List<?> list) {
