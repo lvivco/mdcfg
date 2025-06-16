@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2024 LvivCoffeeCoders team.
+ *   Copyright (C) 2025 LvivCoffeeCoders team.
  */
 package io.github.lvivco.mdcfg.sample.filters;
 
