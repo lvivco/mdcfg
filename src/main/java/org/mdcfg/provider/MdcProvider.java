@@ -12,6 +12,7 @@ import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
+import org.mdcfg.model.Config;
 import org.mdcfg.processor.Processor;
 import org.mdcfg.source.Source;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,7 @@ public class MdcProvider {
     private final Processor processor;
     private final Source source;
     private final MdcCallback<Integer, MdcException> callback;
-    private final boolean isCaseSensitive;
+    private final Config config;
 
     private Map<String, Property> properties;
 
@@ -52,25 +53,20 @@ public class MdcProvider {
      * Creates configured provider object. Do not instantiate it directly, use {@link org.mdcfg.builder.MdcBuilder}
      *
      * @param source Config source
-     * @param autoReload Flag that indicates whether config should autoreload on source change
-     * @param reloadInterval interval in ms for reload
-     * @param callback reload call back. See {@link MdcCallback}.
-     * @param loadHooks List of functions that used for preprocessing config values.
-     * @param isCaseSensitive Flag that indicates whether config should acknowledge case
+     * @param config provider configuration
      * @throws MdcException thrown in case something went wrong.
      */
-    public MdcProvider(Source source, boolean autoReload, long reloadInterval, MdcCallback<Integer, MdcException> callback,
-                       List<Hook> loadHooks, boolean isCaseSensitive) throws MdcException {
+    public MdcProvider(Source source, Config config) throws MdcException {
         this.source = source;
-        this.callback = callback;
-        this.isCaseSensitive = isCaseSensitive;
+        this.callback = config.getCallback();
+        this.config = config;
 
-        this.processor = new Processor(loadHooks);
+        this.processor = new Processor(config);
 
         readProperties();
 
-        if(autoReload){
-            source.observeChange(this::updateProperties, reloadInterval);
+        if(config.isAutoReload()){
+            source.observeChange(this::updateProperties, config.getReloadInterval());
         }
     }
 
@@ -819,7 +815,7 @@ public class MdcProvider {
 
     private <T> List<T> getCompoundObjectList(MdcContext context, String key, BiFunction<MdcContext, String, ? extends T> itemReader) throws MdcException {
         Property property = getProperty(key, context);
-        String listString = Optional.ofNullable(property.getString(context, isCaseSensitive))
+        String listString = Optional.ofNullable(property.getString(context, config.isSelectorSensitive()))
                 .map(s -> LIST_SIGN_PATTERN.matcher(s).replaceAll(""))
                 .orElse(null);
 
@@ -847,21 +843,21 @@ public class MdcProvider {
     }
 
     private String processKey(String key) {
-        return isCaseSensitive ? key : key.toLowerCase(Locale.ROOT);
+        return config.isKeySensitive() ? key : key.toLowerCase(Locale.ROOT);
     }
 
     private Property getProperty(String key, MdcContext context) throws MdcException {
         Property property = Optional.ofNullable(properties.get(processKey(key)))
                 .orElseThrow(() -> new MdcException(String.format("Property %s not found.", key)));
 
-        if(!property.isEnabled(context, isCaseSensitive)){
+        if(!property.isEnabled(context, config.isSelectorSensitive())){
             throw new MdcException(String.format("Property %s is disabled.", key));
         }
         return property;
     }
 
     private String getStringValue(Property property, MdcContext context) throws MdcException {
-        String value = property.getString(context, isCaseSensitive);
+        String value = property.getString(context, config.isSelectorSensitive());
         if(property.isHasReference()) {
             return processRefs(context, value);
         }
@@ -869,7 +865,7 @@ public class MdcProvider {
     }
 
     private List<String> getSplitStringValue(Property property, MdcContext context, String splitBy) throws MdcException {
-        List<String> values = property.getSplitString(context, splitBy, isCaseSensitive);
+        List<String> values = property.getSplitString(context, splitBy, config.isSelectorSensitive());
         if(property.isHasReference()) {
             for (int i = 0; i < values.size(); i++) {
                 values.set(i, processRefs(context, values.get(i)));
@@ -930,7 +926,7 @@ public class MdcProvider {
         List<Property> result = properties.entrySet().stream()
                 .filter(e -> pattern.matcher(e.getKey()).find())
                 .map(Map.Entry::getValue)
-                .filter(p->p.isEnabled(context, isCaseSensitive))
+                .filter(p->p.isEnabled(context, config.isSelectorSensitive()))
                 .collect(Collectors.toList());
         if(result.isEmpty()){
             throw new MdcException(String.format("Property %s not found.", key));
@@ -964,7 +960,8 @@ public class MdcProvider {
     }
 
     private void readProperties() throws MdcException {
-        Map<String, Map<String, String>> data = source.read(processor::getIncludes, isCaseSensitive);
+        Map<String, Map<String, String>> data = source.read(processor::getIncludes,
+                config);
         properties = processor.process(data);
     }
 

@@ -10,6 +10,7 @@ import org.mdcfg.source.HoconSource;
 import org.mdcfg.source.JsonSource;
 import org.mdcfg.source.Source;
 import org.mdcfg.source.YamlSource;
+import org.mdcfg.model.Config;
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,7 +30,8 @@ public class MdcBuilder {
         private long reloadInterval = 1000L;
         private MdcCallback<Integer, MdcException> callback;
         private final List<Hook> loadHooks = new ArrayList<>();
-        private boolean isCaseSensitive = false;
+        private boolean keyCaseSensitive = false;
+        private boolean selectorCaseSensitive = false;
 
         public MdcConfigBuilder(Source source) {
             this.source = source;
@@ -40,7 +42,24 @@ public class MdcBuilder {
          * @return current instance of {@link MdcConfigBuilder}
          */
         public MdcConfigBuilder caseSensitive() {
-            this.isCaseSensitive = true;
+            this.keyCaseSensitive = true;
+            this.selectorCaseSensitive = true;
+            return this;
+        }
+
+        /**
+         * Make property keys case sensitive.
+         */
+        public MdcConfigBuilder caseSensitiveKeys() {
+            this.keyCaseSensitive = true;
+            return this;
+        }
+
+        /**
+         * Make selector values case sensitive.
+         */
+        public MdcConfigBuilder caseSensitiveSelectors() {
+            this.selectorCaseSensitive = true;
             return this;
         }
 
@@ -130,7 +149,14 @@ public class MdcBuilder {
          * @throws MdcException thrown in case something went wrong.
          */
         public MdcProvider build() throws MdcException {
-            return new MdcProvider(source, autoReload, reloadInterval, callback, loadHooks, isCaseSensitive);
+            Config config = new Config(
+                    autoReload,
+                    reloadInterval,
+                    callback,
+                    loadHooks,
+                    keyCaseSensitive,
+                    selectorCaseSensitive);
+            return new MdcProvider(source, config);
         }
     }
 

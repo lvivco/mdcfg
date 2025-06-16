@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.utils.SourceUtils;
+import org.mdcfg.model.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,10 +32,11 @@ public class JsonSource extends FileSource {
     }
 
     @Override
-    Map<String, Map<String, String>> read(InputStream is, boolean isCaseSensitive) throws MdcException {
+    Map<String, Map<String, String>> read(InputStream is,
+                                          Config config) throws MdcException {
         try (is) {
             Map<String, Object> rawData = new ObjectMapper().readValue(is, TYPE);
-            Map<String, Object> flattened = SourceUtils.flatten(rawData, isCaseSensitive);
+            Map<String, Object> flattened = SourceUtils.flatten(rawData, config);
             return SourceUtils.collectProperties(flattened);
         } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);

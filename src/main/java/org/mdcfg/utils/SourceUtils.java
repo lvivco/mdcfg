@@ -5,6 +5,7 @@ package org.mdcfg.utils;
 
 import org.mdcfg.exceptions.MdcException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.mdcfg.model.Config;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,8 +37,9 @@ public final class SourceUtils {
      *  <li>{@code horsepower:model@bmw:drive@4WD: 500}</li>
      *  </ul>
      */
-    public static Map<String, Object> flatten(Map<String, Object> map, boolean isCaseSensitive) {
-        return flatten(map, "", isCaseSensitive);
+    public static Map<String, Object> flatten(Map<String, Object> map,
+                                             Config config) {
+        return flatten(map, "", config);
     }
 
     /** Get configuration grouped by properties */
@@ -85,18 +87,39 @@ public final class SourceUtils {
         }
         return source;
     }
-    private static Map<String, Object> flatten(Map<String, Object> map, String prefix, boolean isCaseSensitive) {
+    private static Map<String, Object> flatten(Map<String, Object> map,
+                                               String prefix,
+                                               Config config) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = isCaseSensitive ? entry.getKey() : entry.getKey().toLowerCase(Locale.ROOT);
+            String key = adjustCase(entry.getKey(), config);
             Object value = entry.getValue();
             if (value instanceof Map) {
-                result.putAll(flatten((Map<String, Object>) value,prefix + key + DIMENSION_SEPARATOR, isCaseSensitive));
+                result.putAll(flatten((Map<String, Object>) value,
+                        prefix + key + DIMENSION_SEPARATOR,
+                        config));
             } else {
                 result.put(prefix + key, value);
             }
         }
         return result;
+    }
+
+    private static String adjustCase(String source,
+                                     Config config) {
+        int idx = source.indexOf(SELECTOR_SEPARATOR);
+        if (idx >= 0) {
+            String dimension = source.substring(0, idx);
+            String value = source.substring(idx + 1);
+            if (!config.isKeySensitive()) {
+                dimension = dimension.toLowerCase(Locale.ROOT);
+            }
+            if (!config.isSelectorSensitive()) {
+                value = value.toLowerCase(Locale.ROOT);
+            }
+            return dimension + SELECTOR_SEPARATOR + value;
+        }
+        return config.isKeySensitive() ? source : source.toLowerCase(Locale.ROOT);
     }
 
     private static Map<String, String> getProperty(Map<String, Map<String, String>> data, String key){

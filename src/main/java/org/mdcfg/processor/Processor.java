@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
+import org.mdcfg.model.Config;
 import org.mdcfg.utils.SourceUtils;
 
 import java.nio.channels.Selector;
@@ -33,10 +34,10 @@ public class Processor {
     private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
     private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@\\w+(?::\\w+@\\w+)*):\\w+[^@]\\w+(?::|$)");
 
-    private final List<Hook> loadHooks;
+    private final Config config;
 
-    public Processor(List<Hook> loadHooks) {
-        this.loadHooks = loadHooks;
+    public Processor(Config config) {
+        this.config = config;
     }
 
     /**
@@ -53,7 +54,7 @@ public class Processor {
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
             if(PROPERTY.matcher(entry.getKey()).matches()) {
                 String propertyName = SUB_PROPERTY_PATTERN.matcher(entry.getKey()).replaceAll(SUB_PROPERTY_SEPARATOR);
-                List<Hook> appropriateHooks = loadHooks.stream()
+                List<Hook> appropriateHooks = config.getLoadHooks().stream()
                         .filter(hook -> hook.getPattern().matcher(propertyName).matches())
                         .collect(Collectors.toList());
                 Map<String, String> processedSelectors = processAliases(entry.getValue(), aliases);
@@ -199,7 +200,10 @@ public class Processor {
 
     /** Create alias helper */
     private Alias createAlias(Map.Entry<String, String> entry, boolean negative) {
-        Pair<String, String> from = SourceUtils.splitSelector(entry.getValue().toLowerCase(Locale.ROOT));
+        String fromSelector = config.isSelectorSensitive()
+                ? entry.getValue()
+                : entry.getValue().toLowerCase(Locale.ROOT);
+        Pair<String, String> from = SourceUtils.splitSelector(fromSelector);
         Pair<String, String> to = SourceUtils.splitSelector(entry.getKey());
         // if "from" dimension equals "to" dimension then replace only selectors
         if(from.getKey().equals(to.getKey())) {
@@ -211,7 +215,8 @@ public class Processor {
             String toValue = negative
                     ? entry.getKey().replace(SELECTOR_SEPARATOR, SELECTOR_SEPARATOR + NEGATIVE_SELECTOR)
                     : entry.getKey();
-            return new Alias(from.getKey(), compileAliasMatcher(fromValue.toLowerCase(Locale.ROOT)), toValue);
+            String matcherValue = config.isSelectorSensitive() ? fromValue : fromValue.toLowerCase(Locale.ROOT);
+            return new Alias(from.getKey(), compileAliasMatcher(matcherValue), toValue);
         }
     }
 

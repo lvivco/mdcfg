@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jasonclawson.jackson.dataformat.hocon.HoconFactory;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.utils.SourceUtils;
+import org.mdcfg.model.Config;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +41,13 @@ public class HoconSource extends FileSource {
     }
 
     @Override
-    Map<String, Map<String, String>> read(InputStream is, boolean isCaseSensitive) throws MdcException {
+    Map<String, Map<String, String>> read(InputStream is,
+                                          Config config) throws MdcException {
         try (is) {
             String inputString = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             String data = numberRows(inputString);
             Map<String, Object> rawData = new ObjectMapper(new HoconFactory()).readValue(data, TYPE);
-            Map<String, Object> flattened = SourceUtils.flatten(orderData(rawData), isCaseSensitive);
+            Map<String, Object> flattened = SourceUtils.flatten(orderData(rawData), config);
             return SourceUtils.collectProperties(flattened);
         } catch (Exception e) {
             throw new MdcException("Couldn't read input source", e);

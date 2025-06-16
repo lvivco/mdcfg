@@ -4,6 +4,7 @@
 package org.mdcfg.source;
 
 import org.mdcfg.exceptions.MdcException;
+import org.mdcfg.model.Config;
 import org.mdcfg.watchers.FileWatcher;
 import org.mdcfg.watchers.FolderWatcher;
 import org.mdcfg.watchers.Watcher;
@@ -34,9 +35,11 @@ public abstract class FileSource extends StreamSource {
     }
 
     @Override
-    public Map<String, Map<String, String>> read(Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor, boolean isCaseSensitive) throws MdcException {
+    public Map<String, Map<String, String>> read(
+            Function<Map<String, Map<String, String>>, Map<String, String>> includesExtractor,
+            Config config) throws MdcException {
         if(root == null){
-            return super.read(includesExtractor, isCaseSensitive);
+            return super.read(includesExtractor, config);
         }
 
         if(!root.exists()){
@@ -48,13 +51,13 @@ public abstract class FileSource extends StreamSource {
             if (files == null || files.length == 0) {
                 throw new MdcException("Folder doesn't contain any config file.");
             }
-            return readAndMerge(toStreamList(Arrays.asList(files)), new HashMap<>(), isCaseSensitive);
+            return readAndMerge(toStreamList(Arrays.asList(files)), new HashMap<>(), config);
         } else {
-            Map<String, Map<String, String>> main = read(toStream(root), isCaseSensitive);
+            Map<String, Map<String, String>> main = read(toStream(root), config);
             includes = includesExtractor.apply(main).values().stream()
                     .map(v -> root.getParentFile().toPath().resolve(Paths.get(v)).toFile())
                     .collect(Collectors.toList());
-            return readAndMerge(toStreamList(includes), main, isCaseSensitive);
+            return readAndMerge(toStreamList(includes), main, config);
         }
     }
 
