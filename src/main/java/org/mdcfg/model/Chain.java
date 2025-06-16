@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.mdcfg.provider.MdcContext;
 
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+
 
 /**
  *  Represents one config chain.
@@ -32,17 +32,34 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor
 public class Chain {
-    private Pattern plusPattern;
-    private Pattern minusPattern;
+    private final Map<String, Selector> selectors;
     @Getter private String value;
-    private List<Range> ranges;
 
-    /** Check whether chain matches context */
-    public boolean match(MdcContext context, String compare) {
-        boolean minusMatch = minusPattern != null && minusPattern.matcher(compare).matches();
-        boolean match = !minusMatch && plusPattern.matcher(compare).matches();
-        return match && !ranges.isEmpty()
-                ? ranges.stream().anyMatch(range -> range.matches(context))
-                : match;
+    /**
+     * Check whether chain matches context.
+     * <p>All positive selectors must match. The chain is discarded only when
+     * every negative selector matches.</p>
+     */
+    public boolean match(MdcContext context, boolean isCaseSensitive) {
+        boolean hasNegative = false;
+        boolean allNegativesMatch = true;
+
+        for (var entry : selectors.entrySet()) {
+            Selector selector = entry.getValue();
+
+            boolean raw = selector.rawMatch(context, isCaseSensitive);
+            if (selector.isNegative()) {
+                hasNegative = true;
+                if (!raw) {
+                    allNegativesMatch = false;
+                }
+            } else if (!raw) {
+                return false;
+            }
+        }
+
+        return !(hasNegative && allNegativesMatch);
     }
+
+
 }

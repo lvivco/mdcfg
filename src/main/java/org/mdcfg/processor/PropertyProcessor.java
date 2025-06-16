@@ -12,7 +12,6 @@ import org.mdcfg.model.*;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /** Parse data of one property and create {@link Property} object. */
 public class PropertyProcessor {
@@ -25,8 +24,6 @@ public class PropertyProcessor {
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN = Pattern.compile("!|,\\s*|\\.\\.");
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{[^}]+}");
-    private static final char UNIT_SEPARATOR = (char) 31;
-    private static final String LIST_EXPRESSION = "\\[(.*" + UNIT_SEPARATOR + ")*%s(" + UNIT_SEPARATOR + ".*)*\\]";
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
     private final List<Chain> chains = new ArrayList<>();
@@ -44,7 +41,7 @@ public class PropertyProcessor {
         createDimensions(map);
         createSelectorChains(map);
 
-        return new Property(name, dimensions, chains, listChains, hasReference, enabled);
+        return new Property(name, chains, listChains, hasReference, enabled);
     }
 
     /** Create {@code List} of {@link Dimension} objects with down to up order. */
@@ -137,44 +134,24 @@ public class PropertyProcessor {
      *  </ul>
      */
     private void createChain(Map<String, String> selectors, String value) {
-        StringBuilder plusBuilder = new StringBuilder();
-        StringBuilder minusBuilder = new StringBuilder();
-        boolean negativeUsed = false;
-        List<Range> ranges = new ArrayList<>();
+        Map<String, Selector> selectorMap = new LinkedHashMap<>();
         List<Dimension> nonEmptyListDimensions = new ArrayList<>();
-        for ( Dimension dimension : dimensions.values()) {
-            if(plusBuilder.length() > 0){
-                plusBuilder.append("\\.");
-            }
-            if(minusBuilder.length() > 0){
-                minusBuilder.append("\\.");
-            }
+
+        for (Dimension dimension : dimensions.values()) {
             String dimensionKey = dimension.getName() + (dimension.isList() ? LIST_SIGN : "");
             if(selectors.containsKey(dimensionKey)) {
                 String selector = selectors.get(dimensionKey);
                 boolean negative = selector.startsWith(NEGATIVE_SELECTOR);
                 if(negative) {
-                    negativeUsed = true;
-                    // remove "!" from selector
                     selector = selector.substring(NEGATIVE_SELECTOR.length());
-                    applySelector(selector, minusBuilder, ranges, dimension, true);
-                    plusBuilder.append(dimension.getName()).append("@.*");
-                } else {
-                    applySelector(selector, plusBuilder, ranges, dimension, false);
-                    minusBuilder.append(dimension.getName()).append("@.*");
                 }
+                Selector data = parseSelector(selector, dimension, negative);
+                selectorMap.put(dimension.getName(), data);
                 if(dimension.isList()) {
                     nonEmptyListDimensions.add(dimension);
                 }
-            } else {
-                // any
-                plusBuilder.append(dimension.getName()).append("@.*");
-                minusBuilder.append(dimension.getName()).append("@.*");
             }
         }
-        // end
-        plusBuilder.append("$");
-        minusBuilder.append("$");
 
         if (null != loadHooks) {
             for (var hook : loadHooks) {
@@ -186,38 +163,11 @@ public class PropertyProcessor {
             hasReference = REFERENCE_PATTERN.matcher(value).find();
         }
 
-        Pattern positivePattern = Pattern.compile(plusBuilder.toString());
-        Pattern negativePattern = negativeUsed ? Pattern.compile(minusBuilder.toString()) : null;
-        Chain chain = new Chain(positivePattern, negativePattern, value, ranges);
+        Chain chain = new Chain(selectorMap, value);
         chains.add(0, chain);
         addListableChains(nonEmptyListDimensions, chain);
     }
 
-    /** Append pattern for one selector and add {@link Range} objects if needed. */
-    private void applySelector(String selector, StringBuilder pattern, List<Range> ranges, Dimension dimension, boolean negative) {
-        if (selector.contains(RANGE_SIGN)) {
-            selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
-            for (String selectorPart : COMMA_PATTERN.split(selector)) {
-                ranges.add(createRange(selectorPart, dimension, negative));
-            }
-            selector = "-?(?:\\d|,|\\s|\\.)*";
-        } else if (LIST_SIGN_PATTERN.matcher(selector).find()) {
-            // selector lists
-            selector = LIST_SIGN_PATTERN.matcher(selector).replaceAll("");
-            selector = Arrays.stream(COMMA_PATTERN.split(selector))
-                    .map(Pattern::quote)
-                    .collect(Collectors.joining("|", "(", ")"));
-        } else {
-            selector = Pattern.quote(selector);
-        }
-
-        // dimension list
-        if (dimension.isList()) {
-            selector = String.format(LIST_EXPRESSION, selector);
-        }
-
-        pattern.append(dimension.getName()).append("@").append(selector);
-    }
 
     /** Return iterator in reverse order */
     private ListIterator<Map.Entry<String, String>> reverseIterator(Map<String, String> map) {
@@ -225,7 +175,7 @@ public class PropertyProcessor {
     }
 
     /** Create {@link Range} object from selector string. */
-    private Range createRange(String selectorPart, Dimension dimension, boolean negative) {
+    private Range createRange(String selectorPart, Dimension dimension) {
         int index = selectorPart.indexOf(RANGE_SIGN);
         String min = null;
         String max = null;
@@ -250,7 +200,31 @@ public class PropertyProcessor {
                 }
             }
         }
-        return new Range(dimension, minInclusive, min, maxInclusive, max, negative);
+        return new Range(dimension, minInclusive, min, maxInclusive, max);
+    }
+
+    /** Parse selector string into {@link Selector} */
+    private Selector parseSelector(String selector, Dimension dimension, boolean negative){
+        List<Range> ranges = new ArrayList<>();
+        if(selector.contains(RANGE_SIGN)) {
+            selector = selector.replace("[", "").replace("]", "").replace(" ", "");
+            for(String part : selector.split(",")) {
+                if(!part.isBlank()) {
+                    ranges.add(createRange(part, dimension));
+                }
+            }
+            return new Selector(dimension, negative, List.of(), ranges);
+        }
+
+        selector = selector.replace("[", "").replace("]", "");
+        List<String> values = new ArrayList<>();
+        for(String part : selector.split(",")) {
+            String val = part.trim();
+            if(!val.isEmpty()) {
+                values.add(val);
+            }
+        }
+        return new Selector(dimension, negative, values, ranges);
     }
 
 
