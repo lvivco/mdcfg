@@ -153,7 +153,7 @@ public class Processor {
     }
 
     /**
-     *  Replace aliases with their substitutors.
+     *  Replace aliases with their substitutes.
      *
      *  <p> For example alias and property:
      *  <pre>
