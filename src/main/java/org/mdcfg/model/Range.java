@@ -4,6 +4,7 @@
 package org.mdcfg.model;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.mdcfg.provider.MdcContext;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @EqualsAndHashCode
 @ToString
+@Getter
 public class Range {
     private final Dimension dimension;
     private double min = -Double.MAX_VALUE;

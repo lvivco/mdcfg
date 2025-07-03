@@ -10,7 +10,6 @@ import org.mdcfg.model.Property;
 import org.mdcfg.model.Config;
 import org.mdcfg.utils.SourceUtils;
 
-import java.nio.channels.Selector;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +27,9 @@ public class Processor {
     private static final String ENABLED_PREFIX = "enabled@:";
     private static final String SELECTOR_SEPARATOR= "@";
     private static final String NEGATIVE_SELECTOR= "!";
-    private static final Pattern ALIASES = Pattern.compile("aliases(?:\\:|$).*$");
-    private static final Pattern INCLUDES = Pattern.compile("includes(?:\\:|$).*$");
-    private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?:\\:|$)).)*$");
+    private static final Pattern ALIASES = Pattern.compile("aliases(?::|$).*$");
+    private static final Pattern INCLUDES = Pattern.compile("includes(?::|$).*$");
+    private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?::|$)).)*$");
     private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
     private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@\\w+(?::\\w+@\\w+)*):\\w+[^@]\\w+(?::|$)");
 
@@ -51,23 +50,42 @@ public class Processor {
         data = processHyperSelectors(data);
         Map<String, List<Alias>> aliases = getAliases(data);
         Map<String, Property> properties = new HashMap<>();
+        
         for (Map.Entry<String, Map<String, String>> entry : data.entrySet()) {
-            if(PROPERTY.matcher(entry.getKey()).matches()) {
-                String propertyName = SUB_PROPERTY_PATTERN.matcher(entry.getKey()).replaceAll(SUB_PROPERTY_SEPARATOR);
-                List<Hook> appropriateHooks = config.getLoadHooks().stream()
-                        .filter(hook -> hook.getPattern().matcher(propertyName).matches())
-                        .collect(Collectors.toList());
-                Map<String, String> processedSelectors = processAliases(entry.getValue(), aliases);
-                Map<String, String> enabledSelectors = filterByPrefix(processedSelectors, ENABLED_PREFIX);
-                Property enabledProperty = !enabledSelectors.isEmpty()
-                        ? new PropertyProcessor(propertyName, null).getProperty(enabledSelectors, null)
-                        : null;
-                Property property = new PropertyProcessor(propertyName, appropriateHooks)
-                        .getProperty(processedSelectors, enabledProperty);
+            if (PROPERTY.matcher(entry.getKey()).matches()) {
+                Property property = processProperty(entry, aliases);
+                String propertyName = extractPropertyName(entry.getKey());
                 properties.put(propertyName, property);
             }
         }
         return properties;
+    }
+    
+    private Property processProperty(Map.Entry<String, Map<String, String>> entry, Map<String, List<Alias>> aliases) throws MdcException {
+        String propertyName = extractPropertyName(entry.getKey());
+        List<Hook> appropriateHooks = findApplicableHooks(propertyName);
+        Map<String, String> processedSelectors = processAliases(entry.getValue(), aliases);
+        Map<String, String> enabledSelectors = filterByPrefix(processedSelectors, ENABLED_PREFIX);
+        
+        Property enabledProperty = createEnabledProperty(propertyName, enabledSelectors);
+        return new PropertyProcessor(propertyName, appropriateHooks)
+                .getProperty(processedSelectors, enabledProperty);
+    }
+    
+    private String extractPropertyName(String key) {
+        return SUB_PROPERTY_PATTERN.matcher(key).replaceAll(SUB_PROPERTY_SEPARATOR);
+    }
+    
+    private List<Hook> findApplicableHooks(String propertyName) {
+        return config.getLoadHooks().stream()
+                .filter(hook -> hook.getPattern().matcher(propertyName).matches())
+                .collect(Collectors.toList());
+    }
+    
+    private Property createEnabledProperty(String propertyName, Map<String, String> enabledSelectors) throws MdcException {
+        return enabledSelectors.isEmpty() 
+                ? null 
+                : new PropertyProcessor(propertyName, null).getProperty(enabledSelectors, null);
     }
 
     /** Parse config to find additional config sources configured in {@code includes} tag. */
@@ -109,11 +127,8 @@ public class Processor {
     }
 
     /** Put value to sub map creating it if absent */
-    private void putSafe(Map<String, Map<String, String>> map, String propertyName, String key, String value ) {
-        if(!map.containsKey(propertyName)){
-            map.put(propertyName, new LinkedHashMap<>());
-        }
-        map.get(propertyName).put(key, value);
+    private void putSafe(Map<String, Map<String, String>> map, String propertyName, String key, String value) {
+        map.computeIfAbsent(propertyName, k -> new LinkedHashMap<>()).put(key, value);
     }
 
     /**
@@ -123,16 +138,17 @@ public class Processor {
      * @return new filtered map
      */
     private Map<String, String> filterByPrefix(Map<String, String> selectors, String prefix) {
-        Map<String, String> result = new LinkedHashMap<>();
-        List<String> toRemove = new ArrayList<>();
-        for (Map.Entry<String, String> selectorEntry : selectors.entrySet()) {
-          if(selectorEntry.getKey().startsWith(prefix)){
-              toRemove.add(selectorEntry.getKey());
-              result.put(selectorEntry.getKey().substring(prefix.length()), selectorEntry.getValue());
-          }
-        }
-
-        toRemove.forEach(selectors::remove);
+        Map<String, String> result = selectors.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(prefix))
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().substring(prefix.length()),
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+        
+        // Remove entries that were filtered
+        result.keySet().forEach(key -> selectors.remove(prefix + key));
         return result;
     }
 

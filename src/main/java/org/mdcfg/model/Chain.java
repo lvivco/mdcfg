@@ -5,6 +5,7 @@ package org.mdcfg.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.mdcfg.provider.MdcContext;
 
 import java.util.Map;
@@ -31,9 +32,11 @@ import java.util.Map;
  *  </ul>
  */
 @AllArgsConstructor
+@ToString
+@Getter
 public class Chain {
     private final Map<String, Selector> selectors;
-    @Getter private String value;
+    private String value;
 
     /**
      * Check whether chain matches context.

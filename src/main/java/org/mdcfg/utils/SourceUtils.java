@@ -7,7 +7,6 @@ import org.mdcfg.exceptions.MdcException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mdcfg.model.Config;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -87,6 +86,7 @@ public final class SourceUtils {
         }
         return source;
     }
+    @SuppressWarnings("unchecked")
     private static Map<String, Object> flatten(Map<String, Object> map,
                                                String prefix,
                                                Config config) {
@@ -105,29 +105,26 @@ public final class SourceUtils {
         return result;
     }
 
-    private static String adjustCase(String source,
-                                     Config config) {
-        int idx = source.indexOf(SELECTOR_SEPARATOR);
-        if (idx >= 0) {
-            String dimension = source.substring(0, idx);
-            String value = source.substring(idx + 1);
-            if (!config.isKeySensitive()) {
-                dimension = dimension.toLowerCase(Locale.ROOT);
-            }
-            if (!config.isSelectorSensitive()) {
-                value = value.toLowerCase(Locale.ROOT);
-            }
-            return dimension + SELECTOR_SEPARATOR + value;
+    private static String adjustCase(String source, Config config) {
+        int selectorIndex = source.indexOf(SELECTOR_SEPARATOR);
+        if (selectorIndex < 0) {
+            return config.isKeySensitive() ? source : source.toLowerCase(Locale.ROOT);
         }
-        return config.isKeySensitive() ? source : source.toLowerCase(Locale.ROOT);
+        
+        String dimension = source.substring(0, selectorIndex);
+        String value = source.substring(selectorIndex + 1);
+        
+        if (!config.isKeySensitive()) {
+            dimension = dimension.toLowerCase(Locale.ROOT);
+        }
+        if (!config.isSelectorSensitive()) {
+            value = value.toLowerCase(Locale.ROOT);
+        }
+        
+        return dimension + SELECTOR_SEPARATOR + value;
     }
 
-    private static Map<String, String> getProperty(Map<String, Map<String, String>> data, String key){
-        if(data.containsKey(key)){
-            return data.get(key);
-        }
-        Map<String, String> val = new LinkedHashMap<>();
-        data.put(key, val);
-        return val;
+    private static Map<String, String> getProperty(Map<String, Map<String, String>> data, String key) {
+        return data.computeIfAbsent(key, k -> new LinkedHashMap<>());
     }
 }

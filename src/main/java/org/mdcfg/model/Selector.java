@@ -4,6 +4,8 @@
 package org.mdcfg.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
@@ -15,6 +17,8 @@ import java.util.List;
  * whether it is positive or negative and can match a context value.
  */
 @AllArgsConstructor
+@Getter
+@ToString
 public class Selector {
     private final Dimension dimension;
     private final boolean negative;
@@ -61,7 +65,5 @@ public class Selector {
         return false;
     }
 
-    public boolean isNegative() {
-        return negative;
-    }
+
 }
