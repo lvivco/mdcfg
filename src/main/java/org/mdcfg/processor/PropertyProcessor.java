@@ -12,6 +12,7 @@ import org.mdcfg.model.*;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** Parse data of one property and create {@link Property} object. */
 public class PropertyProcessor {
@@ -22,7 +23,6 @@ public class PropertyProcessor {
     private static final String NEGATIVE_SELECTOR= "!";
     private static final Pattern LIST_SIGN_PATTERN = Pattern.compile("[\\s\\[\\]]");
     private static final Pattern NUMERIC_SPLITERATOR_PATTERN = Pattern.compile("!|,\\s*|\\.\\.");
-    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{[^}]+}");
     private final String name;
     private final Map<String, Dimension> dimensions = new HashMap<>();
@@ -204,37 +204,27 @@ public class PropertyProcessor {
     }
 
     /** Parse selector string into {@link Selector} */
-    private Selector parseSelector(String selector, Dimension dimension, boolean negative){
-        List<Range> ranges = new ArrayList<>();
-        if(selector.contains(RANGE_SIGN)) {
-            selector = selector.replace("[", "").replace("]", "").replace(" ", "");
-            for(String part : selector.split(",")) {
-                if(!part.isBlank()) {
-                    ranges.add(createRange(part, dimension));
-                }
-            }
+    private Selector parseSelector(String selector, Dimension dimension, boolean negative) {
+        selector = selector.replace("[", "").replace("]", "");
+        
+        if (selector.contains(RANGE_SIGN)) {
+            List<Range> ranges = Arrays.stream(selector.replace(" ", "").split(","))
+                    .filter(part -> !part.isBlank())
+                    .map(part -> createRange(part, dimension))
+                    .collect(Collectors.toList());
             return new Selector(dimension, negative, List.of(), ranges);
         }
-
-        selector = selector.replace("[", "").replace("]", "");
-        List<String> values = new ArrayList<>();
-        for(String part : selector.split(",")) {
-            String val = part.trim();
-            if(!val.isEmpty()) {
-                values.add(val);
-            }
-        }
-        return new Selector(dimension, negative, values, ranges);
+        
+        List<String> values = Arrays.stream(selector.split(","))
+                .map(String::trim)
+                .filter(val -> !val.isEmpty())
+                .collect(Collectors.toList());
+        return new Selector(dimension, negative, values, List.of());
     }
 
 
     /** Store chain in map where key is list dimension name and value is list of appropriate chains */
     private void addListableChains(List<Dimension> dimensions, Chain chain) {
-        for (Dimension isIterableDimension : dimensions) {
-            if(!listChains.containsKey(isIterableDimension.getName())) {
-                listChains.put(isIterableDimension.getName(), new ArrayList<>());
-            }
-            listChains.get(isIterableDimension.getName()).add(0, chain);
-        }
+        dimensions.forEach(dimension -> listChains.computeIfAbsent(dimension.getName(), k -> new ArrayList<>()).add(0, chain));
     }
 }

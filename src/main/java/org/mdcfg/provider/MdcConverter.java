@@ -5,6 +5,8 @@ package org.mdcfg.provider;
 
 import org.mdcfg.exceptions.MdcException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -19,31 +21,32 @@ public class MdcConverter {
     public static final Function<String, Float> TO_FLOAT = Float::parseFloat;
     public static final Function<String, Double> TO_DOUBLE = Double::parseDouble;
 
+    private static final Map<String, Function<String, ?>> CONVERTERS;
+    
+    static {
+        Map<String, Function<String, ?>> map = new HashMap<>();
+        map.put("java.lang.String", TO_STRING);
+        map.put("boolean", TO_BOOLEAN);
+        map.put("java.lang.Boolean", TO_BOOLEAN);
+        map.put("short", TO_SHORT);
+        map.put("java.lang.Short", TO_SHORT);
+        map.put("int", TO_INTEGER);
+        map.put("java.lang.Integer", TO_INTEGER);
+        map.put("long", TO_LONG);
+        map.put("java.lang.Long", TO_LONG);
+        map.put("float", TO_FLOAT);
+        map.put("java.lang.Float", TO_FLOAT);
+        map.put("double", TO_DOUBLE);
+        map.put("java.lang.Double", TO_DOUBLE);
+        CONVERTERS = Map.copyOf(map);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T convertScalar(Class<T> clas, String value) throws MdcException {
-        switch(clas.getCanonicalName()) {
-            case "java.lang.String":
-                return (T)TO_STRING.apply(value);
-            case "boolean":
-            case "java.lang.Boolean":
-                return (T)TO_BOOLEAN.apply(value);
-            case "short":
-            case "java.lang.Short":
-                return (T)TO_SHORT.apply(value);
-            case "int":
-            case "java.lang.Integer":
-                return (T)TO_INTEGER.apply(value);
-            case "long":
-            case "java.lang.Long":
-                return (T)TO_LONG.apply(value);
-            case "float":
-            case "java.lang.Float":
-                return (T)TO_FLOAT.apply(value);
-            case "double":
-            case "java.lang.Double":
-                return (T)TO_DOUBLE.apply(value);
-            default:
-                throw new MdcException(String.format("Provided class: %s is not scalar or supported", clas.getCanonicalName()));
+        Function<String, ?> converter = CONVERTERS.get(clas.getCanonicalName());
+        if (converter == null) {
+            throw new MdcException(String.format("Provided class: %s is not scalar or supported", clas.getCanonicalName()));
         }
+        return (T) converter.apply(value);
     }
 }

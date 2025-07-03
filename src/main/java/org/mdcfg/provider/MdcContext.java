@@ -3,6 +3,8 @@
  */
 package org.mdcfg.provider;
 
+import lombok.ToString;
+
 import java.util.HashMap;
 
 /**
@@ -14,5 +16,6 @@ import java.util.HashMap;
  * </pre>
  * Selector "model" should be passed in context as key and "bmw" as value.
  */
+@ToString(callSuper = true)
 public class MdcContext extends HashMap<String, Object>{
 }
