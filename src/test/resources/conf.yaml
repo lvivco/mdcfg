@@ -27,7 +27,7 @@ headlights:
   xenon:
     color: 3300
     intensity: 1100
-  model@bmw:
+  model@[bmw, fiat]:
     led:
       color: 4500
       intensity:
