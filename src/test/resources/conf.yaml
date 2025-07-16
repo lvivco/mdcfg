@@ -28,6 +28,10 @@ headlights:
   xenon:
     color: 3300
     intensity: 1100
+  add-in*@panoramic-roof:
+    laser:
+      color: 5900
+      intensity: 5800
   line@!rav4:
     drive@!4WD:
       led:

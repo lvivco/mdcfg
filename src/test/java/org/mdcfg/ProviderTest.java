@@ -236,6 +236,21 @@ public class ProviderTest {
 
         headlights = provider.getCompoundMap(
                 TestContextBuilder.init()
+                        .addIn(List.of("panoramic-roof"))
+                        .model("toyota")
+                        .category("crossover")
+                        .drive("4WD")
+                        .build(),"headlights");
+        assertEquals(3, headlights.size());
+        assertEquals("3200", ((Map<String, Object>)headlights.get("halogen")).get("color"));
+        assertEquals("1000", ((Map<String, Object>)headlights.get("halogen")).get("intensity"));
+        assertEquals("3300", ((Map<String, Object>)headlights.get("xenon")).get("color"));
+        assertEquals("1100", ((Map<String, Object>)headlights.get("xenon")).get("intensity"));
+        assertEquals("5900", ((Map<String, Object>)headlights.get("laser")).get("color"));
+        assertEquals("5800", ((Map<String, Object>)headlights.get("laser")).get("intensity"));
+
+        headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
                         .model("toyota")
                         .category("crossover")
                         .drive("4WD")
