@@ -33,7 +33,6 @@ headlights:
       led:
         color: 2200
         intensity: 1000
-  #add-in*@panoramic-roof:
   model@[bmw, fiat]:
     led:
       color: 4500
