@@ -238,6 +238,7 @@ public class ProviderTest {
                 TestContextBuilder.init()
                         .model("toyota")
                         .category("crossover")
+                        .drive("4WD")
                         .build(),"headlights");
         assertEquals(2, headlights.size());
         assertEquals("3200", ((Map<String, Object>)headlights.get("halogen")).get("color"));

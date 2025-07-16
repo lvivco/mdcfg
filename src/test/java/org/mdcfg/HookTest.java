@@ -30,7 +30,7 @@ public class HookTest {
                 })
                 .build();
 
-        assertEquals(55, count.get());
+        assertEquals(57, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
@@ -71,7 +71,7 @@ public class HookTest {
                 })
                 .build();
 
-        assertEquals(12, count.get());
+        assertEquals(13, count.get());
 
         MdcContext context = new MdcContext();
         context.put("model", "bmw");
