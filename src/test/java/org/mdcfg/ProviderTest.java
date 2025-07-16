@@ -159,8 +159,16 @@ public class ProviderTest {
                 provider.getInteger(TestContextBuilder.init().drive("4WD").build(), "engine.block.cylinder-count")
         );
         assertEquals(
-                Integer.valueOf(4),
+                Integer.valueOf(6),
                 provider.getInteger(TestContextBuilder.init().drive("2WD").build(), "engine.block.cylinder-count")
+        );
+        assertEquals(
+                Integer.valueOf(6),
+                provider.getInteger(TestContextBuilder.init().model("fiat").build(), "engine.block.cylinder-count")
+        );
+        assertEquals(
+                Integer.valueOf(4),
+                provider.getInteger(TestContextBuilder.init().drive("2WD").model("fiat").build(), "engine.block.cylinder-count")
         );
         assertEquals(
                 "[2WD]",
@@ -216,6 +224,20 @@ public class ProviderTest {
         Map<String, Object> headlights = provider.getCompoundMap(
                 TestContextBuilder.init()
                         .model("toyota")
+                        .drive("2WD")
+                        .build(),"headlights");
+        assertEquals(3, headlights.size());
+        assertEquals("3200", ((Map<String, Object>)headlights.get("halogen")).get("color"));
+        assertEquals("1000", ((Map<String, Object>)headlights.get("halogen")).get("intensity"));
+        assertEquals("3300", ((Map<String, Object>)headlights.get("xenon")).get("color"));
+        assertEquals("1100", ((Map<String, Object>)headlights.get("xenon")).get("intensity"));
+        assertEquals("2200", ((Map<String, Object>)headlights.get("led")).get("color"));
+        assertEquals("1000", ((Map<String, Object>)headlights.get("led")).get("intensity"));
+
+        headlights = provider.getCompoundMap(
+                TestContextBuilder.init()
+                        .model("toyota")
+                        .category("crossover")
                         .build(),"headlights");
         assertEquals(2, headlights.size());
         assertEquals("3200", ((Map<String, Object>)headlights.get("halogen")).get("color"));
