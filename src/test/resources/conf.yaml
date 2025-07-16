@@ -18,7 +18,8 @@ engine:
         line@kuga: false
     cylinder-count:
       any@: 4
-      drive@!2WD: 6
+      drive@!2WD:
+        model@!fiat: 6
 
 headlights:
   halogen:
@@ -27,6 +28,11 @@ headlights:
   xenon:
     color: 3300
     intensity: 1100
+  line@!rav4:
+    drive@!4WD:
+      led:
+        color: 2200
+        intensity: 1000
   model@[bmw, fiat]:
     led:
       color: 4500

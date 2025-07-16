@@ -31,7 +31,7 @@ public class Processor {
     private static final Pattern INCLUDES = Pattern.compile("includes(?::|$).*$");
     private static final Pattern PROPERTY = Pattern.compile("^(?:(?!(?:aliases|includes)(?::|$)).)*$");
     private static final String ALIAS_REPLACER = "(?:\\[|^|\\s|,|@|!)(%s)(?:,|\\s|]|$)";
-    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@[^:]+(?::\\w+@[^:]+)*):[^@]+(?::|$)");
+    private static final Pattern HYPER_SELECTOR_PATTERN = Pattern.compile("(^\\w+@!?[^:]+(?::\\w+@!?[^:]+)*):[^@:]+(?::|$)");
 
     private final Config config;
 
