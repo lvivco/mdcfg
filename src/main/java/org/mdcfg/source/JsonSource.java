@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2025 LvivCoffeeCoders team.
+ *   Copyright (C) 2026 LvivCoffeeCoders team.
  */
 package org.mdcfg.source;
 
@@ -10,8 +10,6 @@ import org.mdcfg.utils.SourceUtils;
 import org.mdcfg.model.Config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 

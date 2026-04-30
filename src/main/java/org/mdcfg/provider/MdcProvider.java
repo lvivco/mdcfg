@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2025 LvivCoffeeCoders team.
+ *   Copyright (C) 2026 LvivCoffeeCoders team.
  */
 package org.mdcfg.provider;
 
@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mdcfg.builder.MdcCallback;
 import org.mdcfg.exceptions.MdcException;
-import org.mdcfg.model.Hook;
 import org.mdcfg.model.Property;
 import org.mdcfg.model.Config;
 import org.mdcfg.processor.Processor;

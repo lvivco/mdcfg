@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2025 LvivCoffeeCoders team.
+ *   Copyright (C) 2026 LvivCoffeeCoders team.
  */
 package org.mdcfg.model;
 
@@ -8,7 +8,6 @@ import lombok.Getter;
 import org.mdcfg.exceptions.MdcException;
 import org.mdcfg.provider.MdcContext;
 import org.mdcfg.utils.ProviderUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 

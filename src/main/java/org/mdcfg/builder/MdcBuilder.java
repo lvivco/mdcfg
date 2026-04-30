@@ -1,5 +1,5 @@
 /**
- *   Copyright (C) 2025 LvivCoffeeCoders team.
+ *   Copyright (C) 2026 LvivCoffeeCoders team.
  */
 package org.mdcfg.builder;
 
@@ -90,7 +90,7 @@ public class MdcBuilder {
         /**
          * Set up auto reload if source changed with default interval 1 sec.
          *
-         * @param reloadInterval
+         * @param reloadInterval in millis
          * @param callback Call back on reload with {@code onSuccess} and {@code onFailure} handlers. See {@link MdcCallback}.
          *                 {@code onSuccess} will take count of properties as a parameter.
          *                 {@code onFailure} will take exception as a parameter.
